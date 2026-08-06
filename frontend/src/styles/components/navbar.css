@@ -1,0 +1,60 @@
+/*
+|--------------------------------------------------------------------------
+| Navbar
+|--------------------------------------------------------------------------
+|
+| Shared navigation bar used across the application.
+|
+*/
+
+.navbar {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: var(--space-md) var(--space-xl);
+
+  background-color: var(--color-surface);
+
+  border-bottom: 1px solid var(--color-border);
+
+  box-shadow: var(--shadow-sm);
+
+}
+
+.navbar__brand {
+
+  font-size: var(--text-2xl);
+
+  font-weight: var(--font-bold);
+
+  color: var(--color-primary);
+
+}
+
+.navbar__links {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: var(--space-lg);
+
+}
+
+.navbar__links a {
+
+  color: var(--color-text-secondary);
+
+  transition: color 0.2s ease;
+
+}
+
+.navbar__links a:hover {
+
+  color: var(--color-primary);
+
+}

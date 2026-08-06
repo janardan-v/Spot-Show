@@ -1,0 +1,21 @@
+/*
+|--------------------------------------------------------------------------
+| Container
+|--------------------------------------------------------------------------
+|
+| Shared layout container.
+| Centers content and limits maximum width.
+|
+*/
+
+.container {
+
+  width: 100%;
+
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+  padding-inline: var(--space-lg);
+
+}

@@ -1,0 +1,46 @@
+/*
+|--------------------------------------------------------------------------
+| Typography Tokens
+|--------------------------------------------------------------------------
+|
+| Defines typography variables used throughout the application.
+| Components should never use hardcoded font values.
+|
+*/
+
+:root {
+
+  /* ===== Font Family ===== */
+
+  --font-family-base:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  /* ===== Font Sizes ===== */
+
+  --text-xs: 0.75rem;      /* 12px */
+  --text-sm: 0.875rem;     /* 14px */
+  --text-md: 1rem;         /* 16px */
+  --text-lg: 1.125rem;     /* 18px */
+  --text-xl: 1.25rem;      /* 20px */
+  --text-2xl: 1.5rem;      /* 24px */
+  --text-3xl: 2rem;        /* 32px */
+
+  /* ===== Font Weights ===== */
+
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* ===== Line Heights ===== */
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.8;
+}

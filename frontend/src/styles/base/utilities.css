@@ -1,0 +1,59 @@
+/*
+|--------------------------------------------------------------------------
+| Utility Classes
+|--------------------------------------------------------------------------
+|
+| Small reusable helper classes.
+| Keep this file minimal. Only add utilities that are used repeatedly.
+|
+*/
+
+/* Display */
+
+.flex {
+  display: flex;
+}
+
+.grid {
+  display: grid;
+}
+
+.block {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Alignment */
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+/* Width */
+
+.w-full {
+  width: 100%;
+}
+
+/* Text */
+
+.text-center {
+  text-align: center;
+}
+
+/* Cursor */
+
+.cursor-pointer {
+  cursor: pointer;
+}

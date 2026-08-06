@@ -1,0 +1,30 @@
+/*
+|--------------------------------------------------------------------------
+| Shadow Tokens
+|--------------------------------------------------------------------------
+|
+| Defines elevation levels used throughout the application.
+| Components should never use hardcoded box-shadow values.
+|
+*/
+
+:root {
+
+  /* ===== Shadow Levels ===== */
+
+  --shadow-xs:
+    0 1px 2px rgba(0, 0, 0, 0.05);
+
+  --shadow-sm:
+    0 2px 4px rgba(0, 0, 0, 0.08);
+
+  --shadow-md:
+    0 6px 12px rgba(0, 0, 0, 0.12);
+
+  --shadow-lg:
+    0 12px 24px rgba(0, 0, 0, 0.18);
+
+  --shadow-xl:
+    0 20px 40px rgba(0, 0, 0, 0.24);
+
+}
