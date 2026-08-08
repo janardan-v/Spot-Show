@@ -2,8 +2,8 @@ import "./styles/main.css";
 
 import { renderCurrentRoute } from "./router";
 
-function initializeSpotShow() {
-  renderCurrentRoute();
+async function initializeSpotShow() {
+  await renderCurrentRoute();
 }
 
 initializeSpotShow();

@@ -1,0 +1,80 @@
+/*
+|--------------------------------------------------------------------------
+| Movie Card
+|--------------------------------------------------------------------------
+|
+| Card used to display an individual movie/show.
+|
+*/
+
+.movie-card {
+  overflow: hidden;
+
+  background-color: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+
+  border-radius: var(--radius-lg);
+
+  box-shadow: var(--shadow-sm);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.movie-card:hover {
+  transform: translateY(-4px);
+
+  box-shadow: var(--shadow-lg);
+}
+
+.movie-card__poster {
+  width: 100%;
+
+  aspect-ratio: 2 / 3;
+
+  object-fit: cover;
+}
+
+.movie-card__content {
+  padding: var(--space-lg);
+}
+
+.movie-card__title {
+  margin-bottom: var(--space-sm);
+
+  font-size: var(--text-lg);
+
+  font-weight: var(--font-semibold);
+
+  color: var(--color-text-primary);
+}
+
+.movie-card__date {
+  margin-bottom: var(--space-lg);
+
+  font-size: var(--text-sm);
+
+  color: var(--color-text-muted);
+}
+
+.movie-card__button {
+  width: 100%;
+
+  padding: var(--space-sm) var(--space-md);
+
+  border-radius: var(--radius-md);
+
+  background-color: var(--color-primary);
+
+  color: var(--color-white);
+
+  font-weight: var(--font-semibold);
+
+  transition: background-color 0.2s ease;
+}
+
+.movie-card__button:hover {
+  background-color: var(--color-primary-hover);
+}

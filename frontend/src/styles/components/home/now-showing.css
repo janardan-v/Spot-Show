@@ -1,0 +1,30 @@
+/*
+|--------------------------------------------------------------------------
+| Now Showing
+|--------------------------------------------------------------------------
+|
+| Layout styles for the Now Showing section.
+|
+*/
+
+.now-showing {
+  padding-block: var(--space-3xl);
+}
+
+.now-showing__title {
+  margin-bottom: var(--space-xl);
+
+  font-size: var(--text-2xl);
+
+  font-weight: var(--font-bold);
+
+  color: var(--color-text-primary);
+}
+
+.now-showing__grid {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: var(--space-lg);
+}

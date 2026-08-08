@@ -29,3 +29,6 @@
 
 @import "./components/navbar.css";
 @import "./components/home/hero.css";
+@import "./components/home/movie-card.css";
+@import "./components/home/now-showing.css";
+@import "./components/booking/seat-grid.css";

@@ -4,17 +4,39 @@ import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { Booking } from "./pages/Booking";
+import { Show } from "./pages/Show";
 
-export function renderCurrentRoute() {
-  const app = document.querySelector<HTMLDivElement>("#app");
+import { runCleanup } from "./utils/lifecycle";
+
+export function navigate(path: string) {
+  window.history.pushState({}, "", path);
+
+  renderCurrentRoute();
+}
+
+window.addEventListener("popstate", () => {
+  renderCurrentRoute();
+});
+
+export async function renderCurrentRoute() {
+  const app = document.querySelector("#app");
 
   if (!app) {
     throw new Error("Root element '#app' not found.");
   }
 
-  switch (window.location.pathname) {
+  runCleanup();
+
+  const pathname = window.location.pathname;
+
+  if (pathname.startsWith(`${ROUTES.SHOW}/`)) {
+    app.innerHTML = await Show();
+    return;
+  }
+
+  switch (pathname) {
     case ROUTES.HOME:
-      app.innerHTML = Home();
+      app.innerHTML = await Home();
       break;
 
     case ROUTES.LOGIN:

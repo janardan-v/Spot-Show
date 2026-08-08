@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db, pool } from "../../db";
-import { seatsTable } from "../../db/schema";
+import { moviesTable, seatsTable } from "../../db/schema";
 import type { getSeatData, bookTicketData } from "./book.model";
 import ApiError from "../../common/utils/apiError";
 import ApiResponse from "../../common/utils/apiResponse";
@@ -21,6 +21,23 @@ export class bookingService {
     }
     return ApiResponse.success("Fetched seats successfully", {
       showSeatResult,
+    });
+  }
+  static async getShows() {
+    const showResult = await db
+      .select({
+        id: moviesTable.id,
+        movieName: moviesTable.movieName,
+        totalSeats: moviesTable.totalSeats,
+        showDate: moviesTable.showDate,
+      })
+      .from(moviesTable)
+
+    if (!showResult) {
+      throw ApiError.internalServerError("Error while fetching shows");
+    }
+    return ApiResponse.success("Fetched shows successfully", {
+      showResult,
     });
   }
 

@@ -16,9 +16,14 @@ export class bookingController {
       userId,
     });
 
-    if(!result.success){
-      throw ApiError.internalServerError("Server went while booking your sear")
+    if (!result.success) {
+      throw ApiError.internalServerError("Server went while booking your sear");
     }
+
+    return res.status(result.statusCode).json(result.data);
+  }
+  static async getShows(req: Request, res: Response) {
+    const result = await bookingService.getShows();
 
     return res.status(result.statusCode).json(result.data);
   }
