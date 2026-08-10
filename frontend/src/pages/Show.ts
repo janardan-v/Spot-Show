@@ -5,11 +5,24 @@ import { BookingSummary } from "../components/booking/BookingSummary";
 import { registerCleanup } from "../utils/lifecycle";
 import { navigate } from "../router";
 import { ROUTES } from "../types/routes";
+import { moviePosters } from "../utils/moviePosters";
+import { getShows } from "../api/movie.api";
+import { isAuthenticated } from "../store/auth.store";
 
 export async function Show() {
   const showId = window.location.pathname.split("/")[2];
 
-  const seats = await fetchSeats(showId);
+  const [{ showResult }, seats] = await Promise.all([
+    getShows(),
+    fetchSeats(showId),
+  ]);
+
+  const show = showResult.find((show) => show.id === showId);
+
+  if (!show) {
+    throw new Error("Show not found");
+  }
+  const poster = moviePosters[show.movieName] ?? moviePosters.default;
 
   setTimeout(() => {
     const seatGrid = document.querySelector<HTMLDivElement>(".seat-grid");
@@ -19,6 +32,7 @@ export async function Show() {
     }
 
     seatGrid.addEventListener("click", (event) => {
+
       const target = event.target as HTMLElement;
 
       const seatButton = target.closest<HTMLButtonElement>(".seat");
@@ -32,6 +46,11 @@ export async function Show() {
       if (!seatId) {
         return;
       }
+
+      console.log("SELECTED SEAT:", {
+        seatId,
+        label: seatButton.textContent,
+      });
 
       toggleSeat(seatId);
 
@@ -68,7 +87,44 @@ export async function Show() {
           return;
         }
 
-        console.log("Proceed to booking");
+        if (!isAuthenticated()) {
+          const modal =
+            document.querySelector<HTMLDivElement>("[data-login-modal]");
+
+          if (!modal) {
+            return;
+          }
+
+          modal.classList.add("login-modal--visible");
+          return;
+        }
+
+        navigate(`${ROUTES.BOOKING}?showId=${showId}`);
+      });
+    }
+
+    const loginModal =
+      document.querySelector<HTMLDivElement>("[data-login-modal]");
+
+    const closeLoginModal = document.querySelector<HTMLButtonElement>(
+      '[data-action="close-login-modal"]',
+    );
+
+    const loginFromModal = document.querySelector<HTMLButtonElement>(
+      '[data-action="login-from-modal"]',
+    );
+
+    if (loginModal && closeLoginModal && loginFromModal) {
+      closeLoginModal.addEventListener("click", () => {
+        loginModal.classList.remove("login-modal--visible");
+      });
+
+      loginFromModal.addEventListener("click", () => {
+        navigate(
+          `${ROUTES.LOGIN}?returnTo=${encodeURIComponent(
+            `${ROUTES.BOOKING}?showId=${showId}`,
+          )}`,
+        );
       });
     }
   });
@@ -76,17 +132,74 @@ export async function Show() {
   return `
     <main class="container">
 
-      <h1>Show Details</h1>
+      <section class="show-header">
 
-      <p>Show ID: ${showId}</p>
+      <img
+        class="show-header__poster"
+        src="${poster}"
+        alt="${show.movieName}"
+      />
+
+      <div class="show-header__info">
+
+      <h1 class="show-header__title">
+      ${show.movieName}
+      </h1>
+
+      <p class="show-header__time">
+      ${new Date(show.showDate).toLocaleString()}
+      </p>
+
+      </div>
 
       <p>Total Seats: ${seats.length}</p>
+    </section>
 
-      ${SeatGrid(seats)}
+    <h2 class="show-seats__title">
+        Select Your Seats
+    </h2>
 
-      <div class="booking-summary-container">
-        ${BookingSummary(seats)}
+      
+
+    ${SeatGrid(seats)}
+
+    <div class="booking-summary-container">
+      ${BookingSummary(seats)}
+    </div>
+
+     <div
+    class="login-modal"
+    data-login-modal
+  >
+    <div class="login-modal__content">
+
+      <h2>Login Required</h2>
+
+      <p>
+        You are not logged in. Please login to continue with your booking.
+      </p>
+
+      <div class="login-modal__actions">
+
+        <button
+          type="button"
+          data-action="close-login-modal"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          data-action="login-from-modal"
+        >
+          Login
+        </button>
+
+        </div>
+
+        </div>
       </div>
+
 
     </main>
   `;

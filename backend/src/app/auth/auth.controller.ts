@@ -49,4 +49,15 @@ export class userController {
 
     return res.status(result.statusCode).json(result.data);
   }
+  static async refresh(req: Request, res: Response) {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    throw ApiError.unauthorized("Refresh token is required");
+  }
+
+  const result = await userServices.refresh(refreshToken);
+
+  return res.status(result.statusCode).json(result.data);
+}
 }

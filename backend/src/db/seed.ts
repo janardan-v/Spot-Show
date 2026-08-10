@@ -3,25 +3,44 @@ import { db } from "./index";
 import { moviesTable, seatsTable } from "./schema";
 
 async function seed() {
-  const [movie] = await db
-    .insert(moviesTable)
-    .values({
+  const movies = [
+    {
       movieName: "Spider-Man: Brand New Day",
       totalSeats: 100,
-      showDate: new Date("2026-08-05T18:00:00"),
-    })
-    .returning();
+      showDate: new Date("2026-08-15T18:00:00"),
+    },
+    {
+      movieName: "Avengers: Doomsday",
+      totalSeats: 100,
+      showDate: new Date("2026-08-16T18:00:00"),
+    },
+    {
+      movieName: "Mahavatar Narasimha",
+      totalSeats: 100,
+      showDate: new Date("2026-08-17T18:00:00"),
+    },
+    {
+      movieName: "Mahavatar Parshuram",
+      totalSeats: 100,
+      showDate: new Date("2026-08-18T18:00:00"),
+    },
+  ];
 
-  console.log("Movie created:", movie);
+  for (const movieData of movies) {
+    const [movie] = await db
+      .insert(moviesTable)
+      .values(movieData)
+      .returning();
 
-  const seats = Array.from({ length: 100 }, () => ({
-    showId: movie!.id,
-    isBooked: false,
-  }));
+    const seats = Array.from({ length: movieData.totalSeats }, () => ({
+      showId: movie!.id,
+      isBooked: false,
+    }));
 
-  await db.insert(seatsTable).values(seats);
+    await db.insert(seatsTable).values(seats);
+  }
 
-  console.log("100 seats created successfully.");
+  console.log("Database seeded successfully.");
 }
 
 seed()

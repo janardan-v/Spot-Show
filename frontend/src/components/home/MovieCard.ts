@@ -1,4 +1,5 @@
 import type { Movie } from "../../types/movie";
+import { ROUTES } from "../../types/routes";
 import { moviePosters } from "../../utils/moviePosters";
 
 export function MovieCard(movie: Movie) {
@@ -25,7 +26,7 @@ export function MovieCard(movie: Movie) {
           ${new Date(movie.showDate).toLocaleString()}
         </p>
 
-        <button class="movie-card__button">
+        <button class="movie-card__button"  data-route="${ROUTES.SHOW}/${movie.id}"">
           Book Tickets
         </button>
 

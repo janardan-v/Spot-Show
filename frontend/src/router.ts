@@ -1,10 +1,11 @@
 import { ROUTES } from "./types/routes";
-
+import { Navbar } from "./components/Navbar";
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { Booking } from "./pages/Booking";
 import { Show } from "./pages/Show";
+import { Account } from "./pages/Account";
 
 import { runCleanup } from "./utils/lifecycle";
 
@@ -27,32 +28,52 @@ export async function renderCurrentRoute() {
 
   runCleanup();
 
+  let pageContent = document.querySelector("#page-content");
+
+  // Create the app shell only once
+  if (!pageContent) {
+    app.innerHTML = `
+      ${Navbar()}
+      <div id="page-content"></div>
+    `;
+
+    pageContent = document.querySelector("#page-content");
+
+    if (!pageContent) {
+      throw new Error("Page content container not found.");
+    }
+  }
+
   const pathname = window.location.pathname;
 
   if (pathname.startsWith(`${ROUTES.SHOW}/`)) {
-    app.innerHTML = await Show();
+    pageContent.innerHTML = await Show();
     return;
   }
 
   switch (pathname) {
     case ROUTES.HOME:
-      app.innerHTML = await Home();
+      pageContent.innerHTML = await Home();
       break;
 
     case ROUTES.LOGIN:
-      app.innerHTML = Login();
+      pageContent.innerHTML = Login();
       break;
 
     case ROUTES.REGISTER:
-      app.innerHTML = Register();
+      pageContent.innerHTML = Register();
       break;
 
     case ROUTES.BOOKING:
-      app.innerHTML = Booking();
+      pageContent.innerHTML = await Booking();
+      break;
+
+    case ROUTES.ACCOUNT:
+      pageContent.innerHTML = await Account();
       break;
 
     default:
-      app.innerHTML = `
+      pageContent.innerHTML = `
         <main>
           <h1>404</h1>
           <p>Page Not Found</p>
@@ -60,3 +81,53 @@ export async function renderCurrentRoute() {
       `;
   }
 }
+
+document.addEventListener("click", (event) => {
+  const target = event.target as HTMLElement;
+
+  const routeElement = target.closest<HTMLElement>("[data-route]");
+
+  if (!routeElement) {
+    return;
+  }
+
+  const route = routeElement.dataset.route;
+
+  if (!route) {
+    return;
+  }
+
+  event.preventDefault();
+
+  navigate(route);
+});
+
+document.addEventListener("click", (event) => {
+  const target = event.target as HTMLElement;
+
+  const actionElement = target.closest<HTMLElement>("[data-action]");
+
+  if (actionElement?.dataset.action === "explore-movies") {
+    document.querySelector("#now-showing")?.scrollIntoView({
+      behavior: "smooth",
+    });
+
+    return;
+  }
+
+  const routeElement = target.closest<HTMLElement>("[data-route]");
+
+  if (!routeElement) {
+    return;
+  }
+
+  const route = routeElement.dataset.route;
+
+  if (!route) {
+    return;
+  }
+
+  event.preventDefault();
+
+  navigate(route);
+});

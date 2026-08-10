@@ -4,6 +4,7 @@ export const ROUTES = {
   REGISTER: "/register",
   BOOKING: "/booking",
   SHOW: "/shows",
+  ACCOUNT: "/account",
 } as const;
 
 export type Route =

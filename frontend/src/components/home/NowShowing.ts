@@ -5,7 +5,7 @@ export async function NowShowing() {
   const shows = await fetchShows();
 
   return `
-    <section class="now-showing container">
+    <section id="now-showing" class="now-showing container">
 
       <h2 class="now-showing__title">
         Now Showing

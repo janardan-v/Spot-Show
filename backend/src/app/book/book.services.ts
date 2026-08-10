@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { db, pool } from "../../db";
 import { moviesTable, seatsTable } from "../../db/schema";
 import type { getSeatData, bookTicketData } from "./book.model";
@@ -14,7 +14,8 @@ export class bookingService {
         isBooked: seatsTable.isBooked,
       })
       .from(seatsTable)
-      .where(eq(seatsTable.showId, showId));
+      .where(eq(seatsTable.showId, showId))
+      .orderBy(asc(seatsTable.id));
 
     if (!showSeatResult) {
       throw ApiError.internalServerError("Error while fetching seats");
@@ -63,7 +64,6 @@ export class bookingService {
       if (result.rowCount === 0) {
         throw ApiError.conflict("Seat already booked");
       }
-      console.log(userId)
       //if we get the row, we are safe to update
       const sqlU = "update seats set is_booked = true, booked_by = $2 where id = $1";
       const updateResult = await conn.query(sqlU, [seatId, userId]); // Again to avoid SQL INJECTION we are using $1 and $2 as placeholders

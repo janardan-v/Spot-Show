@@ -1,0 +1,34 @@
+.show-header {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.show-header__poster {
+  width: 180px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+
+.show-header__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.show-header__title {
+  margin: 0;
+}
+
+.show-header__time {
+  margin: 0;
+  opacity: 0.8;
+}
+
+.show-seats__title {
+  margin-bottom: 1.5rem;
+}
+

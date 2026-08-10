@@ -16,6 +16,12 @@ export function toggleSeat(seatId: string) {
   listeners.forEach((listener) => listener());
 }
 
+export function removeSelectedSeat(seatId: string) {
+  selectedSeatIds.delete(seatId);
+
+  listeners.forEach((listener) => listener());
+}
+
 export function clearSelectedSeats() {
   selectedSeatIds.clear();
 

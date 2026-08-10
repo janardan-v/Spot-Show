@@ -28,7 +28,7 @@ export function createRefreshToken(payload: UserTokenPayload) {
 
 export function verifyRefreshToken(token: string) {
     try {
-        const payload = JWT.verify(token, process.env.ACCESS_TOKEN_SECRE as string) as UserTokenPayload
+        const payload = JWT.verify(token, process.env.REFRESH_TOKEN_SECRET as string) as UserTokenPayload
         return payload
     }
     catch (error) {

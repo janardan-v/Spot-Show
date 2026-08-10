@@ -1,3 +1,5 @@
+import { ROUTES } from "../../types/routes";
+
 export function Hero() {
   return `
     <section class="hero container">
@@ -12,7 +14,10 @@ export function Hero() {
           Book tickets for the latest blockbusters in just a few clicks.
         </p>
 
-        <button class="hero__button">
+       <button
+          class="hero__button"
+          data-action="explore-movies"
+          >
           Explore Movies
         </button>
 

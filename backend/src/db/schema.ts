@@ -27,6 +27,7 @@ export const moviesTable = pgTable("movies", {
   showDate: timestamp("show_date"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+
 });
 
 export const seatsTable = pgTable("seats", {

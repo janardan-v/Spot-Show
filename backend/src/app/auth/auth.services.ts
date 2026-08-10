@@ -13,6 +13,7 @@ import {
   createAccessToken,
   createRefreshToken,
   verifyAccessToken,
+  verifyRefreshToken,
 } from "../../common/utils/token";
 
 export class userServices {
@@ -77,14 +78,27 @@ export class userServices {
     const accessToken = createAccessToken({ id: userEmailResult.id });
     const refreshToken = createRefreshToken({ id: userEmailResult.id });
 
+    await db
+      .update(usersTable)
+      .set({
+        refreshToken,
+      })
+      .where(eq(usersTable.id, userEmailResult.id));
+
     return ApiResponse.success("Login successful", {
       accessToken,
       refreshToken,
     });
   }
 
-  static async logout(id: string) {
-   
+  static async logout(accessToken: string) {
+    const decodedToken = verifyAccessToken(accessToken);
+
+    if (decodedToken instanceof Error) {
+      throw ApiError.unauthorized("Error while decoding token");
+    }
+
+    const id = decodedToken.id;
     await db
       .update(usersTable)
       .set({
@@ -95,8 +109,13 @@ export class userServices {
     return ApiResponse.success("User logged out successfully", {});
   }
 
-  static async getMe(id: string) {
-   
+  static async getMe(accessToken: string) {
+    const decodedToken = verifyAccessToken(accessToken);
+
+    if (decodedToken instanceof Error) {
+      throw ApiError.unauthorized("Error while decoding token");
+    }
+    const id = decodedToken.id;
     const [userIdSelect] = await db
       .select()
       .from(usersTable)
@@ -112,4 +131,36 @@ export class userServices {
 
     return ApiResponse.success("User found", user);
   }
+
+  static async refresh(refreshToken: string) {
+  const decodedToken = verifyRefreshToken(refreshToken);
+
+  if (decodedToken instanceof Error) {
+    throw ApiError.unauthorized("Invalid refresh token");
+  }
+
+  const id = decodedToken.id;
+
+  const [user] = await db
+    .select({
+      id: usersTable.id,
+      refreshToken: usersTable.refreshToken,
+    })
+    .from(usersTable)
+    .where(eq(usersTable.id, id));
+
+  if (!user) {
+    throw ApiError.notFound("User not found");
+  }
+
+  if (user.refreshToken !== refreshToken) {
+    throw ApiError.unauthorized("Invalid refresh token");
+  }
+
+  const accessToken = createAccessToken({ id });
+
+  return ApiResponse.success("Access token refreshed", {
+    accessToken,
+  });
+}
 }
