@@ -1,4 +1,4 @@
-import { ROUTES } from "../../types/routes";
+
 
 export function Hero() {
   return `
