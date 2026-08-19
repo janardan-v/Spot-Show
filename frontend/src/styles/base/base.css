@@ -32,10 +32,12 @@ body {
 
 ::selection {
   background-color: var(--color-primary);
-  color: var(--color-white);
+  color: var(--color-text-primary);
 }
 
 /* Default headings */
+/* Use the display face for cinematic/marquee character, while body copy
+   stays on the base sans for legibility. */
 
 h1,
 h2,
@@ -43,9 +45,13 @@ h3,
 h4,
 h5,
 h6 {
+  font-family: var(--font-family-display);
+
   font-weight: var(--font-bold);
 
   line-height: var(--leading-tight);
+
+  letter-spacing: var(--tracking-normal);
 
   color: var(--color-text-primary);
 }
@@ -54,4 +60,14 @@ h6 {
 
 p {
   color: var(--color-text-secondary);
+}
+
+/* Links */
+
+a {
+  color: var(--color-accent-gold);
+}
+
+a:hover {
+  color: var(--color-accent-gold-hover);
 }

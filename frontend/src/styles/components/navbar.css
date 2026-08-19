@@ -4,6 +4,8 @@
 |--------------------------------------------------------------------------
 |
 | Shared navigation bar used across the application.
+| Styled as the "entrance signage" of the app — dark, restrained,
+| with a quiet marquee character rather than literal vintage decoration.
 |
 */
 
@@ -11,9 +13,13 @@
 
   display: flex;
 
+  flex-wrap: wrap;
+
   justify-content: space-between;
 
   align-items: center;
+
+  gap: var(--space-md);
 
   padding: var(--space-md) var(--space-xl);
 
@@ -27,17 +33,40 @@
 
 .navbar__brand {
 
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: var(--space-sm);
+
+  font-family: var(--font-family-display);
+
   font-size: var(--text-2xl);
 
   font-weight: var(--font-bold);
 
-  color: var(--color-primary);
+  letter-spacing: var(--tracking-wide);
+
+  color: var(--color-text-primary);
+
+}
+
+/* The word "SPOTSHOW" reads like marquee lettering: warm ivory with a
+   restrained gold underline accent, rather than a literal glowing sign. */
+
+.navbar__brand::after {
+
+  content: "";
+
+  display: none;
 
 }
 
 .navbar__links {
 
   display: flex;
+
+  flex-wrap: wrap;
 
   align-items: center;
 
@@ -47,14 +76,178 @@
 
 .navbar__links a {
 
+  position: relative;
+
+  padding-block: var(--space-xs);
+
+  font-size: var(--text-sm);
+
+  font-weight: var(--font-medium);
+
+  letter-spacing: var(--tracking-wide);
+
   color: var(--color-text-secondary);
 
   transition: color 0.2s ease;
 
 }
 
+/* Understated underline reveal instead of a hard color swap —
+   reads as refined signage rather than a generic SaaS nav. */
+
+.navbar__links a::after {
+
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+
+  right: 100%;
+
+  bottom: -2px;
+
+  height: 2px;
+
+  background-color: var(--color-primary);
+
+  transition: right 0.25s ease;
+
+}
+
 .navbar__links a:hover {
 
+  color: var(--color-text-primary);
+
+}
+
+.navbar__links a:hover::after {
+
+  right: 0;
+
+}
+
+.navbar__links a[aria-current="page"] {
+
   color: var(--color-primary);
+
+}
+
+.navbar__links a[aria-current="page"]::after {
+
+  right: 0;
+
+}
+
+/* Logout button treated as a quiet ghost/outline action, not a bright CTA —
+   the marquee's visual weight stays on the brand and primary nav links. */
+
+.navbar__links button[data-action="logout"] {
+
+  padding: var(--space-xs) var(--space-md);
+
+  font-size: var(--text-sm);
+
+  font-weight: var(--font-medium);
+
+  letter-spacing: var(--tracking-wide);
+
+  color: var(--color-text-secondary);
+
+  background-color: transparent;
+
+  border: 1px solid var(--color-border-strong);
+
+  border-radius: var(--radius-sm);
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+
+}
+
+.navbar__links button[data-action="logout"]:hover {
+
+  color: var(--color-text-primary);
+
+  border-color: var(--color-primary);
+
+  background-color: var(--color-surface-hover);
+
+}
+
+/* Register link gets a touch more presence — the natural "primary action"
+   of the signed-out state — via a subtle filled treatment. */
+
+.navbar__links a[data-route$="/register"] {
+
+  padding: var(--space-xs) var(--space-md);
+
+  color: var(--color-background);
+
+  background-color: var(--color-accent-gold);
+
+  border-radius: var(--radius-sm);
+
+}
+
+.navbar__links a[data-route$="/register"]::after {
+
+  display: none;
+
+}
+
+.navbar__links a[data-route$="/register"]:hover {
+
+  color: var(--color-background);
+
+  background-color: var(--color-accent-gold-hover);
+
+}
+
+/* ===== Focus-visible states ===== */
+/* Strong, unmistakable keyboard focus — gold ring reads as premium
+   rather than a default browser outline. */
+
+.navbar__links a:focus-visible,
+.navbar__links button[data-action="logout"]:focus-visible {
+
+  outline: 2px solid var(--color-accent-gold);
+
+  outline-offset: 3px;
+
+  border-radius: var(--radius-sm);
+
+}
+
+/* ===== Responsive behavior ===== */
+
+@media (max-width: 640px) {
+
+  .navbar {
+
+    padding: var(--space-sm) var(--space-md);
+
+  }
+
+  .navbar__brand {
+
+    font-size: var(--text-xl);
+
+  }
+
+  .navbar__links {
+
+    gap: var(--space-md);
+
+  }
+
+  .navbar__links a,
+  .navbar__links button[data-action="logout"] {
+
+    font-size: var(--text-xs);
+
+  }
 
 }

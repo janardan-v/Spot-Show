@@ -26,7 +26,7 @@ export function MovieCard(movie: Movie) {
           ${new Date(movie.showDate).toLocaleString()}
         </p>
 
-        <button class="movie-card__button"  data-route="${ROUTES.SHOW}/${movie.id}"">
+        <button class="movie-card__button"  data-route="${ROUTES.SHOW}/${movie.id}">
           Book Tickets
         </button>
 

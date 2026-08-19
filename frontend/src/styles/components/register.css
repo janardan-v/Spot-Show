@@ -1,0 +1,221 @@
+/*
+|--------------------------------------------------------------------------
+| Register
+|--------------------------------------------------------------------------
+|
+| Mirrors the finished Login page's card/surface language exactly --
+| the register form itself acts as the centered card (no extra wrapper
+| markup needed), same typography, input, focus-ring, and button
+| treatment. Slightly taller to comfortably hold four fields instead
+| of two, otherwise the same design system.
+|
+| Built entirely against the existing Register.ts markup:
+| .container > h1, .register-form (data-form="register"),
+| labeled inputs (name="name"/"email"/"age"/"password"), submit button,
+| .register-form__error (data-register-error).
+|
+*/
+
+.container:has(.register-form) {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  min-height: 60vh;
+
+  padding-block: var(--space-2xl);
+}
+
+.container:has(.register-form) > h1 {
+  margin-bottom: var(--space-lg);
+
+  font-family: var(--font-family-display);
+
+  font-size: var(--text-2xl);
+
+  font-weight: var(--font-bold);
+
+  letter-spacing: var(--tracking-wide);
+
+  color: var(--color-text-primary);
+
+  text-align: center;
+}
+
+/* ===== The card itself ===== */
+
+.register-form {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: var(--space-lg);
+
+  width: 100%;
+
+  max-width: 420px;
+
+  padding: var(--space-2xl) var(--space-xl);
+
+  background-color: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+
+  border-radius: var(--radius-lg);
+
+  box-shadow: var(--shadow-lg);
+
+  /* Faint warm sheen, consistent with the login form, account card,
+     and booking summary -- a quiet light source rather than a flat
+     panel. */
+
+  background-image: radial-gradient(
+    ellipse 140% 70% at 50% -10%,
+    color-mix(in srgb, var(--color-accent-gold) 8%, transparent) 0%,
+    transparent 60%
+  );
+}
+
+.register-form > div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: var(--space-xs);
+
+  text-align: left;
+}
+
+.register-form label {
+  font-size: var(--text-xs);
+
+  font-weight: var(--font-semibold);
+
+  letter-spacing: var(--tracking-wider);
+
+  text-transform: uppercase;
+
+  color: var(--color-text-muted);
+}
+
+.register-form input {
+  padding: var(--space-sm) var(--space-md);
+
+  font-family: var(--font-family-base);
+
+  font-size: var(--text-md);
+
+  color: var(--color-text-primary);
+
+  background-color: var(--color-surface-raised);
+
+  border: 1px solid var(--color-border-strong);
+
+  border-radius: var(--radius-md);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.register-form input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.register-form input:focus-visible {
+  outline: none;
+
+  border-color: var(--color-accent-gold);
+
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent-gold) 30%, transparent);
+}
+
+.register-form input:invalid:not(:placeholder-shown) {
+  border-color: var(--color-danger);
+}
+
+/* ===== Submit ===== */
+
+.register-form button[type="submit"] {
+  padding: var(--space-md);
+
+  background-color: var(--color-primary);
+
+  color: var(--color-text-primary);
+
+  border: 1px solid var(--color-primary-active);
+
+  border-radius: var(--radius-md);
+
+  font-family: var(--font-family-base);
+
+  font-size: var(--text-md);
+
+  font-weight: var(--font-semibold);
+
+  letter-spacing: var(--tracking-wide);
+
+  box-shadow: var(--shadow-md);
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.register-form button[type="submit"]:hover {
+  background-color: var(--color-primary-hover);
+
+  border-color: var(--color-accent-gold-muted);
+
+  box-shadow: var(--shadow-lg);
+
+  transform: translateY(-1px);
+}
+
+.register-form button[type="submit"]:active {
+  background-color: var(--color-primary-active);
+
+  transform: translateY(0);
+}
+
+.register-form button[type="submit"]:focus-visible {
+  outline: 2px solid var(--color-accent-gold);
+
+  outline-offset: 3px;
+}
+
+/* ===== Error ===== */
+
+.register-form__error {
+  min-height: 1.25em;
+
+  font-size: var(--text-sm);
+
+  color: var(--color-danger);
+
+  text-align: center;
+}
+
+.register-form__error:empty {
+  display: none;
+}
+
+/* ===== Responsive behavior ===== */
+
+@media (max-width: 480px) {
+
+  .container:has(.register-form) {
+    padding-block: var(--space-xl);
+
+    padding-inline: var(--space-md);
+  }
+
+  .register-form {
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+}

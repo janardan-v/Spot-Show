@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "bun server.ts",
     "dev": "tsx watch server.ts",
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
@@ -33,6 +33,7 @@
     "drizzle-orm": "^1.0.0-rc.4",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "node-cron": "^4.6.0",
     "pg": "^8.22.0",
     "zod": "^4.4.3"
   }

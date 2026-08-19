@@ -2,22 +2,114 @@
 ---------------------------------------------------------------------------
 Seat Grid
 ---------------------------------------------------------------------------
+| Auditorium-style seat map. Clarity of state (available/booked/selected)
+| takes priority over decoration.
+|
+| The screen is the room's one true light source. A soft falloff extends
+| from it down into the seating area (visible mainly in the gaps between
+| seats), fading by the lower rows -- an atmosphere cue, not a spotlight.
+| A subtle centre aisle reinforces the "rows of seats" reading over a
+| flat button grid.
 */
 
 .seat-grid {
+  position: relative;
+
   display: grid;
 
   grid-template-columns: repeat(10, 1fr);
 
-  gap: var(--space-sm);
+  row-gap: var(--space-sm);
+
+  column-gap: var(--space-sm);
 
   width: min(100%, 700px);
 
   margin-inline: auto;
+
+  padding-top: var(--space-lg);
+
+  padding-bottom: var(--space-lg);
+
+  /* Screen-light falloff into the room. A single radial gradient
+     anchored at the screen, fading out well before the bottom of the
+     grid -- reads through the gaps between seats, never as a glow on
+     top of them. Scales naturally with however many rows are rendered,
+     since it's sized in viewport-independent units relative to the
+     container rather than pinned to a row count. */
+
+  background-image: radial-gradient(
+    ellipse 90% 60% at 50% 0%,
+    color-mix(in srgb, var(--color-accent-gold) 7%, transparent) 0%,
+    transparent 90%
+  );
+
+  background-repeat: no-repeat;
+
+  /* Soft edge vignette for a sense of containment/depth -- no border, no
+     background panel, just a very low-opacity darkening toward the outer
+     edges so the seating area reads as sitting "in" the room rather than
+     floating on a flat page. */
+
+  box-shadow: inset 0 0 90px 10px
+    color-mix(in srgb, var(--color-background) 45%, transparent);
+}
+
+/* The screen is the room's one true light source — everything else in
+   the auditorium (selected seats, the confirm button) only borrows
+   a fraction of this glow, never matches it. */
+
+.seat-grid::before {
+  content: "SCREEN";
+
+  display: block;
+
+  grid-column: 1 / -1;
+
+  margin-bottom: var(--space-md);
+
+  padding-block: var(--space-md);
+
+  text-align: center;
+
+  font-family: var(--font-family-base);
+
+  font-size: var(--text-xs);
+
+  font-weight: var(--font-semibold);
+
+  letter-spacing: var(--tracking-wider);
+
+  color: var(--color-text-muted);
+
+  background: linear-gradient(
+    to bottom,
+    color-mix(
+      in srgb,
+      var(--color-accent-gold) 14%,
+      var(--color-surface-hover)
+    ),
+    transparent
+  );
+
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
+
+  /* A directional glow that spills downward, like light being cast into
+     the room, rather than a uniform glow that outlines a rectangle on
+     all sides. The hard border that previously closed off the bottom
+     edge is removed -- the gradient's own fade to transparent is what
+     now defines the edge, so it reads as light dispersing rather than a
+     panel ending. */
+
+  box-shadow:
+    var(--shadow-glow-gold),
+    0 36px 48px -20px color-mix(in srgb, var(--color-accent-gold) 20%, transparent);
 }
 
 .seat {
-  aspect-ratio: 1;
+  position: relative;
+
+  aspect-ratio: 6 / 5;
 
   display: grid;
   place-items: center;
@@ -34,251 +126,146 @@ Seat Grid
 
   font-size: var(--text-xs);
 
+  font-weight: var(--font-medium);
+
   cursor: pointer;
+
+  /* A slightly heavier bottom border reads as a seat base rather than a
+     flat rectangle, without introducing any new tokens or shapes. */
+
+  border-bottom-width: 2px;
 
   transition:
     transform 0.15s ease,
     background-color 0.15s ease,
-    border-color 0.15s ease;
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* Subtle centre aisle: a wider gap after the 5th seat in every row of
+   10, symmetrical on both sides of the room. The row length is fixed
+   by grid-template-columns (always 10), so this is stable regardless
+   of how many seats/rows are rendered -- not a fragile magic-number
+   position, just a per-row structural rule. */
+
+.seat:nth-child(10n + 5) {
+  margin-right: var(--space-md);
+}
+
+.seat:nth-child(10n + 6) {
+  margin-left: var(--space-md);
 }
 
 .seat:hover:not(:disabled) {
   transform: translateY(-2px);
+
+  border-color: var(--color-accent-gold-muted);
+
+  box-shadow: var(--shadow-xs);
 }
+
+.seat:focus-visible {
+  outline: 2px solid var(--color-accent-gold);
+
+  outline-offset: 2px;
+}
+
+/* ===== Available ===== */
 
 .seat--available {
   background-color: var(--color-surface);
+
+  border-color: var(--color-border);
 }
 
+/* ===== Booked ===== */
+
 .seat--booked {
-  background-color: var(--color-danger);
+  background-color: var(--color-surface-hover);
 
-  border-color: var(--color-danger);
+  border-color: var(--color-border);
 
-  color: var(--color-white);
+  color: var(--color-text-muted);
 
   cursor: not-allowed;
 
-  opacity: 0.65;
+  opacity: 0.55;
+
+  position: relative;
 }
+
+.seat--booked::after {
+  content: "";
+
+  position: absolute;
+
+  width: 60%;
+
+  height: 1px;
+
+  background-color: var(--color-text-muted);
+
+  transform: rotate(-45deg);
+}
+
+.seat--booked:hover {
+  transform: none;
+
+  border-color: var(--color-border);
+
+  box-shadow: none;
+}
+
+/* ===== Selected ===== */
+/* Keeps the primary red identity (selected is still an action state,
+   consistent with buttons elsewhere in the app) but gains a restrained
+   theatre-light quality via the existing red glow token -- previously
+   defined but unused anywhere in the app. No new token introduced. */
 
 .seat--selected {
   background-color: var(--color-primary);
 
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-hover);
 
-  color: var(--color-white);
+  color: var(--color-text-primary);
+
+  font-weight: var(--font-semibold);
+
+  box-shadow: var(--shadow-sm), var(--shadow-glow-primary);
 
   transform: translateY(-2px);
 }
 
+.seat--selected:hover {
+  transform: translateY(-2px);
 
-/*
----------------------------------------------------------------------------
-Selected Seats
----------------------------------------------------------------------------
-*/
-
-.selected-seats {
-  display: flex;
-
-  flex-wrap: wrap;
-
-  gap: 0.6rem;
-
-  margin-bottom: 0.75rem;
+  border-color: var(--color-primary-hover);
 }
 
-.selected-seat {
-  display: inline-flex;
+/* ===== Responsive ===== */
 
-  align-items: center;
+@media (max-width: 640px) {
+  .seat-grid {
+    gap: var(--space-xs);
 
-  justify-content: center;
+    padding-top: var(--space-md);
+  }
 
-  min-width: 44px;
+  .seat-grid::before {
+    margin-bottom: var(--space-md);
 
-  height: 38px;
+    font-size: 0.65rem;
+  }
 
-  padding: 0 0.75rem;
+  .seat:nth-child(10n + 5) {
+    margin-right: var(--space-sm);
+  }
 
-  border: 1px solid;
+  .seat:nth-child(10n + 6) {
+    margin-left: var(--space-sm);
+  }
 
-  border-radius: 8px;
-
-  font-weight: 600;
-}
-
-
-/*
----------------------------------------------------------------------------
-Booking Summary
----------------------------------------------------------------------------
-*/
-
-.booking-summary {
-  max-width: 600px;
-
-  margin: 2rem auto;
-
-  padding: 2rem;
-
-  border: 1px solid;
-
-  border-radius: 16px;
-}
-
-.booking-summary > h1 {
-  margin-bottom: 1.5rem;
-}
-
-.booking-summary > h2 {
-  margin-bottom: 0.75rem;
-}
-
-
-/*
----------------------------------------------------------------------------
-Show Information
----------------------------------------------------------------------------
-*/
-
-.booking-show-info {
-  padding-bottom: 1.5rem;
-
-  margin-bottom: 1.5rem;
-
-  border-bottom: 1px solid;
-}
-
-.booking-show-info h2 {
-  margin-bottom: 0.75rem;
-}
-
-.booking-show-info p {
-  margin: 0.25rem 0;
-}
-
-
-/*
----------------------------------------------------------------------------
-Selected Seat Count
----------------------------------------------------------------------------
-*/
-
-.booking-summary [data-selected-count] {
-  margin-bottom: 1.5rem;
-}
-
-
-/*
----------------------------------------------------------------------------
-Booking Message
----------------------------------------------------------------------------
-*/
-
-.booking-message {
-  margin-bottom: 1.25rem;
-
-  padding: 1rem 1.25rem;
-
-  border: 1px solid;
-
-  border-radius: 12px;
-}
-
-.booking-message strong {
-  display: block;
-
-  margin-bottom: 0.5rem;
-}
-
-.booking-message p {
-  margin: 0.35rem 0;
-}
-
-.booking-message ul {
-  margin: 0.75rem 0 0;
-
-  padding-left: 1.25rem;
-}
-
-.booking-message li {
-  margin: 0.3rem 0;
-}
-
-
-/*
----------------------------------------------------------------------------
-Confirm Booking Button
----------------------------------------------------------------------------
-*/
-
-.booking-summary [data-action="confirm-booking"] {
-  width: 100%;
-
-  min-height: 46px;
-
-  padding: 0.75rem 1rem;
-
-  border: 1px solid;
-
-  border-radius: 10px;
-
-  font-size: 1rem;
-
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-.booking-summary [data-action="confirm-booking"]:disabled {
-  opacity: 0.65;
-
-  cursor: not-allowed;
-}
-.login-modal {
-  display: none;
-
-  position: fixed;
-  inset: 0;
-
-  align-items: center;
-  justify-content: center;
-
-  padding: 1rem;
-
-  background: rgba(0, 0, 0, 0.6);
-
-  z-index: 1000;
-}
-
-.login-modal--visible {
-  display: flex;
-}
-
-.login-modal__content {
-  width: min(100%, 420px);
-
-  padding: 2rem;
-
-  border-radius: 16px;
-
-  background: var(--color-surface);
-}
-
-.login-modal__content h2 {
-  margin-bottom: 0.75rem;
-}
-
-.login-modal__content p {
-  margin-bottom: 1.5rem;
-}
-
-.login-modal__actions {
-  display: flex;
-
-  justify-content: flex-end;
-
-  gap: 0.75rem;
+  .seat {
+    font-size: 0.65rem;
+  }
 }

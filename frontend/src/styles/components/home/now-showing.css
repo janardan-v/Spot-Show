@@ -4,6 +4,8 @@
 |--------------------------------------------------------------------------
 |
 | Layout styles for the Now Showing section.
+| A modern lobby display wall of framed posters — generous spacing,
+| aligned rows, restrained section header treatment.
 |
 */
 
@@ -12,13 +14,41 @@
 }
 
 .now-showing__title {
-  margin-bottom: var(--space-xl);
+  position: relative;
+
+  display: inline-block;
+
+  margin-bottom: var(--space-2xl);
+
+  padding-bottom: var(--space-sm);
+
+  font-family: var(--font-family-display);
 
   font-size: var(--text-2xl);
 
   font-weight: var(--font-bold);
 
+  letter-spacing: var(--tracking-wide);
+
   color: var(--color-text-primary);
+}
+
+/* Small marquee-style underline accent instead of a heavy divider rule. */
+
+.now-showing__title::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+
+  bottom: 0;
+
+  width: 48px;
+
+  height: 2px;
+
+  background-color: var(--color-accent-gold);
 }
 
 .now-showing__grid {
@@ -26,5 +56,45 @@
 
   grid-template-columns: repeat(4, 1fr);
 
-  gap: var(--space-lg);
+  gap: var(--space-xl);
+
+  align-items: stretch;
+}
+
+/* ===== Responsive behavior ===== */
+
+@media (max-width: 1024px) {
+
+  .now-showing__grid {
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: var(--space-lg);
+
+  }
+
+}
+
+@media (max-width: 640px) {
+
+  .now-showing {
+
+    padding-block: var(--space-2xl);
+
+  }
+
+  .now-showing__grid {
+
+    grid-template-columns: 1fr;
+
+    gap: var(--space-lg);
+
+  }
+
+  .now-showing__title {
+
+    font-size: var(--text-xl);
+
+  }
+
 }

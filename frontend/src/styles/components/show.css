@@ -1,34 +1,238 @@
+/*
+|--------------------------------------------------------------------------
+| Show Header
+|--------------------------------------------------------------------------
+|
+| Poster + movie/show metadata displayed at the top of the Show page.
+|
+*/
+
 .show-header {
   display: flex;
-  gap: 2rem;
+
+  gap: var(--space-xl);
+
   align-items: center;
-  margin-bottom: 2.5rem;
+
+  justify-content: center;
+
+  margin-bottom: var(--space-md);
 }
 
 .show-header__poster {
   width: 180px;
+
+  flex-shrink: 0;
+
   aspect-ratio: 2 / 3;
+
   object-fit: cover;
-  border-radius: 12px;
+
+  background-color: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+
+  border-radius: var(--radius-lg);
+
+  box-shadow: var(--shadow-md);
+
   display: block;
 }
 
 .show-header__info {
   display: flex;
+
   flex-direction: column;
-  gap: 0.75rem;
+
+  gap: var(--space-sm);
+
+  padding-top: var(--space-xs);
 }
 
 .show-header__title {
   margin: 0;
+
+  font-family: var(--font-family-display);
+
+  font-size: var(--text-3xl);
+
+  font-weight: var(--font-bold);
+
+  line-height: var(--leading-tight);
+
+  color: var(--color-text-primary);
 }
 
 .show-header__time {
   margin: 0;
-  opacity: 0.8;
+
+  font-size: var(--text-md);
+
+  color: var(--color-text-secondary);
+
+  opacity: 1;
 }
+
+/* Small gold marker echoes the movie-card metadata treatment, keeping
+   the date/time line visually tied to the rest of the app without
+   inventing new metadata. */
+
+.show-header__time::before {
+  content: "";
+
+  display: inline-block;
+
+  width: 6px;
+
+  height: 6px;
+
+  margin-right: var(--space-sm);
+
+  background-color: var(--color-accent-gold);
+
+  border-radius: var(--radius-full);
+
+  vertical-align: middle;
+}
+
+/* Quiet, secondary metadata line -- smaller and more muted than the
+   showtime, so it never competes with the title/showtime/poster. */
+
+.show-header__meta {
+  margin: 0;
+
+  font-size: var(--text-sm);
+
+  color: var(--color-text-muted);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Show Seats Section
+|--------------------------------------------------------------------------
+*/
 
 .show-seats__title {
-  margin-bottom: 1.5rem;
+  max-width: min(100%, 700px);
+
+  margin-inline: auto;
+
+  margin-bottom: var(--space-sm);
+
+  font-family: var(--font-family-display);
+
+  font-size: var(--text-xl);
+
+  font-weight: var(--font-semibold);
+
+  color: var(--color-text-primary);
+
+  text-align: center;
 }
 
+/*
+|--------------------------------------------------------------------------
+| Show Booking Layout
+|--------------------------------------------------------------------------
+|
+| The auditorium (seat-selection title + seat grid) on the left/main, the
+| admission ticket in a narrower right rail. CSS Grid, not absolute
+| positioning, so the rail height tracks the auditorium naturally.
+|
+| Two columns only activate at 1080px+, once there is genuinely enough
+| room for both the ~700px auditorium and the ticket rail without
+| compressing the auditorium. Below that, the page stays single-column
+| and stacked.
+|
+*/
+
+.show-booking-layout {
+  display: grid;
+
+  grid-template-columns: 1fr;
+
+  gap: var(--space-2xl);
+
+  align-items: start;
+
+  margin-bottom: var(--space-xl);
+}
+
+.show-auditorium {
+  min-width: 0;
+}
+
+/* The booking-summary-container itself has no visual styling of its own —
+   it's a layout slot. The ticket's own visual design lives entirely in
+   booking-summary.css, untouched here. */
+
+.show-booking-layout .booking-summary-container {
+  min-width: 0;
+}
+
+@media (min-width: 1080px) {
+
+  .show-booking-layout {
+
+    grid-template-columns: minmax(0, 1fr) 380px;
+
+  }
+
+  /* The auditorium column leads with the "Select Your Seats" title before
+     the seat grid itself begins. Nudging the rail down by roughly that
+     title's rendered height aligns the ticket's top edge with the
+     auditorium's actual content (the screen/seats), rather than with
+     the title text -- a more natural reading pairing than a raw grid-row
+     alignment would give. Sticky positioning keeps it tracking the
+     viewport as the auditorium scrolls, without ever overflowing
+     horizontally. */
+
+  .show-booking-layout .booking-summary-container {
+
+    margin-top: calc(var(--text-xl) * var(--leading-tight) + var(--space-sm));
+
+    position: sticky;
+
+    top: var(--space-2xl);
+
+  }
+
+}
+
+/* ===== Responsive behavior ===== */
+
+@media (max-width: 640px) {
+
+  .show-header {
+
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+
+    gap: var(--space-lg);
+
+  }
+
+  .show-header__poster {
+
+    width: 140px;
+
+  }
+
+  .show-header__title {
+
+    font-size: var(--text-2xl);
+
+  }
+
+  .show-booking-layout {
+
+    gap: var(--space-xl);
+
+    margin-bottom: var(--space-2xl);
+
+  }
+
+}

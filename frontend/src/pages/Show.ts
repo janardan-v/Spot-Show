@@ -150,21 +150,28 @@ export async function Show() {
       ${new Date(show.showDate).toLocaleString()}
       </p>
 
+      <p class="show-header__meta">Total Seats: ${seats.length}</p>
+
       </div>
 
-      <p>Total Seats: ${seats.length}</p>
     </section>
 
-    <h2 class="show-seats__title">
-        Select Your Seats
-    </h2>
+    <div class="show-booking-layout">
 
-      
+      <div class="show-auditorium">
 
-    ${SeatGrid(seats)}
+        <h2 class="show-seats__title">
+            Select Your Seats
+        </h2>
 
-    <div class="booking-summary-container">
-      ${BookingSummary(seats)}
+        ${SeatGrid(seats)}
+
+      </div>
+
+      <div class="booking-summary-container">
+        ${BookingSummary(seats)}
+      </div>
+
     </div>
 
      <div

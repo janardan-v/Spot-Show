@@ -11,6 +11,7 @@
 :root {
 
   /* ===== Font Family ===== */
+  /* Base: used for body copy, UI chrome, forms, booking flow — stays highly legible */
 
   --font-family-base:
     Inter,
@@ -19,6 +20,16 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
+
+  /* Display: used for marquee titles, hero headings, movie titles — carries the
+     "old-school theatre" character. Falls back gracefully to a refined serif
+     stack if the primary display face isn't loaded. */
+
+  --font-family-display:
+    "Playfair Display",
+    Georgia,
+    "Times New Roman",
+    serif;
 
   /* ===== Font Sizes ===== */
 
@@ -29,6 +40,7 @@
   --text-xl: 1.25rem;      /* 20px */
   --text-2xl: 1.5rem;      /* 24px */
   --text-3xl: 2rem;        /* 32px */
+  --text-4xl: 2.75rem;     /* 44px — marquee / hero scale */
 
   /* ===== Font Weights ===== */
 
@@ -37,6 +49,13 @@
   --font-medium: 500;
   --font-semibold: 600;
   --font-bold: 700;
+
+  /* ===== Letter Spacing (new) ===== */
+  /* Small, restrained tracking for marquee-style headings and eyebrow labels */
+
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+  --tracking-wider: 0.08em;
 
   /* ===== Line Heights ===== */
 

@@ -1,0 +1,187 @@
+/*
+|--------------------------------------------------------------------------
+| Account
+|--------------------------------------------------------------------------
+|
+| The "patron / membership card" -- a single centered card presenting the
+| signed-in user's details. Distinct from the booking-summary ticket (no
+| notches/tear-line -- that language stays reserved for the ticket) but
+| reuses the same surface/elevation/typography conventions as the rest
+| of SpotShow.
+|
+| Built entirely against the existing Account.ts markup:
+| .account-page, .account-card, .account-info, .account-field,
+| .account-field__label, .account-field__value,
+| [data-action="account-logout"].
+|
+*/
+
+.account-page {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-height: 60vh;
+
+  padding: var(--space-xl);
+}
+
+.account-card {
+  width: 100%;
+
+  max-width: 420px;
+
+  padding: var(--space-2xl) var(--space-xl);
+
+  background-color: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+
+  border-radius: var(--radius-lg);
+
+  box-shadow: var(--shadow-lg);
+
+  text-align: center;
+
+  /* Faint warm sheen, consistent with the booking summary and login
+     modal -- a quiet light source rather than a flat panel. */
+
+  background-image: radial-gradient(
+    ellipse 140% 70% at 50% -10%,
+    color-mix(in srgb, var(--color-accent-gold) 8%, transparent) 0%,
+    transparent 60%
+  );
+}
+
+.account-card h1 {
+  margin-bottom: var(--space-xl);
+
+  font-family: var(--font-family-display);
+
+  font-size: var(--text-2xl);
+
+  font-weight: var(--font-bold);
+
+  letter-spacing: var(--tracking-wide);
+
+  color: var(--color-text-primary);
+}
+
+/* ===== Info rows ===== */
+
+.account-info {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: var(--space-lg);
+
+  margin-bottom: var(--space-xl);
+
+  padding-bottom: var(--space-xl);
+
+  border-bottom: 1px dashed var(--color-border-strong);
+}
+
+.account-field {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: var(--space-xs);
+
+  text-align: left;
+}
+
+.account-field__label {
+  font-size: var(--text-xs);
+
+  font-weight: var(--font-semibold);
+
+  letter-spacing: var(--tracking-wider);
+
+  text-transform: uppercase;
+
+  color: var(--color-text-muted);
+}
+
+.account-field__value {
+  font-size: var(--text-md);
+
+  font-weight: var(--font-medium);
+
+  color: var(--color-text-primary);
+}
+
+/* ===== Error-fallback message ===== */
+/* The catch-path in Account.ts renders a plain <p> in place of
+   .account-info -- style it quietly within the same card shell. */
+
+.account-card p {
+  margin-bottom: var(--space-xl);
+
+  font-size: var(--text-sm);
+
+  color: var(--color-text-secondary);
+}
+
+/* ===== Logout ===== */
+/* Secondary/ghost treatment -- matches the navbar's existing logout
+   button language, since logout isn't this page's primary action. */
+
+.account-card [data-action="account-logout"] {
+  width: 100%;
+
+  padding: var(--space-sm) var(--space-lg);
+
+  font-family: var(--font-family-base);
+
+  font-size: var(--text-sm);
+
+  font-weight: var(--font-semibold);
+
+  letter-spacing: var(--tracking-wide);
+
+  color: var(--color-text-secondary);
+
+  background-color: transparent;
+
+  border: 1px solid var(--color-border-strong);
+
+  border-radius: var(--radius-md);
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.account-card [data-action="account-logout"]:hover {
+  color: var(--color-text-primary);
+
+  border-color: var(--color-primary);
+
+  background-color: var(--color-surface-hover);
+}
+
+.account-card [data-action="account-logout"]:focus-visible {
+  outline: 2px solid var(--color-accent-gold);
+
+  outline-offset: 3px;
+}
+
+/* ===== Responsive behavior ===== */
+
+@media (max-width: 480px) {
+
+  .account-page {
+    padding: var(--space-lg);
+  }
+
+  .account-card {
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+}

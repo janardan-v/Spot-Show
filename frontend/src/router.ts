@@ -33,7 +33,7 @@ export async function renderCurrentRoute() {
   // Create the app shell only once
   if (!pageContent) {
     app.innerHTML = `
-      ${Navbar()}
+      <div id="navbar-root"></div>
       <div id="page-content"></div>
     `;
 
@@ -42,6 +42,17 @@ export async function renderCurrentRoute() {
     if (!pageContent) {
       throw new Error("Page content container not found.");
     }
+  }
+
+  // The navbar depends on auth state, which can change between navigations
+  // (login, logout) without a full page reload. Unlike the page-content
+  // shell above, it must be re-rendered on every route change, not just
+  // the first, so "Login/Register" vs "My Account/Logout" always reflects
+  // the current auth state.
+  const navbarRoot = document.querySelector<HTMLElement>("#navbar-root");
+
+  if (navbarRoot) {
+    navbarRoot.innerHTML = Navbar();
   }
 
   const pathname = window.location.pathname;
