@@ -29,7 +29,7 @@ export function Navbar() {
   <header class="navbar">
 
     <div class="navbar__brand">
-      🎬 SpotShow
+      SpotShow
     </div>
 
     <nav class="navbar__links">

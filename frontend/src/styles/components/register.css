@@ -219,3 +219,217 @@
   }
 
 }
+
+
+/* ==========================================================================
+   REGISTER — JOIN THE CINEMA
+   ========================================================================== */
+
+.container:has(.register-form) {
+  position: relative;
+
+  min-height: calc(100vh - 4.5rem);
+
+  padding:
+    clamp(1.75rem, 5vh, 3.5rem)
+    var(--space-md)
+    var(--space-3xl);
+
+  background:
+    radial-gradient(
+      ellipse 50% 30% at 50% 0%,
+      color-mix(
+        in srgb,
+        var(--color-accent-gold) 5%,
+        transparent
+      ),
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 76% 46% at 50% 100%,
+      color-mix(
+        in srgb,
+        var(--color-surface-raised) 10%,
+        transparent
+      ),
+      transparent 74%
+    ),
+    var(--color-background);
+}
+
+/* Cinema identity line above the registration form. */
+.container:has(.register-form)::before {
+  content: "SPOTSHOW  •  JOIN THE HOUSE";
+
+  order: -2;
+
+  margin-bottom: var(--space-sm);
+
+  font-family: var(--font-family-base);
+
+  font-size: 0.65rem;
+
+  font-weight: var(--font-semibold);
+
+  letter-spacing: var(--tracking-wider);
+
+  color: var(--color-text-muted);
+}
+
+.container:has(.register-form) > h1 {
+  order: -1;
+
+  margin-bottom: var(--space-xl);
+
+  font-size: clamp(
+    var(--text-2xl),
+    4vw,
+    2.75rem
+  );
+
+  line-height: var(--leading-tight);
+
+  text-shadow:
+    0 12px 32px
+    color-mix(
+      in srgb,
+      var(--color-black) 35%,
+      transparent
+    );
+}
+
+.register-form {
+  position: relative;
+
+  gap: var(--space-md);
+
+  width: min(100%, 450px);
+
+  padding:
+    clamp(1.5rem, 4vw, 2.2rem)
+    clamp(1.35rem, 4vw, 2.35rem)
+    1.6rem;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(
+        in srgb,
+        var(--color-surface-raised) 82%,
+        transparent
+      ),
+      var(--color-surface)
+    );
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: var(--radius-lg);
+
+  box-shadow:
+    var(--shadow-lg),
+    0 28px 70px
+    color-mix(
+      in srgb,
+      var(--color-black) 28%,
+      transparent
+    );
+
+  background-image:
+    radial-gradient(
+      ellipse 100% 55% at 50% -12%,
+      color-mix(
+        in srgb,
+        var(--color-accent-gold) 7%,
+        transparent
+      ),
+      transparent 72%
+    );
+}
+
+.register-form > div {
+  gap: 0.4rem;
+}
+
+.register-form label {
+  color: var(--color-text-muted);
+}
+
+.register-form input {
+  min-height: 47px;
+
+  padding:
+    0.65rem
+    0.9rem;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--color-background) 35%,
+      var(--color-surface-raised)
+    );
+}
+
+.register-form input:hover:not(:focus) {
+  border-color:
+    var(--color-border-strong);
+}
+
+.register-form button[type="submit"] {
+  min-height: 50px;
+
+  margin-top: var(--space-xs);
+
+  background-color: var(--color-primary);
+
+  box-shadow:
+    var(--shadow-md),
+    0 10px 28px
+    color-mix(
+      in srgb,
+      var(--color-primary) 18%,
+      transparent
+    );
+}
+
+.register-form__error {
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .container:has(.register-form) {
+    min-height: calc(100vh - 4rem);
+
+    padding:
+      var(--space-lg)
+      var(--space-md)
+      var(--space-2xl);
+  }
+
+  .container:has(.register-form) > h1 {
+    font-size: var(--text-2xl);
+  }
+
+  .register-form {
+    gap: var(--space-sm);
+
+    padding:
+      var(--space-xl)
+      var(--space-lg)
+      var(--space-lg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .register-form input,
+  .register-form button[type="submit"] {
+    transition: none;
+  }
+
+  .register-form button[type="submit"]:hover {
+    transform: none;
+  }
+}

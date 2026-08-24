@@ -185,3 +185,529 @@
   }
 
 }
+
+
+/* ==========================================================================
+   ACCOUNT PAGE — RETURNING PATRON / MEMBER AREA
+   ========================================================================== */
+
+/*
+ * Account is intentionally not styled like the booking ticket.
+ * It should feel like a private cinema-club/member card.
+ */
+
+.account-page {
+  position: relative;
+
+  min-height: calc(100vh - 4.5rem);
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: center;
+
+  padding:
+    clamp(2rem, 6vh, 4.5rem)
+    var(--space-md)
+    var(--space-3xl);
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      ellipse 50% 34% at 50% 0%,
+      color-mix(
+        in srgb,
+        var(--color-accent-gold) 5%,
+        transparent
+      ),
+      transparent 72%
+    ),
+    linear-gradient(
+      180deg,
+      var(--color-background) 0%,
+      color-mix(
+        in srgb,
+        var(--color-background) 94%,
+        var(--color-surface)
+      ) 100%
+    );
+}
+
+/*
+ * Quiet architectural glow behind the member card.
+ */
+.account-page::before {
+  content: "";
+
+  position: absolute;
+
+  top: -12rem;
+  left: 50%;
+
+  width: min(70vw, 900px);
+  height: 34rem;
+
+  transform: translateX(-50%);
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      color-mix(
+        in srgb,
+        var(--color-accent-gold) 4%,
+        transparent
+      ),
+      transparent 68%
+    );
+
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   MEMBER CARD
+   ========================================================================== */
+
+.account-card {
+  position: relative;
+
+  z-index: 1;
+
+  width: min(100%, 520px);
+
+  padding:
+    clamp(1.75rem, 4vw, 2.5rem)
+    clamp(1.5rem, 4vw, 2.5rem);
+
+  overflow: hidden;
+
+  text-align: left;
+
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(
+        in srgb,
+        var(--color-surface-raised) 86%,
+        transparent
+      ),
+      color-mix(
+        in srgb,
+        var(--color-surface) 96%,
+        transparent
+      )
+    );
+
+  border: 1px solid var(--color-border);
+
+  border-radius: var(--radius-lg);
+
+  box-shadow:
+    var(--shadow-lg),
+    0 28px 70px
+    color-mix(
+      in srgb,
+      var(--color-black) 30%,
+      transparent
+    );
+
+  background-image:
+    radial-gradient(
+      ellipse 90% 55% at 50% -10%,
+      color-mix(
+        in srgb,
+        var(--color-accent-gold) 7%,
+        transparent
+      ),
+      transparent 72%
+    );
+}
+
+/*
+ * Member-area identity.
+ */
+.account-card::before {
+  content: "SPOTSHOW  •  MEMBER AREA";
+
+  display: block;
+
+  margin-bottom: var(--space-lg);
+
+  font-size: 0.65rem;
+
+  font-weight: var(--font-semibold);
+
+  letter-spacing: var(--tracking-wider);
+
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   HEADING
+   ========================================================================== */
+
+.account-card h1 {
+  margin:
+    0
+    0
+    var(--space-2xl);
+
+  font-family: var(--font-family-display);
+
+  font-size: clamp(
+    var(--text-2xl),
+    4vw,
+    2.6rem
+  );
+
+  font-weight: var(--font-bold);
+
+  line-height: var(--leading-tight);
+
+  letter-spacing: var(--tracking-wide);
+
+  color: var(--color-text-primary);
+}
+
+/* ==========================================================================
+   PROFILE INFORMATION
+   ========================================================================== */
+
+.account-info {
+  display: grid;
+
+  grid-template-columns: 1fr;
+
+  gap: 0;
+
+  margin-bottom: var(--space-xl);
+
+  border-top:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--color-border) 70%,
+      transparent
+    );
+
+  border-bottom:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--color-border) 70%,
+      transparent
+    );
+}
+
+.account-field {
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: var(--space-xs);
+
+  padding:
+    var(--space-lg)
+    0;
+
+  text-align: left;
+}
+
+.account-field + .account-field {
+  border-top:
+    1px dashed
+    var(--color-border-strong);
+}
+
+.account-field__label {
+  font-size: var(--text-xs);
+
+  font-weight: var(--font-semibold);
+
+  letter-spacing: var(--tracking-wider);
+
+  text-transform: uppercase;
+
+  color: var(--color-text-muted);
+}
+
+.account-field__value {
+  overflow-wrap: anywhere;
+
+  font-size: var(--text-md);
+
+  font-weight: var(--font-medium);
+
+  line-height: var(--leading-relaxed);
+
+  color: var(--color-text-primary);
+}
+
+/* ==========================================================================
+   ERROR / FALLBACK
+   ========================================================================== */
+
+.account-card > p {
+  margin:
+    0 0
+    var(--space-xl);
+
+  padding:
+    var(--space-md)
+    var(--space-lg);
+
+  color: var(--color-text-secondary);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--color-surface-hover) 62%,
+      transparent
+    );
+
+  border:
+    1px solid
+    var(--color-border);
+
+  border-radius: var(--radius-md);
+
+  font-size: var(--text-sm);
+
+  line-height: var(--leading-relaxed);
+}
+
+/* ==========================================================================
+   LOGOUT
+   ========================================================================== */
+
+.account-card [data-action="account-logout"] {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 100%;
+
+  min-height: 48px;
+
+  padding:
+    var(--space-sm)
+    var(--space-lg);
+
+  color: var(--color-text-secondary);
+
+  background:
+    transparent;
+
+  border:
+    1px solid
+    var(--color-border-strong);
+
+  border-radius: var(--radius-md);
+
+  font-family: var(--font-family-base);
+
+  font-size: var(--text-sm);
+
+  font-weight: var(--font-semibold);
+
+  letter-spacing: var(--tracking-wide);
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.account-card [data-action="account-logout"]:hover {
+  color: var(--color-text-primary);
+
+  border-color:
+    var(--color-accent-gold-muted);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--color-surface-hover) 72%,
+      transparent
+    );
+
+  transform: translateY(-1px);
+}
+
+.account-card [data-action="account-logout"]:active {
+  transform: translateY(0);
+}
+
+.account-card [data-action="account-logout"]:focus-visible {
+  outline:
+    2px solid
+    var(--color-accent-gold);
+
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .account-page {
+    min-height: calc(100vh - 4rem);
+
+    padding:
+      var(--space-xl)
+      var(--space-md)
+      var(--space-2xl);
+  }
+
+  .account-card {
+    padding:
+      var(--space-xl)
+      var(--space-lg);
+  }
+
+  .account-card::before {
+    margin-bottom: var(--space-md);
+  }
+
+  .account-card h1 {
+    margin-bottom: var(--space-xl);
+
+    font-size: var(--text-2xl);
+  }
+
+  .account-field {
+    padding-block: var(--space-md);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-card [data-action="account-logout"] {
+    transition: none;
+  }
+
+  .account-card [data-action="account-logout"]:hover {
+    transform: none;
+  }
+}
+
+
+/* ==========================================================================
+   ACCOUNT PAGE — FINAL ATMOSPHERE POLISH
+   ========================================================================== */
+
+/*
+ * Keep the card grounded in the same cinema architecture as the other
+ * pages without introducing decorative objects.
+ */
+.account-page {
+  background:
+    radial-gradient(
+      ellipse 42% 28% at 50% 12%,
+      color-mix(
+        in srgb,
+        var(--color-accent-gold) 4%,
+        transparent
+      ),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 72% 48% at 50% 100%,
+      color-mix(
+        in srgb,
+        var(--color-surface-raised) 12%,
+        transparent
+      ),
+      transparent 72%
+    ),
+    var(--color-background);
+}
+
+/*
+ * The member label itself is the identity marker.
+ * No extra line crosses it.
+ */
+.account-card::before {
+  margin-bottom: var(--space-md);
+
+  color: var(--color-text-muted);
+}
+
+/*
+ * A quieter title treatment keeps the visual focus on the member data.
+ */
+.account-card h1 {
+  margin-bottom: var(--space-xl);
+
+  text-shadow:
+    0 10px 32px
+    color-mix(
+      in srgb,
+      var(--color-black) 32%,
+      transparent
+    );
+}
+
+/*
+ * Give the information rows a slightly stronger internal rhythm.
+ */
+.account-info {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(
+        in srgb,
+        var(--color-surface-raised) 18%,
+        transparent
+      ),
+      transparent 48%
+    );
+}
+
+.account-field__value {
+  letter-spacing: 0.01em;
+}
+
+/*
+ * Keep logout secondary, but give it a subtle premium response.
+ */
+.account-card [data-action="account-logout"] {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(
+        in srgb,
+        var(--color-surface-hover) 18%,
+        transparent
+      ),
+      transparent
+    );
+}
+
+/* ==========================================================================
+   MOBILE
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .account-page {
+    background:
+      radial-gradient(
+        ellipse 60% 30% at 50% 8%,
+        color-mix(
+          in srgb,
+          var(--color-accent-gold) 4%,
+          transparent
+        ),
+        transparent 72%
+      ),
+      var(--color-background);
+  }
+}

@@ -32,7 +32,7 @@ export async function Show() {
     }
 
     seatGrid.addEventListener("click", (event) => {
-
+      console.log("SEAT GRID CLICK");
       const target = event.target as HTMLElement;
 
       const seatButton = target.closest<HTMLButtonElement>(".seat");
@@ -41,6 +41,7 @@ export async function Show() {
         return;
       }
 
+      console.log("SEAT BUTTON:", seatButton);
       const seatId = seatButton.dataset.seatId;
 
       if (!seatId) {
@@ -150,31 +151,56 @@ export async function Show() {
       ${new Date(show.showDate).toLocaleString()}
       </p>
 
-      <p class="show-header__meta">Total Seats: ${seats.length}</p>
+      <p class="show-header__meta">
+        Total Seats: ${seats.length}
+      </p>
 
       </div>
-
     </section>
 
     <div class="show-booking-layout">
-
-      <div class="show-auditorium">
-
-        <h2 class="show-seats__title">
+      <div class="show-booking-sticky">
+        <section
+          class="show-auditorium"
+          aria-labelledby="show-seat-title"
+        >
+          <h2 id="show-seat-title" class="show-seats__title">
             Select Your Seats
-        </h2>
+          </h2>
 
-        ${SeatGrid(seats)}
+          <div class="seat-legend" aria-label="Seat availability">
+            <span class="seat-legend__item">
+              <span
+                class="seat-legend__swatch seat-legend__swatch--available"
+                aria-hidden="true"
+              ></span>
+              Available
+            </span>
+            <span class="seat-legend__item">
+              <span
+                class="seat-legend__swatch seat-legend__swatch--selected"
+                aria-hidden="true"
+              ></span>
+              Selected
+            </span>
+            <span class="seat-legend__item">
+              <span
+                class="seat-legend__swatch seat-legend__swatch--booked"
+                aria-hidden="true"
+              ></span>
+              Occupied
+            </span>
+          </div>
 
+          ${SeatGrid(seats)}
+        </section>
+
+        <div class="booking-summary-container">
+          ${BookingSummary(seats)}
+        </div>
       </div>
-
-      <div class="booking-summary-container">
-        ${BookingSummary(seats)}
-      </div>
-
     </div>
-
-     <div
+<div
     class="login-modal"
     data-login-modal
   >

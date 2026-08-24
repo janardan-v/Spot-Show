@@ -1,84 +1,184 @@
 /*
 |--------------------------------------------------------------------------
-| Navbar
+| Navbar — SpotShow Cinema Entrance
 |--------------------------------------------------------------------------
 |
 | Shared navigation bar used across the application.
-| Styled as the "entrance signage" of the app — dark, restrained,
-| with a quiet marquee character rather than literal vintage decoration.
+|
+| Design direction:
+| - blends into the cinema environment
+| - minimal, dark, premium
+| - no heavy navbar panel
+| - no strong bottom border
+| - generous horizontal spacing
+| - persistent while scrolling
 |
 */
 
+/*
+ * #navbar-root is the persistent shell created by the router.
+ * Keep the sticky behavior on the root wrapper so the navbar remains
+ * available while individual page content changes below it.
+ */
+#navbar-root {
+  position: sticky;
+
+  top: 0;
+
+  z-index: 1000;
+}
+
+/* ==========================================================================
+   NAVBAR
+   ========================================================================== */
+
 .navbar {
+  position: relative;
 
   display: flex;
 
-  flex-wrap: wrap;
+  align-items: center;
 
   justify-content: space-between;
 
-  align-items: center;
+  gap: var(--space-xl);
 
-  gap: var(--space-md);
+  width: 100%;
 
-  padding: var(--space-md) var(--space-xl);
+  padding:
+    var(--space-md)
+    clamp(
+      var(--space-lg),
+      4vw,
+      var(--space-3xl)
+    );
 
-  background-color: var(--color-surface);
+  /*
+   * Blend with the application instead of looking like a separate panel.
+   */
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(
+        in srgb,
+        var(--color-background) 96%,
+        transparent
+      ),
+      color-mix(
+        in srgb,
+        var(--color-background) 88%,
+        transparent
+      )
+    );
 
-  border-bottom: 1px solid var(--color-border);
+  /*
+   * Very subtle separation only through atmosphere, not a hard line.
+   */
+  box-shadow:
+    0 10px 28px
+    color-mix(
+      in srgb,
+      var(--color-black) 14%,
+      transparent
+    );
 
-  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
 
+  /*
+   * Prevent flex wrapping from making the desktop navbar look like
+   * a two-line header.
+   */
+  flex-wrap: nowrap;
 }
 
-.navbar__brand {
+/* ==========================================================================
+   BRAND
+   ========================================================================== */
 
+.navbar__brand {
   display: inline-flex;
 
   align-items: center;
 
   gap: var(--space-sm);
 
+  flex-shrink: 0;
+
   font-family: var(--font-family-display);
 
-  font-size: var(--text-2xl);
+  font-size: clamp(
+    var(--text-xl),
+    2vw,
+    var(--text-2xl)
+  );
 
   font-weight: var(--font-bold);
+
+  line-height: 1;
 
   letter-spacing: var(--tracking-wide);
 
   color: var(--color-text-primary);
 
+  text-decoration: none;
 }
 
-/* The word "SPOTSHOW" reads like marquee lettering: warm ivory with a
-   restrained gold underline accent, rather than a literal glowing sign. */
-
+/*
+ * Keep the marquee treatment extremely subtle.
+ */
 .navbar__brand::after {
-
   content: "";
 
-  display: none;
+  display: block;
 
+  width: 22px;
+
+  height: 2px;
+
+  margin-left: var(--space-xs);
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--color-accent-gold),
+      transparent
+    );
+
+  opacity: 0.55;
 }
 
+/* ==========================================================================
+   LINKS
+   ========================================================================== */
+
 .navbar__links {
-
   display: flex;
-
-  flex-wrap: wrap;
 
   align-items: center;
 
-  gap: var(--space-lg);
+  justify-content: flex-end;
 
+  gap: clamp(
+    var(--space-md),
+    2vw,
+    var(--space-xl)
+  );
+
+  min-width: 0;
 }
 
 .navbar__links a {
-
   position: relative;
 
-  padding-block: var(--space-xs);
+  display: inline-flex;
+
+  align-items: center;
+
+  padding:
+    var(--space-xs)
+    0;
+
+  font-family: var(--font-family-base);
 
   font-size: var(--text-sm);
 
@@ -88,63 +188,96 @@
 
   color: var(--color-text-secondary);
 
-  transition: color 0.2s ease;
+  text-decoration: none;
 
+  white-space: nowrap;
+
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
 }
 
-/* Understated underline reveal instead of a hard color swap —
-   reads as refined signage rather than a generic SaaS nav. */
-
+/*
+ * Very restrained cinematic underline.
+ */
 .navbar__links a::after {
-
   content: "";
 
   position: absolute;
 
   left: 0;
 
-  right: 100%;
+  bottom: -3px;
 
-  bottom: -2px;
+  width: 100%;
 
-  height: 2px;
+  height: 1px;
 
-  background-color: var(--color-primary);
+  background:
+    var(--color-accent-gold);
 
-  transition: right 0.25s ease;
+  transform:
+    scaleX(0);
 
+  transform-origin: right center;
+
+  opacity: 0.75;
+
+  transition:
+    transform 0.25s ease;
 }
 
 .navbar__links a:hover {
-
   color: var(--color-text-primary);
-
 }
 
 .navbar__links a:hover::after {
+  transform:
+    scaleX(1);
 
-  right: 0;
-
+  transform-origin: left center;
 }
 
 .navbar__links a[aria-current="page"] {
-
-  color: var(--color-primary);
-
+  color: var(--color-text-primary);
 }
 
 .navbar__links a[aria-current="page"]::after {
+  transform:
+    scaleX(1);
 
-  right: 0;
-
+  transform-origin: left center;
 }
 
-/* Logout button treated as a quiet ghost/outline action, not a bright CTA —
-   the marquee's visual weight stays on the brand and primary nav links. */
+/* ==========================================================================
+   LOGOUT
+   ========================================================================== */
 
 .navbar__links button[data-action="logout"] {
+  display: inline-flex;
 
-  padding: var(--space-xs) var(--space-md);
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    var(--space-xs)
+    var(--space-md);
+
+  color: var(--color-text-secondary);
+
+  background: transparent;
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--color-border-strong) 72%,
+      transparent
+    );
+
+  border-radius: var(--radius-sm);
+
+  font-family: var(--font-family-base);
 
   font-size: var(--text-sm);
 
@@ -152,102 +285,122 @@
 
   letter-spacing: var(--tracking-wide);
 
-  color: var(--color-text-secondary);
+  white-space: nowrap;
 
-  background-color: transparent;
-
-  border: 1px solid var(--color-border-strong);
-
-  border-radius: var(--radius-sm);
+  cursor: pointer;
 
   transition:
     color 0.2s ease,
     border-color 0.2s ease,
     background-color 0.2s ease;
-
 }
 
 .navbar__links button[data-action="logout"]:hover {
-
   color: var(--color-text-primary);
 
-  border-color: var(--color-primary);
+  border-color:
+    var(--color-accent-gold-muted);
 
-  background-color: var(--color-surface-hover);
-
+  background:
+    color-mix(
+      in srgb,
+      var(--color-surface-hover) 60%,
+      transparent
+    );
 }
 
-/* Register link gets a touch more presence — the natural "primary action"
-   of the signed-out state — via a subtle filled treatment. */
+/* ==========================================================================
+   REGISTER
+   ========================================================================== */
 
 .navbar__links a[data-route$="/register"] {
-
-  padding: var(--space-xs) var(--space-md);
+  padding:
+    var(--space-xs)
+    var(--space-md);
 
   color: var(--color-background);
 
-  background-color: var(--color-accent-gold);
+  background:
+    var(--color-accent-gold);
 
   border-radius: var(--radius-sm);
 
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .navbar__links a[data-route$="/register"]::after {
-
   display: none;
-
 }
 
 .navbar__links a[data-route$="/register"]:hover {
-
   color: var(--color-background);
 
-  background-color: var(--color-accent-gold-hover);
+  background:
+    var(--color-accent-gold-hover);
 
+  transform: translateY(-1px);
 }
 
-/* ===== Focus-visible states ===== */
-/* Strong, unmistakable keyboard focus — gold ring reads as premium
-   rather than a default browser outline. */
+/* ==========================================================================
+   FOCUS
+   ========================================================================== */
 
 .navbar__links a:focus-visible,
 .navbar__links button[data-action="logout"]:focus-visible {
+  outline:
+    2px solid
+    var(--color-accent-gold);
 
-  outline: 2px solid var(--color-accent-gold);
-
-  outline-offset: 3px;
+  outline-offset: 4px;
 
   border-radius: var(--radius-sm);
-
 }
 
-/* ===== Responsive behavior ===== */
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
 
-@media (max-width: 640px) {
-
+@media (max-width: 768px) {
   .navbar {
+    padding:
+      var(--space-sm)
+      var(--space-md);
 
-    padding: var(--space-sm) var(--space-md);
-
+    gap: var(--space-md);
   }
 
   .navbar__brand {
-
     font-size: var(--text-xl);
+  }
 
+  .navbar__brand::after {
+    display: none;
   }
 
   .navbar__links {
-
     gap: var(--space-md);
-
   }
 
   .navbar__links a,
   .navbar__links button[data-action="logout"] {
-
     font-size: var(--text-xs);
+  }
+}
 
+@media (max-width: 480px) {
+  .navbar {
+    align-items: flex-start;
   }
 
+  .navbar__links {
+    gap: var(--space-sm);
+  }
+
+  .navbar__links button[data-action="logout"] {
+    padding:
+      var(--space-xs)
+      var(--space-sm);
+  }
 }

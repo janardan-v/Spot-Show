@@ -96,26 +96,6 @@ export async function renderCurrentRoute() {
 document.addEventListener("click", (event) => {
   const target = event.target as HTMLElement;
 
-  const routeElement = target.closest<HTMLElement>("[data-route]");
-
-  if (!routeElement) {
-    return;
-  }
-
-  const route = routeElement.dataset.route;
-
-  if (!route) {
-    return;
-  }
-
-  event.preventDefault();
-
-  navigate(route);
-});
-
-document.addEventListener("click", (event) => {
-  const target = event.target as HTMLElement;
-
   const actionElement = target.closest<HTMLElement>("[data-action]");
 
   if (actionElement?.dataset.action === "explore-movies") {
@@ -139,6 +119,5 @@ document.addEventListener("click", (event) => {
   }
 
   event.preventDefault();
-
   navigate(route);
 });

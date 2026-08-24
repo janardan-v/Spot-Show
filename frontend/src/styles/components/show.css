@@ -4,19 +4,26 @@
 |--------------------------------------------------------------------------
 |
 | Poster + movie/show metadata displayed at the top of the Show page.
+| Styled as a screening announcement -- a small "eyebrow" label above the
+| title, a clear title/showtime/meta hierarchy, and a deliberate rhythm
+| into the auditorium below, rather than a generic profile/info row.
 |
 */
 
 .show-header {
   display: flex;
 
-  gap: var(--space-xl);
+  gap: var(--space-2xl);
 
   align-items: center;
 
   justify-content: center;
 
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-2xl);
+
+  padding-bottom: var(--space-2xl);
+
+  border-bottom: 1px solid var(--color-border);
 }
 
 .show-header__poster {
@@ -49,6 +56,31 @@
   padding-top: var(--space-xs);
 }
 
+/* "Now Screening" eyebrow -- generated purely from existing tokens on the
+   info block, no new markup. Signals "screening announcement" rather than
+   a plain title, echoing the marquee-underline language used elsewhere
+   (now-showing title, navbar links). */
+
+.show-header__info::before {
+  content: "Now Screening";
+
+  display: block;
+
+  margin-bottom: var(--space-xs);
+
+  font-family: var(--font-family-base);
+
+  font-size: var(--text-xs);
+
+  font-weight: var(--font-semibold);
+
+  letter-spacing: var(--tracking-wider);
+
+  text-transform: uppercase;
+
+  color: var(--color-accent-gold);
+}
+
 .show-header__title {
   margin: 0;
 
@@ -65,6 +97,8 @@
 
 .show-header__time {
   margin: 0;
+
+  margin-top: var(--space-xs);
 
   font-size: var(--text-md);
 
@@ -101,6 +135,8 @@
 .show-header__meta {
   margin: 0;
 
+  margin-top: var(--space-xs);
+
   font-size: var(--text-sm);
 
   color: var(--color-text-muted);
@@ -110,14 +146,22 @@
 |--------------------------------------------------------------------------
 | Show Seats Section
 |--------------------------------------------------------------------------
+|
+| Acts as the threshold between the screening announcement above and the
+| auditorium below -- a quiet marquee-style label with a centered accent
+| rule, rather than an isolated page heading.
 */
 
 .show-seats__title {
+  position: relative;
+
   max-width: min(100%, 700px);
 
   margin-inline: auto;
 
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-lg);
+
+  padding-bottom: var(--space-sm);
 
   font-family: var(--font-family-display);
 
@@ -125,9 +169,32 @@
 
   font-weight: var(--font-semibold);
 
+  letter-spacing: var(--tracking-wide);
+
   color: var(--color-text-primary);
 
   text-align: center;
+}
+
+/* Small centered accent rule, echoing the now-showing/navbar underline
+   language -- reinforces "entering the auditorium" without adding weight. */
+
+.show-seats__title::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+
+  bottom: 0;
+
+  width: 40px;
+
+  height: 2px;
+
+  background-color: var(--color-accent-gold);
+
+  transform: translateX(-50%);
 }
 
 /*
@@ -189,7 +256,9 @@
 
   .show-booking-layout .booking-summary-container {
 
-    margin-top: calc(var(--text-xl) * var(--leading-tight) + var(--space-sm));
+    margin-top: calc(
+      var(--text-xl) * var(--leading-tight) + var(--space-sm) + var(--space-lg)
+    );
 
     position: sticky;
 
@@ -213,6 +282,16 @@
 
     gap: var(--space-lg);
 
+    margin-bottom: var(--space-xl);
+
+    padding-bottom: var(--space-xl);
+
+  }
+
+  .show-header__info::before {
+
+    text-align: center;
+
   }
 
   .show-header__poster {
@@ -227,6 +306,14 @@
 
   }
 
+  .show-seats__title {
+
+    font-size: var(--text-lg);
+
+    margin-bottom: var(--space-md);
+
+  }
+
   .show-booking-layout {
 
     gap: var(--space-xl);
@@ -235,4 +322,1568 @@
 
   }
 
+}
+
+/* ==========================================================================
+   SHOW PAGE REFINEMENT — CURRENT
+   Existing rules above are intentionally preserved.
+   ========================================================================== */
+
+.show-header {
+  position: relative;
+  margin-bottom: var(--space-2xl);
+  padding-bottom: var(--space-2xl);
+}
+
+.show-header::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: min(70%, 760px);
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-accent-gold) 18%, transparent),
+    transparent
+  );
+}
+
+.show-header__poster {
+  box-shadow:
+    var(--shadow-md),
+    0 16px 36px color-mix(in srgb, var(--color-black) 24%, transparent);
+}
+
+.show-header__info::before {
+  content: "Now Screening";
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-family-base);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent-gold);
+}
+
+.show-header__title {
+  max-width: 18ch;
+}
+
+.show-header > p {
+  margin-top: var(--space-sm);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.show-auditorium {
+  position: relative;
+  min-width: 0;
+  padding:
+    var(--space-xl)
+    clamp(var(--space-xs), 1.3vw, var(--space-xl))
+    var(--space-2xl);
+  background:
+    radial-gradient(
+      ellipse 82% 44% at 50% 0%,
+      color-mix(in srgb, var(--color-accent-gold) 4%, transparent),
+      transparent 72%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-surface) 34%, transparent),
+      transparent 34%
+    );
+  border-top:
+    1px solid
+    color-mix(in srgb, var(--color-border-strong) 34%, transparent);
+  border-bottom:
+    1px solid
+    color-mix(in srgb, var(--color-border) 26%, transparent);
+  box-shadow:
+    inset 0 24px 48px color-mix(in srgb, var(--color-black) 12%, transparent),
+    inset 0 -60px 80px color-mix(in srgb, var(--color-black) 16%, transparent);
+}
+
+.show-seats__title {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto var(--space-lg);
+  padding: 0 var(--space-xl) var(--space-sm);
+}
+
+.show-seats__title::before {
+  content: "AUDITORIUM";
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-family-base);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-text-muted);
+}
+
+.show-seats__title::after {
+  width: 44px;
+}
+
+.seat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-sm) var(--space-lg);
+  margin: 0 auto var(--space-lg);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-muted);
+}
+
+.seat-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.seat-legend__swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.seat-legend__swatch--available {
+  background: var(--color-surface);
+}
+
+.seat-legend__swatch--selected {
+  background: var(--color-primary);
+  border-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-glow-primary);
+}
+
+.seat-legend__swatch--booked {
+  position: relative;
+  background: var(--color-surface-hover);
+  opacity: 0.65;
+}
+
+.seat-legend__swatch--booked::after {
+  content: "";
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  top: 50%;
+  height: 1px;
+  background: var(--color-text-muted);
+  transform: rotate(-45deg);
+}
+
+.show-booking-layout .booking-summary-container {
+  min-width: 0;
+}
+
+@media (min-width: 1080px) {
+  .show-booking-layout {
+    grid-template-columns: minmax(0, 1fr) 380px;
+  }
+
+  .show-booking-layout .booking-summary-container {
+    position: sticky;
+    top: var(--space-2xl);
+    margin-top:
+      calc(
+        var(--text-xl) * var(--leading-tight)
+        + var(--space-xl)
+      );
+  }
+}
+
+@media (max-width: 900px) {
+  .show-header {
+    gap: var(--space-xl);
+  }
+
+  .show-header__poster {
+    width: 150px;
+  }
+
+  .show-header__title {
+    font-size: var(--text-2xl);
+  }
+}
+
+@media (max-width: 640px) {
+  .show-header {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-xl);
+    text-align: center;
+  }
+
+  .show-header__info {
+    align-items: center;
+  }
+
+  .show-header__title {
+    max-width: none;
+  }
+
+  .show-auditorium {
+    padding:
+      var(--space-lg)
+      var(--space-xs)
+      var(--space-xl);
+  }
+
+  .seat-legend {
+    gap: var(--space-xs) var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+
+  .seat-legend__swatch {
+    width: 9px;
+    height: 9px;
+  }
+}
+
+/* ==========================================================================
+   SHOW PASS — SCREENING HEADER / AUDITORIUM POLISH
+   ========================================================================== */
+
+/* Keep all screening metadata together in the information column. */
+.show-header__meta {
+  margin: var(--space-xs) 0 0;
+
+  font-size: var(--text-sm);
+
+  color: var(--color-text-muted);
+
+  letter-spacing: var(--tracking-wide);
+}
+
+.show-header__meta::before {
+  content: "";
+
+  display: inline-block;
+
+  width: 5px;
+  height: 5px;
+
+  margin-right: var(--space-sm);
+
+  vertical-align: middle;
+
+  background: var(--color-accent-gold);
+
+  border-radius: var(--radius-full);
+
+  opacity: 0.8;
+}
+
+/* The legend should be visible without becoming a second heading. */
+.seat-legend {
+  color: var(--color-text-secondary);
+
+  text-shadow:
+    0 1px 10px
+    color-mix(in srgb, var(--color-black) 28%, transparent);
+}
+
+.seat-legend__swatch--available {
+  background: var(--color-surface-raised);
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--color-border-strong) 82%,
+      transparent
+    );
+}
+
+.seat-legend__swatch--selected {
+  background: var(--color-primary);
+
+  border-color: var(--color-accent-gold-muted);
+
+  box-shadow:
+    0 0 0 1px
+    color-mix(
+      in srgb,
+      var(--color-accent-gold) 12%,
+      transparent
+    ),
+    var(--shadow-glow-primary);
+}
+
+.seat-legend__swatch--booked {
+  background:
+    color-mix(
+      in srgb,
+      var(--color-surface-hover) 90%,
+      var(--color-background)
+    );
+
+  border-color: var(--color-border-strong);
+}
+
+/* Give the auditorium a little more visual separation from the page. */
+.show-auditorium {
+  border-radius: var(--radius-lg);
+
+  background:
+    radial-gradient(
+      ellipse 72% 28% at 50% 0%,
+      color-mix(in srgb, var(--color-accent-gold) 5%, transparent),
+      transparent 72%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-surface) 40%, transparent),
+      color-mix(in srgb, var(--color-background) 22%, transparent) 58%,
+      color-mix(in srgb, var(--color-black) 18%, transparent)
+    );
+}
+
+/* Keep the screen as the visual gateway into the seat field. */
+.show-auditorium .seat-grid::before {
+  margin-inline: auto;
+
+  width: min(82%, 720px);
+
+  color: var(--color-accent-gold);
+
+  text-shadow:
+    0 0 18px
+    color-mix(in srgb, var(--color-accent-gold) 10%, transparent);
+}
+
+/* Mobile: the metadata remains inside the centred screening column. */
+@media (max-width: 640px) {
+  .show-header__meta {
+    margin-top: 0;
+  }
+}
+
+/* ==========================================================================
+   SHOW PASS — HEADER BREATHING ROOM + STICKY BOOKING WORKSPACE
+   ========================================================================== */
+
+/* Comfortable breathing room below the global navbar. */
+.show-header {
+  margin-top: clamp(
+    1.75rem,
+    4vw,
+    2.75rem
+  );
+}
+
+/*
+ * Desktop:
+ * once the user reaches the booking section, it becomes a viewport-height
+ * booking station. The seat map scrolls inside the auditorium while the
+ * cinema ticket remains visible beside it.
+ */
+@media (min-width: 1080px) {
+  .show-booking-layout {
+    position: sticky;
+    top: var(--space-lg);
+
+    height: calc(100svh - (var(--space-lg) * 2));
+    max-height: calc(100svh - (var(--space-lg) * 2));
+    min-height: 34rem;
+
+    margin-bottom: var(--space-3xl);
+
+    overflow: hidden;
+
+    align-items: stretch;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      380px;
+
+    isolation: isolate;
+  }
+
+  .show-booking-layout .show-auditorium {
+    height: 100%;
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    overscroll-behavior: contain;
+
+    scrollbar-width: thin;
+    scrollbar-color:
+      var(--color-border-strong)
+      transparent;
+  }
+
+  .show-booking-layout .show-auditorium::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .show-booking-layout .show-auditorium::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .show-booking-layout .show-auditorium::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border-radius: var(--radius-full);
+  }
+
+  .show-booking-layout .booking-summary-container {
+    position: sticky;
+    top: 0;
+
+    height: 100%;
+    min-height: 0;
+
+    display: flex;
+    align-items: flex-start;
+
+    padding: var(--space-md);
+
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-surface) 26%, transparent),
+        transparent
+      );
+
+    border-left:
+      1px solid
+      color-mix(in srgb, var(--color-border) 38%, transparent);
+  }
+
+  .show-booking-layout
+  .booking-summary-container
+  .booking-summary {
+    width: 100%;
+    margin: 0;
+
+    max-height: calc(100% - var(--space-lg));
+    overflow-y: auto;
+  }
+
+  /* Keep the auditorium entrance visible while the seat rows scroll. */
+  .show-booking-layout .show-seats__title {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+
+    margin-top: 0;
+
+    padding-top: var(--space-md);
+    padding-bottom: var(--space-md);
+
+    background:
+      linear-gradient(
+        180deg,
+        var(--color-surface) 0%,
+        color-mix(in srgb, var(--color-surface) 92%, transparent) 78%,
+        transparent
+      );
+
+    backdrop-filter: blur(8px);
+  }
+
+  .show-booking-layout .seat-legend {
+    position: sticky;
+    top: 4.75rem;
+    z-index: 19;
+
+    margin-top: calc(-1 * var(--space-xs));
+    margin-bottom: var(--space-md);
+
+    padding-block: var(--space-xs);
+
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-surface) 96%, transparent),
+        transparent
+      );
+
+    backdrop-filter: blur(6px);
+  }
+}
+
+/* Tablet/mobile: keep ordinary page scrolling. */
+@media (max-width: 1079px) {
+  .show-header {
+    margin-top: var(--space-xl);
+  }
+
+  .show-booking-layout {
+    position: relative;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .show-booking-layout .show-auditorium,
+  .show-booking-layout .booking-summary-container {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 640px) {
+  .show-header {
+    margin-top: var(--space-lg);
+  }
+}
+
+
+
+
+/* ==========================================================================
+   FINAL FIX — NATURAL STICKY BOOKING WORKSPACE
+   --------------------------------------------------------------------------
+   The previous viewport-locking implementation created nested scrollbars.
+   This override removes the inner scrolling and lets the whole booking
+   workspace behave as one sticky desktop section beneath the navbar.
+   ========================================================================== */
+
+@media (min-width: 1080px) {
+  .show-header {
+    margin-top: clamp(1.75rem, 4vw, 2.75rem);
+  }
+
+  /*
+   * The booking section itself sticks beneath the navbar.
+   * It retains normal document flow and therefore never creates a second
+   * scrolling page inside the page.
+   */
+  .show-booking-layout {
+    position: sticky;
+
+    top: var(--space-lg);
+
+    height: auto;
+    min-height: 0;
+    max-height: none;
+
+    overflow: visible;
+
+    align-items: start;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      380px;
+  }
+
+  /*
+   * Auditorium must participate in normal page flow.
+   * No internal scrollbar.
+   */
+  .show-booking-layout .show-auditorium {
+    height: auto;
+    min-height: 0;
+
+    overflow: visible;
+
+    overscroll-behavior: auto;
+
+    scrollbar-width: auto;
+  }
+
+  .show-booking-layout .show-auditorium::-webkit-scrollbar {
+    display: none;
+  }
+
+  /*
+   * The ticket simply sits beside the auditorium because the parent itself
+   * is sticky. No nested sticky rail or internal scrolling is necessary.
+   */
+  .show-booking-layout .booking-summary-container {
+    position: relative;
+
+    top: auto;
+
+    height: auto;
+    min-height: 0;
+
+    display: block;
+
+    padding: 0;
+
+    background: transparent;
+
+    border-left: 0;
+  }
+
+  .show-booking-layout
+  .booking-summary-container
+  .booking-summary {
+    width: 100%;
+
+    max-height: none;
+
+    overflow: visible;
+
+    margin: 0;
+  }
+
+  /*
+   * The section title and legend are normal content again.
+   * They move naturally with the auditorium as the page scrolls.
+   */
+  .show-booking-layout .show-seats__title,
+  .show-booking-layout .seat-legend {
+    position: relative;
+
+    top: auto;
+
+    z-index: auto;
+
+    backdrop-filter: none;
+  }
+
+  /*
+   * Compact the desktop seat map just enough that the complete auditorium
+   * can comfortably fit into a typical laptop/desktop viewport once the
+   * booking workspace is parked beneath the navbar.
+   */
+  .show-booking-layout .seat-grid {
+    width: min(100%, 620px);
+
+    row-gap: var(--space-sm);
+
+    column-gap: var(--space-xs);
+
+    padding-top: var(--space-lg);
+
+    padding-bottom: var(--space-lg);
+  }
+
+  .show-booking-layout .seat {
+    aspect-ratio: 7 / 5;
+
+    font-size: var(--text-xs);
+  }
+
+  .show-booking-layout .seat:nth-child(10n + 5) {
+    margin-right: var(--space-sm);
+  }
+
+  .show-booking-layout .seat:nth-child(10n + 6) {
+    margin-left: var(--space-sm);
+  }
+}
+
+@media (max-width: 1079px) {
+  /* Keep the mobile/tablet version as ordinary document flow. */
+  .show-booking-layout {
+    position: relative;
+
+    top: auto;
+
+    height: auto;
+    min-height: 0;
+    max-height: none;
+
+    overflow: visible;
+  }
+
+  .show-booking-layout .show-auditorium,
+  .show-booking-layout .booking-summary-container,
+  .show-booking-layout .booking-summary-container .booking-summary {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+
+/* ==========================================================================
+   SHOW PAGE — DESKTOP COMPOSITION PASS
+   ==========================================================================
+   Goal:
+   - keep the screening header comfortably separated from the navbar
+   - make the booking workspace feel like one deliberate desktop station
+   - compact the auditorium vertically so the full seat field is visible
+   - align the ticket naturally with the auditorium
+   - keep normal document scrolling (no nested scrollbars)
+   ========================================================================== */
+
+@media (min-width: 1080px) {
+
+  /* ------------------------------------------------------------------------
+     1. Screening header breathing room
+     ------------------------------------------------------------------------ */
+
+  .show-header {
+    margin-top: clamp(2rem, 3vw, 2.75rem);
+    margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
+  }
+
+  /* ------------------------------------------------------------------------
+     2. Booking station
+     ------------------------------------------------------------------------ */
+
+  .show-booking-layout {
+    position: sticky;
+
+    top: var(--space-lg);
+
+    display: grid;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      360px;
+
+    column-gap: var(--space-xl);
+
+    align-items: start;
+
+    width: 100%;
+
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-3xl);
+
+    height: auto;
+    min-height: 0;
+    max-height: none;
+
+    overflow: visible;
+
+    isolation: isolate;
+  }
+
+  /* ------------------------------------------------------------------------
+     3. Auditorium chamber
+     ------------------------------------------------------------------------ */
+
+  .show-booking-layout .show-auditorium {
+    min-width: 0;
+
+    padding:
+      var(--space-lg)
+      clamp(var(--space-sm), 1.2vw, var(--space-lg))
+      var(--space-lg);
+
+    border-radius: var(--radius-lg);
+
+    background:
+      radial-gradient(
+        ellipse 78% 36% at 50% 0%,
+        color-mix(in srgb, var(--color-accent-gold) 4%, transparent),
+        transparent 72%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-surface) 34%, transparent),
+        color-mix(in srgb, var(--color-background) 10%, transparent)
+      );
+
+    box-shadow:
+      inset 0 22px 40px color-mix(in srgb, var(--color-black) 10%, transparent),
+      inset 0 -45px 64px color-mix(in srgb, var(--color-black) 12%, transparent);
+  }
+
+  /* ------------------------------------------------------------------------
+     4. Compact vertical rhythm
+     ------------------------------------------------------------------------ */
+
+  .show-booking-layout .show-seats__title {
+    margin-bottom: var(--space-sm);
+
+    padding-top: var(--space-xs);
+    padding-bottom: var(--space-xs);
+
+    background: transparent;
+  }
+
+  .show-booking-layout .seat-legend {
+    margin-bottom: var(--space-sm);
+
+    padding-block: 2px;
+
+    background: transparent;
+  }
+
+  .show-booking-layout .seat-grid {
+    width: 100%;
+
+    max-width: 760px;
+
+    margin-inline: auto;
+
+    padding:
+      var(--space-md)
+      var(--space-xs)
+      var(--space-md);
+
+    row-gap: clamp(
+      0.45rem,
+      0.75vw,
+      0.7rem
+    );
+
+    column-gap: clamp(
+      0.2rem,
+      0.45vw,
+      0.45rem
+    );
+  }
+
+  /*
+   * Fit the complete 10-row field into a much more comfortable desktop
+   * height without making seats feel miniature.
+   */
+  .show-booking-layout .seat {
+    aspect-ratio: 1.28 / 1;
+
+    min-height: 40px;
+
+    font-size: var(--text-xs);
+  }
+
+  /* Central aisle remains clearly visible. */
+  .show-booking-layout .seat:nth-child(10n + 5) {
+    margin-right: clamp(0.45rem, 0.9vw, 0.85rem);
+  }
+
+  .show-booking-layout .seat:nth-child(10n + 6) {
+    margin-left: clamp(0.45rem, 0.9vw, 0.85rem);
+  }
+
+  /* ------------------------------------------------------------------------
+     5. Screen occupies less vertical territory
+     ------------------------------------------------------------------------ */
+
+  .show-booking-layout .seat-grid::before {
+    width: min(74%, 650px);
+
+    margin-bottom: var(--space-lg);
+
+    padding-block: var(--space-sm);
+
+    min-height: 50px;
+  }
+
+  /* ------------------------------------------------------------------------
+     6. Ticket alignment
+     ------------------------------------------------------------------------ */
+
+  .show-booking-layout .booking-summary-container {
+    align-self: start;
+
+    padding: var(--space-sm) 0 0;
+
+    border-left: 0;
+
+    background: transparent;
+  }
+
+  .show-booking-layout
+  .booking-summary-container
+  .booking-summary {
+    width: 100%;
+
+    max-width: 360px;
+
+    margin: 0;
+
+    position: sticky;
+
+    top: var(--space-lg);
+  }
+
+  /*
+   * Keep the ticket centered around the upper-middle of the auditorium
+   * rather than hanging down after the seat grid.
+   */
+  .show-booking-layout .booking-summary {
+    transform: translateY(
+      clamp(
+        1rem,
+        4vh,
+        2.25rem
+      )
+    );
+  }
+
+  /* ------------------------------------------------------------------------
+     7. Desktop-only whitespace control
+     ------------------------------------------------------------------------ */
+
+  .show-booking-layout::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    top: -1px;
+
+    height: 1px;
+
+    background:
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        color-mix(in srgb, var(--color-border) 34%, transparent) 18%,
+        color-mix(in srgb, var(--color-border) 24%, transparent) 82%,
+        transparent 100%
+      );
+
+    pointer-events: none;
+  }
+}
+
+/* ==========================================================================
+   WIDER DESKTOP
+   ========================================================================== */
+
+@media (min-width: 1440px) {
+  .show-booking-layout {
+    grid-template-columns:
+      minmax(0, 1fr)
+      390px;
+
+    column-gap: var(--space-2xl);
+  }
+
+  .show-booking-layout .seat-grid {
+    max-width: 820px;
+  }
+
+  .show-booking-layout .seat {
+    min-height: 42px;
+  }
+
+  .show-booking-layout
+  .booking-summary-container
+  .booking-summary {
+    max-width: 390px;
+  }
+}
+
+/* ==========================================================================
+   TABLET / MOBILE — NORMAL SCROLLING
+   ========================================================================== */
+
+@media (max-width: 1079px) {
+  .show-booking-layout {
+    position: relative;
+
+    top: auto;
+
+    height: auto;
+    min-height: 0;
+    max-height: none;
+
+    overflow: visible;
+  }
+
+  .show-booking-layout .booking-summary-container .booking-summary {
+    position: relative;
+
+    top: auto;
+
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .show-header {
+    margin-top: var(--space-lg);
+  }
+
+  .show-booking-layout .seat {
+    min-height: 34px;
+
+    font-size: 0.7rem;
+  }
+
+  .show-booking-layout .seat-grid::before {
+    width: 88%;
+  }
+}
+
+
+/* ==========================================================================
+   SHOW PAGE — FINAL DESKTOP COMPOSITION TUNE
+   ========================================================================== */
+
+@media (min-width: 1080px) {
+  /*
+   * Keep the booking station comfortably below the navbar when it becomes
+   * sticky. This prevents the screen/title area from being clipped at the
+   * top of the viewport.
+   */
+  .show-booking-layout {
+    top: clamp(
+      5.25rem,
+      9vh,
+      7rem
+    );
+
+    margin-top: var(--space-xl);
+  }
+
+  /*
+   * Use the available desktop height more deliberately: the auditorium
+   * remains the dominant element while preserving a breathing margin around
+   * the screen and final row.
+   */
+  .show-booking-layout .show-auditorium {
+    padding-top: var(--space-md);
+    padding-bottom: var(--space-md);
+  }
+
+  .show-booking-layout .show-seats__title {
+    margin-top: 0;
+    margin-bottom: var(--space-xs);
+    padding-top: 0;
+    padding-bottom: var(--space-xs);
+  }
+
+  .show-booking-layout .seat-legend {
+    margin-top: 0;
+    margin-bottom: var(--space-xs);
+  }
+
+  .show-booking-layout .seat-grid {
+    padding-top: var(--space-sm);
+    padding-bottom: var(--space-sm);
+
+    row-gap: clamp(
+      0.35rem,
+      0.6vw,
+      0.55rem
+    );
+  }
+
+  /*
+   * Keep the complete row set comfortably inside the booking viewport
+   * without shrinking the seats excessively.
+   */
+  .show-booking-layout .seat {
+    min-height: 38px;
+  }
+
+  /*
+   * Align the ticket with the auditorium's useful vertical centre instead of
+   * making it appear too low when the workspace sticks.
+   */
+  .show-booking-layout
+  .booking-summary-container
+  .booking-summary {
+    position: sticky;
+
+    top: var(--space-md);
+
+    transform: translateY(
+      clamp(
+        1.5rem,
+        7vh,
+        3.5rem
+      )
+    );
+  }
+}
+
+@media (min-width: 1440px) {
+  .show-booking-layout {
+    top: clamp(
+      5.5rem,
+      8vh,
+      7rem
+    );
+  }
+
+  .show-booking-layout .seat {
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 1079px) {
+  .show-booking-layout {
+    top: auto;
+    margin-top: var(--space-lg);
+  }
+
+  .show-booking-layout
+  .booking-summary-container
+  .booking-summary {
+    transform: none;
+  }
+}
+
+
+
+/* ==========================================================================
+   SHOW PAGE — OVERRIDE LEGACY STICKY EXPERIMENTS
+   ========================================================================== */
+
+@media (min-width: 1080px) {
+  .show-booking-layout {
+    position: relative;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+    align-items: initial;
+  }
+
+  .show-booking-layout .show-auditorium {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    overscroll-behavior: auto;
+    scrollbar-width: auto;
+  }
+
+  .show-booking-layout .show-auditorium::-webkit-scrollbar {
+    display: none;
+  }
+
+  .show-booking-layout .booking-summary-container {
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    display: block;
+    overflow: visible;
+    background: transparent;
+    border-left: 0;
+  }
+
+  .show-booking-layout .booking-summary-container .booking-summary {
+    position: relative;
+    top: auto;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    margin: 0;
+    transform: none;
+  }
+
+  .show-booking-layout .show-seats__title,
+  .show-booking-layout .seat-legend {
+    position: relative;
+    top: auto;
+    z-index: auto;
+    backdrop-filter: none;
+  }
+}
+
+
+/* ==========================================================================
+   SHOW PAGE — FINAL STICKY BOOKING STAGE
+   ========================================================================== */
+
+@media (min-width: 1080px) {
+  .show-booking-layout {
+    position: relative;
+    display: block;
+    width: 100%;
+    margin-top: var(--space-xl);
+    padding-bottom: 70vh;
+    overflow: visible;
+  }
+
+  .show-booking-sticky {
+    position: sticky;
+    top: calc(72px + var(--space-md));
+    z-index: 20;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    align-items: start;
+    column-gap: var(--space-xl);
+    width: 100%;
+    height: calc(100vh - 72px - (var(--space-md) * 2));
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .show-booking-sticky .show-auditorium {
+    position: relative;
+    min-width: 0;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    padding: var(--space-md) clamp(var(--space-sm), 1vw, var(--space-md)) var(--space-md);
+    border-radius: var(--radius-lg);
+  }
+
+  .show-booking-sticky .show-seats__title {
+    margin-top: 0;
+    margin-bottom: var(--space-sm);
+    padding-top: 0;
+    padding-bottom: var(--space-xs);
+    background: transparent;
+  }
+
+  .show-booking-sticky .seat-legend {
+    margin-top: 0;
+    margin-bottom: var(--space-sm);
+    padding-block: 2px;
+    background: transparent;
+  }
+
+  .show-booking-sticky .seat-grid {
+    width: min(100%, 760px);
+    margin-inline: auto;
+    row-gap: clamp(4px, 0.55vh, 8px);
+    column-gap: clamp(4px, 0.45vw, 8px);
+    padding-top: var(--space-sm);
+    padding-bottom: var(--space-sm);
+    overflow: visible;
+  }
+
+  .show-booking-sticky .seat {
+    min-height: 38px;
+    aspect-ratio: 1.35 / 1;
+    font-size: var(--text-xs);
+  }
+
+  .show-booking-sticky .seat:nth-child(10n + 5) {
+    margin-right: clamp(0.4rem, 0.8vw, 0.75rem);
+  }
+
+  .show-booking-sticky .seat:nth-child(10n + 6) {
+    margin-left: clamp(0.4rem, 0.8vw, 0.75rem);
+  }
+
+  .show-booking-sticky .booking-summary-container {
+    position: relative;
+    align-self: start;
+    min-width: 0;
+    height: auto;
+    padding-top: var(--space-sm);
+    overflow: visible;
+    background: transparent;
+    border-left: 0;
+  }
+
+  .show-booking-sticky .booking-summary-container .booking-summary {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+    margin: 0;
+    overflow: visible;
+    transform: none;
+  }
+}
+
+@media (min-width: 1440px) {
+  .show-booking-sticky {
+    grid-template-columns: minmax(0, 1fr) 390px;
+    column-gap: var(--space-2xl);
+  }
+
+  .show-booking-sticky .seat-grid {
+    max-width: 820px;
+  }
+
+  .show-booking-sticky .seat {
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 1079px) {
+  .show-booking-layout {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding-bottom: 0;
+    overflow: visible;
+  }
+
+  .show-booking-sticky {
+    position: relative;
+    top: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .show-booking-sticky .show-auditorium {
+    height: auto;
+    overflow: visible;
+    padding: var(--space-lg) var(--space-xs) var(--space-xl);
+  }
+
+  .show-booking-sticky .booking-summary-container {
+    padding-top: 0;
+  }
+
+  .show-booking-sticky .booking-summary-container .booking-summary {
+    position: relative;
+    top: auto;
+    transform: none;
+  }
+}
+
+
+/* ==========================================================================
+   SHOW PAGE — FINAL SEATING FIT FIX
+   ========================================================================== */
+
+@media (min-width: 1080px) {
+  /*
+   * The sticky stage remains the viewport anchor, but the auditorium itself
+   * must NOT clip the final seat row.
+   */
+  .show-booking-sticky .show-auditorium {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+
+    padding-top: var(--space-sm);
+    padding-bottom: var(--space-sm);
+  }
+
+  /*
+   * Compact the vertical rhythm across all ten rows.
+   */
+  .show-booking-sticky .show-seats__title {
+    margin-bottom: 0.2rem;
+    padding-bottom: 0.15rem;
+  }
+
+  .show-booking-sticky .seat-legend {
+    margin-bottom: 0.25rem;
+    padding-block: 0;
+  }
+
+  .show-booking-sticky .seat-grid {
+    row-gap: 0.34rem;
+    column-gap: 0.38rem;
+
+    padding-top: 0.4rem;
+    padding-bottom: 0.35rem;
+  }
+
+  /*
+   * Slightly shorter seats preserve readability while fitting A-J.
+   */
+  .show-booking-sticky .seat {
+    min-height: 0;
+
+    height: clamp(34px, 4.4vh, 39px);
+
+    aspect-ratio: auto;
+
+    font-size: var(--text-xs);
+  }
+
+  /*
+   * Keep the screen from consuming too much vertical space.
+   */
+  .show-booking-sticky .seat-grid::before {
+    width: min(68%, 620px);
+
+    min-height: 0;
+
+    height: clamp(42px, 6.2vh, 52px);
+
+    margin-bottom: 0.5rem;
+
+    padding-block: 0.15rem;
+  }
+
+  /*
+   * The sticky stage should size itself to the full visible auditorium.
+   * Do not force a fixed height that clips row J.
+   */
+  .show-booking-sticky {
+    height: auto;
+    min-height: 0;
+  }
+
+  /*
+   * Ticket stays beside the complete auditorium.
+   */
+  .show-booking-sticky .booking-summary-container {
+    align-self: start;
+  }
+}
+
+/* Extra-tight desktop tuning for shorter laptop viewports. */
+@media (min-width: 1080px) and (max-height: 820px) {
+  .show-booking-sticky .seat {
+    height: 33px;
+  }
+
+  .show-booking-sticky .seat-grid {
+    row-gap: 0.25rem;
+  }
+
+  .show-booking-sticky .seat-grid::before {
+    height: 38px;
+    margin-bottom: 0.35rem;
+  }
+
+  .show-booking-sticky .show-auditorium {
+    padding-block: 0.4rem;
+  }
+}
+
+@media (min-width: 1440px) and (min-height: 900px) {
+  .show-booking-sticky .seat {
+    height: 39px;
+  }
+}
+
+/*
+ * The outer booking region still provides the sticky scroll range.
+ * The auditorium itself no longer hides the lower rows.
+ */
+
+
+/* ==========================================================================
+   FINAL MOBILE SEAT GRID FIX
+   --------------------------------------------------------------------------
+   All ten seats in every row must stay inside the phone viewport.
+   Desktop/tablet composition is intentionally untouched.
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .show-booking-layout,
+  .show-booking-layout .show-auditorium {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .show-booking-layout .show-auditorium {
+    padding-inline: 0.45rem;
+  }
+
+  /*
+   * Explicit ten-column grid for the narrow viewport.
+   * Each seat gets an equal share of the available width.
+   */
+  .show-booking-layout .seat-grid {
+    display: grid;
+
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    margin-inline: auto;
+
+    column-gap: clamp(0.12rem, 0.9vw, 0.3rem);
+    row-gap: clamp(0.28rem, 1.5vw, 0.45rem);
+
+    padding:
+      0.45rem
+      0.2rem
+      0.7rem;
+
+    box-sizing: border-box;
+  }
+
+  /*
+   * The old desktop aisle offsets consume too much horizontal space on
+   * phones, so the mobile layout creates the aisle with a grid-column gap.
+   */
+  .show-booking-layout .seat:nth-child(10n + 5),
+  .show-booking-layout .seat:nth-child(10n + 6) {
+    margin-inline: 0;
+  }
+
+  .show-booking-layout .seat {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+
+    aspect-ratio: 1.35 / 1;
+
+    padding:
+      0.18rem
+      0.08rem;
+
+    box-sizing: border-box;
+
+    font-size: clamp(0.58rem, 2.2vw, 0.72rem);
+    line-height: 1;
+
+    overflow: hidden;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
+
+  /*
+   * Keep the cinema screen proportional to the phone width.
+   */
+  .show-booking-layout .seat-grid::before {
+    grid-column: 1 / -1;
+
+    width: 82%;
+    max-width: 82%;
+
+    min-height: 0;
+    height: clamp(2.2rem, 8vw, 3.1rem);
+
+    margin:
+      0 auto
+      0.7rem;
+
+    padding-block: 0.15rem;
+
+    box-sizing: border-box;
+  }
+
+  /*
+   * Keep the complete auditorium visible without introducing a nested
+   * horizontal scrollbar.
+   */
+  .show-booking-layout .show-auditorium {
+    overflow-x: clip;
+  }
+
+  /*
+   * Booking summary stays below the auditorium on mobile.
+   */
+  .show-booking-layout .booking-summary-container,
+  .show-booking-layout
+  .booking-summary-container
+  .booking-summary {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 380px) {
+  .show-booking-layout .show-auditorium {
+    padding-inline: 0.25rem;
+  }
+
+  .show-booking-layout .seat-grid {
+    column-gap: 0.1rem;
+
+    padding-inline: 0.1rem;
+  }
+
+  .show-booking-layout .seat {
+    aspect-ratio: 1.25 / 1;
+
+    font-size: 0.56rem;
+  }
 }

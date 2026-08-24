@@ -12,64 +12,60 @@
 :root {
 
   /* ===== Primary ===== */
-  /* Cinematic marquee red — deep, velvet, restrained (not a streaming-brand red) */
+  /* Cinematic gold — restrained theatre marquee accent */
 
-  --color-primary: #a3161f;
-  --color-primary-hover: #8a1119;
-  --color-primary-active: #6e0d14;
+  --color-primary: #c9a24a;
+  --color-primary-hover: #d8b766;
+  --color-primary-active: #a98535;
 
-  /* ===== Accent (new) ===== */
-  /* Muted theatre champagne — used sparingly for highlights, prices, active states.
-     (Variable names kept as "-gold" for backward compatibility with existing
-     component CSS; the value itself is champagne, not literal gold.) */
+  /* ===== Accent ===== */
+  /* Warm theatre gold — used for highlights, prices, active states and focus */
 
-  --color-accent-gold: #d4c19c;
-  --color-accent-gold-hover: #c2ac82;
-  --color-accent-gold-muted: #9c8f6e;
+  --color-accent-gold: #c9a24a;
+  --color-accent-gold-hover: #d8b766;
+  --color-accent-gold-muted: #8f7438;
 
   /* ===== Neutral ===== */
 
-  --color-white: #ffffff;
-  --color-black: #000000;
+  --color-white: #f5f2ea;
+  --color-black: #070707;
 
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
+  --color-gray-50: #faf9f5;
+  --color-gray-100: #eeeae1;
+  --color-gray-200: #ddd8ce;
+  --color-gray-300: #c5c0b6;
+  --color-gray-400: #a7a29a;
+  --color-gray-500: #8e8a82;
+  --color-gray-600: #6f6b64;
+  --color-gray-700: #4d4a45;
+  --color-gray-800: #2d2b28;
+  --color-gray-900: #181818;
 
   /* ===== Semantic ===== */
 
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --color-info: #3b82f6;
+  --color-success: #5e9a70;
+  --color-warning: #c08a32;
+  --color-danger: #b84a4a;
+  --color-info: #7188a8;
 
   /* ===== Background ===== */
-  /* Deep midnight navy (not warm charcoal, not cool slate-grey) with
-     layered surfaces */
+  /* Black theatre environment with layered charcoal surfaces */
 
-  --color-background: #0a0e18;
-  --color-surface: #131b2e;
-  --color-surface-hover: #1d2740;
-  --color-surface-raised: #171f36;
+  --color-background: #070707;
+  --color-surface: #111111;
+  --color-surface-hover: #222222;
+  --color-surface-raised: #181818;
 
   /* ===== Text ===== */
-  /* Warm cream/champagne-tinted rather than pure white, so text still
-     reads as lit and inviting against the cooler navy background */
+  /* Warm ivory for a softer cinematic white */
 
-  --color-text-primary: #f2ecdd;
-  --color-text-secondary: #c7bfa8;
-  --color-text-muted: #8f8a76;
+  --color-text-primary: #f5f2ea;
+  --color-text-secondary: #c9c5bc;
+  --color-text-muted: #8e8a82;
 
   /* ===== Border ===== */
-  /* Subtle, navy-toned borders that read against navy surfaces */
+  /* Quiet charcoal borders so gold remains the visual signature */
 
-  --color-border: #263252;
-  --color-border-strong: #37456b;
+  --color-border: #2c2c2c;
+  --color-border-strong: #44413b;
 }

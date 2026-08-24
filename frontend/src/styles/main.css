@@ -34,6 +34,7 @@
 @import "./components/booking/seat-grid.css";
 @import "./components/booking/booking-summary.css";
 @import "./components/booking/login-modal.css";
+@import "./components/booking/booking-page.css";
 @import "./components/show.css";
 @import "./components/account.css";
 @import "./components/login.css";

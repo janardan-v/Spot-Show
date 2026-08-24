@@ -1,75 +1,39 @@
 /*
 |--------------------------------------------------------------------------
-| Color Tokens
+| Shadow Tokens
 |--------------------------------------------------------------------------
 |
-| This file defines the visual identity of the application.
-| Components should NEVER use hardcoded colors.
-| Always reference these variables.
+| This file defines the application's shadow and cinematic glow system.
+| Components should reference these variables rather than hardcode shadows.
 |
 */
 
 :root {
 
-  /* ===== Primary ===== */
-  /* Cinematic marquee red — deep, velvet, restrained (not a streaming-brand red) */
+  /* ===== Base shadows ===== */
 
-  --color-primary: #a3161f;
-  --color-primary-hover: #8a1119;
-  --color-primary-active: #6e0d14;
+  --shadow-xs:
+    0 1px 2px rgba(0, 0, 0, 0.22);
 
-  /* ===== Accent (new) ===== */
-  /* Muted theatre champagne — used sparingly for highlights, prices, active states.
-     (Variable names kept as "-gold" for backward compatibility with existing
-     component CSS; the value itself is champagne, not literal gold.) */
+  --shadow-sm:
+    0 3px 8px rgba(0, 0, 0, 0.28);
 
-  --color-accent-gold: #d4c19c;
-  --color-accent-gold-hover: #c2ac82;
-  --color-accent-gold-muted: #9c8f6e;
+  --shadow-md:
+    0 8px 20px rgba(0, 0, 0, 0.34);
 
-  /* ===== Neutral ===== */
+  --shadow-lg:
+    0 14px 34px rgba(0, 0, 0, 0.40);
 
-  --color-white: #ffffff;
-  --color-black: #000000;
+  --shadow-xl:
+    0 24px 56px rgba(0, 0, 0, 0.48);
 
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
+  /* ===== Cinematic glows ===== */
 
-  /* ===== Semantic ===== */
+  --shadow-glow-primary:
+    0 0 22px rgba(201, 162, 74, 0.18),
+    0 0 48px rgba(201, 162, 74, 0.08);
 
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --color-info: #3b82f6;
-
-  /* ===== Background ===== */
-  /* Deep midnight navy (not warm charcoal, not cool slate-grey) with
-     layered surfaces */
-
-  --color-background: #0a0e18;
-  --color-surface: #131b2e;
-  --color-surface-hover: #1d2740;
-  --color-surface-raised: #171f36;
-
-  /* ===== Text ===== */
-  /* Warm cream/champagne-tinted rather than pure white, so text still
-     reads as lit and inviting against the cooler navy background */
-
-  --color-text-primary: #f2ecdd;
-  --color-text-secondary: #c7bfa8;
-  --color-text-muted: #8f8a76;
-
-  /* ===== Border ===== */
-  /* Subtle, navy-toned borders that read against navy surfaces */
-
-  --color-border: #263252;
-  --color-border-strong: #37456b;
+  --shadow-glow-gold:
+    0 0 18px rgba(201, 162, 74, 0.18),
+    0 14px 42px rgba(201, 162, 74, 0.08);
 }

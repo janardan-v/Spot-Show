@@ -19,7 +19,7 @@ Seat Grid
 
   grid-template-columns: repeat(10, 1fr);
 
-  row-gap: var(--space-sm);
+  row-gap: var(--space-md);
 
   column-gap: var(--space-sm);
 
@@ -27,9 +27,9 @@ Seat Grid
 
   margin-inline: auto;
 
-  padding-top: var(--space-lg);
+  padding-top: var(--space-xl);
 
-  padding-bottom: var(--space-lg);
+  padding-bottom: var(--space-xl);
 
   /* Screen-light falloff into the room. A single radial gradient
      anchored at the screen, fading out well before the bottom of the
@@ -39,9 +39,9 @@ Seat Grid
      container rather than pinned to a row count. */
 
   background-image: radial-gradient(
-    ellipse 90% 60% at 50% 0%,
+    ellipse 90% 55% at 50% 0%,
     color-mix(in srgb, var(--color-accent-gold) 7%, transparent) 0%,
-    transparent 90%
+    transparent 88%
   );
 
   background-repeat: no-repeat;
@@ -66,7 +66,7 @@ Seat Grid
 
   grid-column: 1 / -1;
 
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-xl);
 
   padding-block: var(--space-md);
 
@@ -246,13 +246,17 @@ Seat Grid
 
 @media (max-width: 640px) {
   .seat-grid {
-    gap: var(--space-xs);
+    row-gap: var(--space-sm);
 
-    padding-top: var(--space-md);
+    column-gap: var(--space-xs);
+
+    padding-top: var(--space-lg);
+
+    padding-bottom: var(--space-lg);
   }
 
   .seat-grid::before {
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-lg);
 
     font-size: 0.65rem;
   }
@@ -267,5 +271,68 @@ Seat Grid
 
   .seat {
     font-size: 0.65rem;
+  }
+}
+
+/* ==========================================================================
+   SHOW PAGE AUDITORIUM REFINEMENT
+   Existing seat-state rules above remain intact.
+   ========================================================================== */
+
+.show-auditorium .seat-grid {
+  padding:
+    var(--space-xl)
+    clamp(var(--space-xs), 1.3vw, var(--space-lg))
+    var(--space-2xl);
+  background:
+    radial-gradient(
+      ellipse 90% 42% at 50% 0%,
+      color-mix(in srgb, var(--color-accent-gold) 6%, transparent),
+      transparent 72%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-surface-raised) 12%, transparent),
+      transparent 34%
+    );
+  border-top:
+    1px solid
+    color-mix(in srgb, var(--color-border-strong) 28%, transparent);
+  border-bottom:
+    1px solid
+    color-mix(in srgb, var(--color-border) 22%, transparent);
+  box-shadow:
+    inset 0 28px 58px color-mix(in srgb, var(--color-black) 16%, transparent),
+    inset 0 -60px 80px color-mix(in srgb, var(--color-black) 20%, transparent);
+}
+
+.show-auditorium .seat-grid::before {
+  margin-bottom: var(--space-xl);
+  border:
+    1px solid
+    color-mix(in srgb, var(--color-accent-gold) 10%, transparent);
+  box-shadow:
+    0 10px 34px color-mix(in srgb, var(--color-black) 22%, transparent);
+}
+
+.show-auditorium .seat:nth-child(10n + 5) {
+  margin-right: var(--space-md);
+}
+
+.show-auditorium .seat:nth-child(10n + 6) {
+  margin-left: var(--space-md);
+}
+
+@media (max-width: 640px) {
+  .show-auditorium .seat-grid {
+    padding-inline: 0;
+  }
+
+  .show-auditorium .seat:nth-child(10n + 5) {
+    margin-right: var(--space-sm);
+  }
+
+  .show-auditorium .seat:nth-child(10n + 6) {
+    margin-left: var(--space-sm);
   }
 }

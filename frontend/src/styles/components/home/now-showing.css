@@ -1,100 +1,2834 @@
 /*
 |--------------------------------------------------------------------------
-| Now Showing
+| Now Showing — SpotShow Cinema Gallery / Current Canonical Version
 |--------------------------------------------------------------------------
 |
-| Layout styles for the Now Showing section.
-| A modern lobby display wall of framed posters — generous spacing,
-| aligned rows, restrained section header treatment.
+| The gallery is treated as a physical corridor rather than a poster grid.
+| Two opposing walls, a floor, ceiling lights and a central vanishing point
+| stay fixed while the poster pairs travel through depth as the visitor
+| scrolls forward.
 |
 */
 
 .now-showing {
-  padding-block: var(--space-3xl);
+    --gallery-perspective: 1700px;
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    padding-block: var(--space-3xl) 0;
+    background:
+        radial-gradient(
+            ellipse 44% 60% at 50% 15%,
+            color-mix(in srgb, var(--color-accent-gold) 5%, transparent),
+            transparent 72%
+        ),
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-background) 94%, black),
+            var(--color-background) 48%,
+            color-mix(in srgb, var(--color-background) 92%, black)
+        );
+}
+
+.now-showing::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -5;
+    pointer-events: none;
+    background:
+        radial-gradient(
+            ellipse 30% 35% at 50% 36%,
+            color-mix(in srgb, var(--color-accent-gold) 6%, transparent),
+            transparent 78%
+        ),
+        linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--color-black) 30%, transparent),
+            transparent 28%,
+            transparent 72%,
+            color-mix(in srgb, var(--color-black) 30%, transparent)
+        );
+}
+
+.now-showing::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 11%;
+    bottom: 0;
+    z-index: -4;
+    width: min(36%, 520px);
+    transform: translateX(-50%);
+    pointer-events: none;
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            color-mix(in srgb, var(--color-accent-gold) 4%, transparent) 50%,
+            transparent
+        );
+    clip-path: polygon(48% 0, 52% 0, 100% 100%, 0 100%);
+    opacity: 0.9;
 }
 
 .now-showing__title {
-  position: relative;
-
-  display: inline-block;
-
-  margin-bottom: var(--space-2xl);
-
-  padding-bottom: var(--space-sm);
-
-  font-family: var(--font-family-display);
-
-  font-size: var(--text-2xl);
-
-  font-weight: var(--font-bold);
-
-  letter-spacing: var(--tracking-wide);
-
-  color: var(--color-text-primary);
+    position: relative;
+    z-index: 10;
+    display: block;
+    width: min(100%, 1120px);
+    margin: 0 auto var(--space-xl);
+    padding-inline: var(--space-sm);
+    padding-bottom: var(--space-md);
+    font-family: var(--font-family-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-text-primary);
+    text-align: left;
 }
 
-/* Small marquee-style underline accent instead of a heavy divider rule. */
+.now-showing__title::before {
+    content: "THE GALLERY";
+    display: block;
+    margin-bottom: var(--space-xs);
+    font-family: var(--font-family-base);
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
+    letter-spacing: var(--tracking-wider);
+    color: var(--color-text-muted);
+}
 
 .now-showing__title::after {
-  content: "";
-
-  position: absolute;
-
-  left: 0;
-
-  bottom: 0;
-
-  width: 48px;
-
-  height: 2px;
-
-  background-color: var(--color-accent-gold);
+    content: "";
+    position: absolute;
+    left: var(--space-sm);
+    bottom: 0;
+    width: 52px;
+    height: 2px;
+    background-color: var(--color-accent-gold);
 }
 
-.now-showing__grid {
-  display: grid;
-
-  grid-template-columns: repeat(4, 1fr);
-
-  gap: var(--space-xl);
-
-  align-items: stretch;
+.now-showing__sequence {
+    position: relative;
+    width: min(100%, 1320px);
+    margin-inline: auto;
 }
 
-/* ===== Responsive behavior ===== */
+/* One physical camera position. */
+.now-showing__stage {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    height: min(88svh, 900px);
+    min-height: 650px;
+    overflow: hidden;
+    perspective: var(--gallery-perspective);
+    perspective-origin: 50% 48%;
+    transform-style: preserve-3d;
+    background:
+        radial-gradient(
+            ellipse 22% 30% at 50% 45%,
+            color-mix(in srgb, var(--color-text-primary) 3%, transparent),
+            transparent 75%
+        );
+}
+
+/* Physical gallery atmosphere: architectural light bands and a soft ceiling-to-floor
+   gradient move subtly with the visitor instead of leaving the scene as a flat void. */
+.now-showing__stage::before,
+.now-showing__stage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.now-showing__stage::before {
+    background:
+        linear-gradient(90deg,
+            transparent 0%,
+            color-mix(in srgb, var(--color-surface) 22%, transparent) 13%,
+            transparent 13.3%,
+            transparent 86.7%,
+            color-mix(in srgb, var(--color-surface) 22%, transparent) 87%,
+            transparent 100%),
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--color-surface) 16%, transparent),
+            transparent 28%,
+            transparent 68%,
+            color-mix(in srgb, var(--color-black) 28%, transparent));
+    opacity: 0.9;
+    transform: translate3d(calc(var(--gallery-scene-progress, 0) * -18px), 0, 0);
+}
+
+.now-showing__stage::after {
+    background:
+        radial-gradient(ellipse 18% 42% at calc(50% - 19% + var(--gallery-scene-progress, 0) * 10%) 43%,
+            color-mix(in srgb, var(--color-accent-gold) 6%, transparent), transparent 70%),
+        radial-gradient(ellipse 18% 42% at calc(50% + 19% - var(--gallery-scene-progress, 0) * 10%) 43%,
+            color-mix(in srgb, var(--color-accent-gold) 6%, transparent), transparent 70%);
+    mix-blend-mode: screen;
+    opacity: 0.8;
+}
+
+/* The two architectural walls. */
+.now-showing__walls,
+.now-showing__wall {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transform-style: preserve-3d;
+}
+
+.now-showing__wall::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        repeating-linear-gradient(90deg,
+            transparent 0,
+            transparent 24.5%,
+            color-mix(in srgb, var(--color-border) 13%, transparent) 24.8%,
+            color-mix(in srgb, var(--color-black) 20%, transparent) 25.1%,
+            transparent 25.4%),
+        repeating-linear-gradient(0deg,
+            transparent 0,
+            transparent 31%,
+            color-mix(in srgb, var(--color-border) 7%, transparent) 31.2%,
+            transparent 31.5%);
+    opacity: 0.42;
+    transform: translateX(calc(var(--gallery-scene-progress, 0) * 12px));
+}
+
+.now-showing__wall::after {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 18%;
+    bottom: 6%;
+    border: 1px solid color-mix(in srgb, var(--color-border) 9%, transparent);
+    box-shadow:
+        inset 0 0 35px color-mix(in srgb, var(--color-black) 22%, transparent),
+        0 0 28px color-mix(in srgb, var(--color-black) 18%, transparent);
+    opacity: 0.55;
+    transform: translateX(calc(var(--gallery-scene-progress, 0) * -8px));
+}
+
+.now-showing__wall--left {
+    clip-path: polygon(0 0, 47% 13%, 47% 100%, 0 100%);
+    background:
+        linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--color-black) 52%, transparent),
+            color-mix(in srgb, var(--color-surface) 26%, transparent) 74%,
+            transparent
+        );
+    border-right: 1px solid color-mix(in srgb, var(--color-accent-gold) 8%, transparent);
+}
+
+.now-showing__wall--right {
+    clip-path: polygon(53% 13%, 100% 0, 100% 100%, 53% 100%);
+    background:
+        linear-gradient(
+            270deg,
+            color-mix(in srgb, var(--color-black) 52%, transparent),
+            color-mix(in srgb, var(--color-surface) 26%, transparent) 74%,
+            transparent
+        );
+    border-left: 1px solid color-mix(in srgb, var(--color-accent-gold) 8%, transparent);
+}
+
+/* Ceiling recedes toward the same vanishing point as the floor. */
+.now-showing__ceiling {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    clip-path: polygon(0 0, 100% 0, 53% 36%, 47% 36%);
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-black) 58%, transparent),
+            color-mix(in srgb, var(--color-surface) 16%, transparent)
+        );
+}
+
+.now-showing__ceiling span {
+    position: absolute;
+    top: 5%;
+    width: 9%;
+    height: 2px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-text-primary) 42%, transparent);
+    box-shadow:
+        0 0 16px color-mix(in srgb, var(--color-text-primary) 26%, transparent),
+        0 0 38px color-mix(in srgb, var(--color-accent-gold) 14%, transparent);
+}
+
+.now-showing__ceiling span:nth-child(1) { left: 8%; transform: rotate(7deg); }
+.now-showing__ceiling span:nth-child(2) { left: 31%; transform: rotate(3deg); }
+.now-showing__ceiling span:nth-child(3) { right: 31%; transform: rotate(-3deg); }
+.now-showing__ceiling span:nth-child(4) { right: 8%; transform: rotate(-7deg); }
+
+.now-showing__ceiling::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 44%;
+    height: 34%;
+    transform: translateX(-50%);
+    background:
+        linear-gradient(90deg,
+            transparent,
+            color-mix(in srgb, var(--color-surface) 24%, transparent) 18%,
+            color-mix(in srgb, var(--color-text-primary) 5%, transparent) 50%,
+            color-mix(in srgb, var(--color-surface) 24%, transparent) 82%,
+            transparent);
+    clip-path: polygon(0 0, 100% 0, 57% 100%, 43% 100%);
+    opacity: 0.72;
+    transform: translateX(calc(-50% + var(--gallery-scene-progress, 0) * 10px));
+}
+
+/* Floor converges to a point behind the poster pairs. */
+.now-showing__floor {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    clip-path: polygon(0 100%, 100% 100%, 53% 39%, 47% 39%);
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent 0,
+            transparent 11%,
+            color-mix(in srgb, var(--color-border) 8%, transparent) 11.2%,
+            transparent 11.5%
+        ),
+        linear-gradient(
+            180deg,
+            transparent 0,
+            color-mix(in srgb, var(--color-black) 20%, transparent) 48%,
+            color-mix(in srgb, var(--color-black) 54%, transparent)
+        );
+}
+
+.now-showing__floor::before,
+.now-showing__floor::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 39%;
+    width: 1px;
+    height: 70%;
+    transform-origin: top center;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-accent-gold) 14%, transparent),
+        transparent
+    );
+}
+
+.now-showing__floor::before { transform: rotate(19deg); }
+.now-showing__floor::after { transform: rotate(-19deg); }
+
+.now-showing__floor-line {
+    position: absolute;
+    left: 50%;
+    top: 39%;
+    width: 100%;
+    height: 1px;
+    transform-origin: center top;
+    background: color-mix(in srgb, var(--color-border) 12%, transparent);
+}
+
+.now-showing__floor-line--1 { transform: translateX(-50%) scaleY(1) translateY(60px); }
+.now-showing__floor-line--2 { transform: translateX(-50%) scaleY(1) translateY(145px); }
+.now-showing__floor-line--3 { transform: translateX(-50%) scaleY(1) translateY(260px); }
+
+.now-showing__pairs {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    transform-style: preserve-3d;
+}
+
+.now-showing__pair {
+    --gallery-distance: -900px;
+    --gallery-opacity: 0;
+    --gallery-scale: 0.52;
+    --gallery-rotate: 0deg;
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    justify-items: center;
+    column-gap: clamp(140px, 17vw, 260px);
+    padding-inline: clamp(28px, 5vw, 90px);
+    opacity: var(--gallery-opacity);
+    visibility: visible;
+    pointer-events: none;
+    transform:
+        translate3d(var(--gallery-x), 0, var(--gallery-distance))
+        scale(var(--gallery-scale))
+        rotateY(var(--gallery-rotate));
+    transform-style: preserve-3d;
+    transform-origin: 50% 50%;
+    will-change: transform, opacity;
+}
+
+.now-showing__pair.is-active {
+    pointer-events: auto;
+}
+
+/* The frames themselves are physical objects attached to opposite walls. */
+.now-showing__frame {
+    position: relative;
+    width: min(100%, 292px);
+    padding: 10px;
+    background:
+        linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--color-text-primary) 18%, var(--color-surface)),
+            var(--color-surface)
+        );
+    border: 1px solid color-mix(in srgb, var(--color-accent-gold) 28%, var(--color-border));
+    box-shadow:
+        0 0 0 4px color-mix(in srgb, var(--color-black) 70%, transparent),
+        0 20px 48px color-mix(in srgb, var(--color-black) 55%, transparent),
+        0 0 34px color-mix(in srgb, var(--color-accent-gold) 5%, transparent);
+    transform-style: preserve-3d;
+}
+
+.now-showing__frame::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    z-index: -1;
+    border: 1px solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+    background: color-mix(in srgb, var(--color-black) 72%, transparent);
+}
+
+.now-showing__frame--left {
+    justify-self: end;
+    transform: perspective(1100px) rotateY(10deg) rotateZ(-0.3deg);
+    transform-origin: right center;
+}
+
+.now-showing__frame--right {
+    justify-self: start;
+    transform: perspective(1100px) rotateY(-10deg) rotateZ(0.3deg);
+    transform-origin: left center;
+}
+
+.now-showing__frame .movie-card {
+    width: 100%;
+}
+
+/* Warm pools of light imply gallery spotlights without looking decorative. */
+.now-showing__frame::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -30px;
+    width: 90%;
+    height: 80%;
+    z-index: -2;
+    transform: translateX(-50%);
+    background: radial-gradient(
+        ellipse,
+        color-mix(in srgb, var(--color-accent-gold) 10%, transparent),
+        transparent 70%
+    );
+    filter: blur(12px);
+    pointer-events: none;
+}
+
+.now-showing__vanishing-light {
+    position: absolute;
+    left: 50%;
+    top: 35%;
+    z-index: 2;
+    width: 180px;
+    height: 90px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(
+        ellipse,
+        color-mix(in srgb, var(--color-text-primary) 12%, transparent),
+        transparent 70%
+    );
+    filter: blur(10px);
+    pointer-events: none;
+}
+
+.now-showing__walkway {
+    position: absolute;
+    left: 50%;
+    bottom: -12%;
+    z-index: 3;
+    width: min(31%, 420px);
+    height: 65%;
+    transform: translateX(-50%) perspective(1000px) rotateX(64deg);
+    transform-origin: bottom center;
+    pointer-events: none;
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            color-mix(in srgb, var(--color-text-primary) 5%, transparent) 48%,
+            transparent
+        );
+    border-inline: 1px solid color-mix(in srgb, var(--color-accent-gold) 7%, transparent);
+    box-shadow: 0 -12px 45px color-mix(in srgb, var(--color-accent-gold) 3%, transparent);
+}
+
+/* Invisible scroll markers supply the physical walking distance. */
+.now-showing__steps {
+    position: relative;
+    z-index: 1;
+    margin-top: calc(-1 * min(88svh, 900px));
+    pointer-events: none;
+}
+
+.now-showing__step {
+    height: min(88svh, 900px);
+}
+
+.now-showing__step:last-child {
+    height: min(72svh, 740px);
+}
+
+.now-showing__pair--single {
+    grid-template-columns: 1fr;
+}
+
+.now-showing__pair--single .now-showing__frame--left {
+    justify-self: center;
+    transform: perspective(1100px) rotateY(0deg);
+}
+
+@media (min-width: 1200px) {
+    .now-showing__stage {
+        height: min(90svh, 930px);
+    }
+
+    .now-showing__steps {
+        margin-top: calc(-1 * min(90svh, 930px));
+    }
+
+    .now-showing__step {
+        height: min(90svh, 930px);
+    }
+}
 
 @media (max-width: 1024px) {
+    .now-showing {
+        --gallery-perspective: 1200px;
+    }
 
-  .now-showing__grid {
+    .now-showing__stage {
+        height: 82svh;
+        min-height: 590px;
+    }
 
-    grid-template-columns: repeat(2, 1fr);
+    .now-showing__steps {
+        margin-top: -82svh;
+    }
 
-    gap: var(--space-lg);
+    .now-showing__step {
+        height: 82svh;
+    }
 
-  }
+    .now-showing__pair {
+        column-gap: clamp(70px, 11vw, 150px);
+        padding-inline: 22px;
+    }
 
+    .now-showing__frame {
+        width: min(100%, 250px);
+    }
+
+    .now-showing__frame--left {
+        transform: perspective(900px) rotateY(7deg);
+    }
+
+    .now-showing__frame--right {
+        transform: perspective(900px) rotateY(-7deg);
+    }
 }
 
 @media (max-width: 640px) {
+    .now-showing {
+        --gallery-perspective: none;
+        padding-top: var(--space-2xl);
+    }
 
-  .now-showing {
+    .now-showing::after,
+    .now-showing__ceiling,
+    .now-showing__walls,
+    .now-showing__floor,
+    .now-showing__vanishing-light,
+    .now-showing__walkway {
+        display: none;
+    }
 
-    padding-block: var(--space-2xl);
+    .now-showing__title {
+        width: 100%;
+        margin-bottom: var(--space-md);
+        font-size: var(--text-xl);
+    }
 
-  }
+    .now-showing__stage {
+        height: 78svh;
+        min-height: 560px;
+        perspective: none;
+    }
 
-  .now-showing__grid {
+    .now-showing__steps {
+        margin-top: -78svh;
+    }
 
-    grid-template-columns: 1fr;
+    .now-showing__step {
+        height: 78svh;
+    }
 
-    gap: var(--space-lg);
+    .now-showing__pair {
+        grid-template-columns: 1fr;
+        row-gap: var(--space-lg);
+        padding-inline: var(--space-md);
+    }
 
-  }
+    .now-showing__frame,
+    .now-showing__frame--left,
+    .now-showing__frame--right,
+    .now-showing__pair--single .now-showing__frame--left {
+        width: min(100%, 280px);
+        justify-self: center;
+        transform: none;
+    }
+}
 
-  .now-showing__title {
+@media (prefers-reduced-motion: reduce) {
+    .now-showing__pair {
+        transform: none;
+        transition: none;
+    }
+}
 
-    font-size: var(--text-xl);
+/* ================================================================
+   PASS 5 — architectural environment refinement
+   ================================================================ */
 
-  }
+.now-showing__stage {
+    background:
+        radial-gradient(ellipse 16% 20% at 50% 38%,
+            color-mix(in srgb, var(--color-accent-gold) 9%, transparent),
+            transparent 72%),
+        radial-gradient(ellipse 70% 55% at 50% 100%,
+            color-mix(in srgb, var(--color-surface) 42%, transparent),
+            transparent 72%),
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--color-surface) 34%, var(--color-background)) 0%,
+            var(--color-background) 48%,
+            color-mix(in srgb, var(--color-black) 18%, var(--color-background)) 100%);
+}
 
+/* Architectural wall bays: the hall should read as a constructed room,
+   not a backdrop behind floating cards. */
+.now-showing__wall::before {
+    background:
+        linear-gradient(90deg,
+            transparent 0,
+            transparent 12%,
+            color-mix(in srgb, var(--color-border) 13%, transparent) 12.2%,
+            transparent 12.5%,
+            transparent 25%,
+            color-mix(in srgb, var(--color-border) 10%, transparent) 25.2%,
+            transparent 25.5%,
+            transparent 50%,
+            color-mix(in srgb, var(--color-border) 11%, transparent) 50.2%,
+            transparent 50.5%,
+            transparent 75%,
+            color-mix(in srgb, var(--color-border) 10%, transparent) 75.2%,
+            transparent 75.5%,
+            transparent 87.5%,
+            color-mix(in srgb, var(--color-border) 13%, transparent) 87.8%,
+            transparent 88%),
+        repeating-linear-gradient(0deg,
+            transparent 0,
+            transparent 31%,
+            color-mix(in srgb, var(--color-border) 8%, transparent) 31.2%,
+            transparent 31.6%);
+    opacity: .52;
+}
+
+.now-showing__wall::after {
+    border: 1px solid color-mix(in srgb, var(--color-text-primary) 7%, transparent);
+    box-shadow:
+        inset 0 0 55px color-mix(in srgb, var(--color-black) 26%, transparent),
+        inset 0 -30px 40px color-mix(in srgb, var(--color-black) 18%, transparent),
+        0 0 34px color-mix(in srgb, var(--color-black) 20%, transparent);
+}
+
+/* Recessed ceiling panels and a soft central ceiling glow. */
+.now-showing__ceiling {
+    background:
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--color-black) 70%, transparent),
+            color-mix(in srgb, var(--color-surface) 22%, transparent));
+}
+
+.now-showing__ceiling::before {
+    content: "";
+    position: absolute;
+    inset: 5% 9% 0;
+    background:
+        repeating-linear-gradient(90deg,
+            transparent 0,
+            transparent 23.5%,
+            color-mix(in srgb, var(--color-border) 9%, transparent) 23.8%,
+            transparent 24.1%);
+    clip-path: polygon(0 0, 100% 0, 58% 100%, 42% 100%);
+    opacity: .55;
+}
+
+/* The floor gets a quiet material texture and converging architectural seams. */
+.now-showing__floor {
+    background:
+        repeating-linear-gradient(90deg,
+            transparent 0,
+            transparent 12%,
+            color-mix(in srgb, var(--color-border) 6%, transparent) 12.15%,
+            transparent 12.3%),
+        repeating-linear-gradient(0deg,
+            transparent 0,
+            transparent 11%,
+            color-mix(in srgb, var(--color-border) 9%, transparent) 11.15%,
+            transparent 11.45%),
+        linear-gradient(180deg,
+            transparent 0,
+            color-mix(in srgb, var(--color-surface) 22%, transparent) 48%,
+            color-mix(in srgb, var(--color-black) 64%, transparent));
+}
+
+/* Warm wall sconces: deliberately architectural rather than decorative. */
+.now-showing__walls::before,
+.now-showing__walls::after {
+    content: "";
+    position: absolute;
+    top: 27%;
+    width: 12px;
+    height: 72px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-accent-gold) 30%, var(--color-surface));
+    box-shadow:
+        0 0 14px color-mix(in srgb, var(--color-accent-gold) 22%, transparent),
+        0 0 42px color-mix(in srgb, var(--color-accent-gold) 9%, transparent);
+    pointer-events: none;
+    opacity: .7;
+}
+
+.now-showing__walls::before { left: 18%; }
+.now-showing__walls::after { right: 18%; }
+
+/* ================================================================
+   INTERACTION / STACKING
+   ================================================================ */
+
+/* The pair is a full-stage animation layer, never the click target. */
+.now-showing__pair {
+    pointer-events: none;
+}
+
+/* The active pair itself remains transparent to pointer events. */
+.now-showing__pair.is-active {
+    pointer-events: none;
+}
+
+/* Only the actual frame receives interaction. */
+.now-showing__pair.is-active .now-showing__frame {
+    position: relative;
+    z-index: 30;
+    pointer-events: auto;
+}
+
+/* Keep the existing MovieCard interaction completely intact. */
+.now-showing__pair.is-active .movie-card {
+    position: relative;
+    z-index: 31;
+    pointer-events: auto;
+}
+
+/* Existing data-route button remains the real navigation target. */
+.now-showing__pair.is-active .movie-card__button {
+    position: relative;
+    z-index: 32;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* Architectural layers must never intercept clicks. */
+.now-showing__stage::before,
+.now-showing__stage::after,
+.now-showing__walls,
+.now-showing__wall,
+.now-showing__ceiling,
+.now-showing__floor,
+.now-showing__vanishing-light,
+.now-showing__walkway {
+    pointer-events: none;
+}
+
+/* Keep the poster layer above the architectural environment. */
+.now-showing__pairs {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+}
+
+/* Keep the walkway visually behind the posters but above the floor. */
+.now-showing__walkway {
+    z-index: 3;
+}
+
+@media (max-width: 640px) {
+    .now-showing__stage {
+        background:
+            radial-gradient(ellipse 50% 28% at 50% 36%,
+                color-mix(in srgb, var(--color-accent-gold) 6%, transparent),
+                transparent 75%),
+            linear-gradient(180deg,
+                color-mix(in srgb, var(--color-surface) 22%, var(--color-background)),
+                var(--color-background));
+    }
+
+    .now-showing__walls::before,
+    .now-showing__walls::after {
+        display: none;
+    }
+}
+
+/* ================================================================
+   PASS 6 — physical gallery architecture
+   ================================================================ */
+
+/* Read the room as a real architectural interior: cornice, wall bays,
+   lower wainscot, ceiling coffers, recessed fixtures and floor runners. */
+.now-showing__stage {
+    background:
+        radial-gradient(ellipse 22% 24% at 50% 32%,
+            color-mix(in srgb, var(--color-text-primary) 6%, transparent),
+            transparent 72%),
+        radial-gradient(ellipse 68% 54% at 50% 100%,
+            color-mix(in srgb, var(--color-surface) 38%, transparent),
+            transparent 74%),
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--color-surface) 38%, var(--color-background)) 0%,
+            var(--color-background) 48%,
+            color-mix(in srgb, var(--color-black) 24%, var(--color-background)) 100%);
+}
+
+/* Stronger wall construction: upper panel, picture rail and lower dado. */
+.now-showing__wall {
+    background-image:
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--color-text-primary) 3%, transparent) 0 17%,
+            color-mix(in srgb, var(--color-border) 16%, transparent) 17.1% 17.35%,
+            transparent 17.5% 73%,
+            color-mix(in srgb, var(--color-black) 28%, transparent) 73.2% 73.7%,
+            color-mix(in srgb, var(--color-surface) 12%, transparent) 74% 100%),
+        linear-gradient(90deg,
+            color-mix(in srgb, var(--color-black) 40%, transparent),
+            transparent 16%,
+            color-mix(in srgb, var(--color-surface) 18%, transparent) 50%,
+            transparent 84%,
+            color-mix(in srgb, var(--color-black) 40%, transparent));
+}
+
+.now-showing__wall::before {
+    opacity: .68;
+    background:
+        linear-gradient(90deg,
+            transparent 0 8%,
+            color-mix(in srgb, var(--color-border) 15%, transparent) 8.2%,
+            transparent 8.5% 29%,
+            color-mix(in srgb, var(--color-border) 10%, transparent) 29.2%,
+            transparent 29.5% 50%,
+            color-mix(in srgb, var(--color-border) 14%, transparent) 50.2%,
+            transparent 50.5% 71%,
+            color-mix(in srgb, var(--color-border) 10%, transparent) 71.2%,
+            transparent 71.5% 92%,
+            color-mix(in srgb, var(--color-border) 15%, transparent) 92.2%,
+            transparent 92.5%),
+        linear-gradient(180deg,
+            transparent 0 18%,
+            color-mix(in srgb, var(--color-border) 12%, transparent) 18.2%,
+            transparent 18.5% 73%,
+            color-mix(in srgb, var(--color-border) 8%, transparent) 73.2%,
+            transparent 73.5%);
+}
+
+.now-showing__wall::after {
+    left: 7%;
+    right: 7%;
+    top: 9%;
+    bottom: 3%;
+    border-color: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
+    box-shadow:
+        inset 0 0 0 8px color-mix(in srgb, var(--color-black) 12%, transparent),
+        inset 0 -90px 70px color-mix(in srgb, var(--color-black) 24%, transparent),
+        inset 0 0 50px color-mix(in srgb, var(--color-black) 24%, transparent);
+}
+
+/* A proper cornice line where wall meets ceiling. */
+.now-showing__walls::after {
+    top: 15%;
+    right: 0;
+    width: 100%;
+    height: 2px;
+    border-radius: 0;
+    background: color-mix(in srgb, var(--color-text-primary) 11%, transparent);
+    box-shadow:
+        0 3px 0 color-mix(in srgb, var(--color-black) 35%, transparent),
+        0 0 22px color-mix(in srgb, var(--color-accent-gold) 5%, transparent);
+    opacity: .8;
+}
+
+/* The previous sconce is replaced by a believable wall-wash: a narrow
+   fixture plus its vertical pool of light. */
+.now-showing__walls::before {
+    top: 28%;
+    left: 14%;
+    width: 14px;
+    height: 54px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--color-accent-gold) 34%, var(--color-surface));
+    box-shadow:
+        0 0 12px color-mix(in srgb, var(--color-accent-gold) 32%, transparent),
+        0 18px 42px 12px color-mix(in srgb, var(--color-accent-gold) 8%, transparent);
+}
+
+/* Ceiling coffers: broad beams receding to the vanishing point. */
+.now-showing__ceiling {
+    background:
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--color-black) 78%, transparent),
+            color-mix(in srgb, var(--color-surface) 24%, transparent)),
+        repeating-linear-gradient(90deg,
+            transparent 0 18%,
+            color-mix(in srgb, var(--color-black) 32%, transparent) 18.3% 19%,
+            transparent 19.3% 31%);
+}
+
+.now-showing__ceiling::before {
+    inset: 4% 5% 0;
+    opacity: .8;
+    background:
+        linear-gradient(90deg,
+            transparent 0 12%,
+            color-mix(in srgb, var(--color-text-primary) 7%, transparent) 12.3%,
+            transparent 12.7% 31%,
+            color-mix(in srgb, var(--color-text-primary) 5%, transparent) 31.3%,
+            transparent 31.7% 50%,
+            color-mix(in srgb, var(--color-text-primary) 7%, transparent) 50.3%,
+            transparent 50.7% 69%,
+            color-mix(in srgb, var(--color-text-primary) 5%, transparent) 69.3%,
+            transparent 69.7% 88%,
+            color-mix(in srgb, var(--color-text-primary) 7%, transparent) 88.3%,
+            transparent 88.7%);
+    clip-path: polygon(0 0, 100% 0, 57% 100%, 43% 100%);
+}
+
+/* Existing four spans become recessed ceiling fixtures with a visible body,
+   light source and falloff rather than simple horizontal lines. */
+.now-showing__ceiling span {
+    top: 7%;
+    width: clamp(56px, 7vw, 110px);
+    height: 8px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--color-text-primary) 58%, var(--color-surface));
+    box-shadow:
+        0 0 7px color-mix(in srgb, var(--color-text-primary) 42%, transparent),
+        0 8px 22px color-mix(in srgb, var(--color-accent-gold) 12%, transparent),
+        0 24px 70px 18px color-mix(in srgb, var(--color-text-primary) 5%, transparent);
+}
+
+/* Turn the floor into a real corridor with long planks/stone seams and a
+   central runner. */
+.now-showing__floor {
+    background:
+        repeating-linear-gradient(90deg,
+            transparent 0 8%,
+            color-mix(in srgb, var(--color-border) 7%, transparent) 8.15%,
+            transparent 8.35% 16%),
+        repeating-linear-gradient(0deg,
+            transparent 0 7%,
+            color-mix(in srgb, var(--color-border) 9%, transparent) 7.15%,
+            transparent 7.35%),
+        linear-gradient(180deg,
+            color-mix(in srgb, var(--color-surface) 8%, transparent),
+            color-mix(in srgb, var(--color-surface) 30%, transparent) 48%,
+            color-mix(in srgb, var(--color-black) 68%, transparent));
+}
+
+.now-showing__floor::before,
+.now-showing__floor::after {
+    width: 3px;
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--color-accent-gold) 12%, transparent),
+        color-mix(in srgb, var(--color-border) 8%, transparent) 42%,
+        transparent);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--color-accent-gold) 4%, transparent);
+}
+
+.now-showing__walkway {
+    width: min(36%, 500px);
+    background:
+        linear-gradient(90deg,
+            transparent,
+            color-mix(in srgb, var(--color-surface) 13%, transparent) 16%,
+            color-mix(in srgb, var(--color-text-primary) 4%, transparent) 50%,
+            color-mix(in srgb, var(--color-surface) 13%, transparent) 84%,
+            transparent),
+        repeating-linear-gradient(0deg,
+            transparent 0 11%,
+            color-mix(in srgb, var(--color-border) 8%, transparent) 11.2%,
+            transparent 11.6%);
+    border-inline-color: color-mix(in srgb, var(--color-border) 14%, transparent);
+    box-shadow:
+        0 -18px 55px color-mix(in srgb, var(--color-text-primary) 4%, transparent),
+        inset 0 0 80px color-mix(in srgb, var(--color-black) 22%, transparent);
+}
+
+/* Architectural baseboard along the lower edge of the walls. */
+.now-showing__walls {
+    box-shadow:
+        inset 0 -72px 0 color-mix(in srgb, var(--color-black) 22%, transparent),
+        inset 0 -75px 0 1px color-mix(in srgb, var(--color-border) 10%, transparent);
+}
+
+@media (max-width: 1024px) {
+    .now-showing__wall::after {
+        box-shadow:
+            inset 0 0 0 5px color-mix(in srgb, var(--color-black) 12%, transparent),
+            inset 0 -60px 50px color-mix(in srgb, var(--color-black) 22%, transparent),
+            inset 0 0 40px color-mix(in srgb, var(--color-black) 22%, transparent);
+    }
+}
+
+@media (max-width: 640px) {
+    .now-showing__walls,
+    .now-showing__ceiling,
+    .now-showing__floor {
+        display: block;
+    }
+
+    .now-showing__stage {
+        background:
+            radial-gradient(ellipse 48% 28% at 50% 30%,
+                color-mix(in srgb, var(--color-accent-gold) 7%, transparent),
+                transparent 75%),
+            linear-gradient(180deg,
+                color-mix(in srgb, var(--color-surface) 26%, var(--color-background)),
+                var(--color-background));
+    }
+
+    .now-showing__ceiling span {
+        width: 48px;
+        height: 6px;
+    }
+}
+
+/* ================================================================
+   PASS 7 — PHYSICAL GALLERY ENVIRONMENT
+   ================================================================ */
+
+/*
+ * The scene is now treated as a real interior:
+ * - articulated wall planes and moulding
+ * - recessed ceiling coffers + visible fixtures
+ * - tiled/polished floor
+ * - restrained poster/light reflections on the floor
+ * - a unified vanishing point
+ *
+ * No external image is used; the room is generated from the existing
+ * HTML layers so the environment can move naturally with the gallery.
+ */
+
+/* ------------------------- ROOM ------------------------- */
+
+.now-showing__stage {
+    background:
+        radial-gradient(
+            ellipse 18% 22% at 50% 30%,
+            color-mix(in srgb, var(--color-text-primary) 6%, transparent),
+            transparent 74%
+        ),
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-surface) 45%, var(--color-background)) 0%,
+            var(--color-background) 48%,
+            color-mix(in srgb, var(--color-black) 28%, var(--color-background)) 100%
+        );
+}
+
+/* ------------------------- WALLS ------------------------- */
+
+.now-showing__wall {
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-surface-raised) 30%, transparent) 0 16%,
+            color-mix(in srgb, var(--color-border) 16%, transparent) 16.1% 16.5%,
+            color-mix(in srgb, var(--color-surface) 22%, transparent) 16.6% 74%,
+            color-mix(in srgb, var(--color-black) 35%, transparent) 74.2% 74.8%,
+            color-mix(in srgb, var(--color-surface-raised) 18%, transparent) 75% 100%
+        ),
+        linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--color-black) 42%, transparent),
+            transparent 18%,
+            color-mix(in srgb, var(--color-surface) 24%, transparent) 50%,
+            transparent 82%,
+            color-mix(in srgb, var(--color-black) 42%, transparent)
+        );
+}
+
+/* Vertical wall bays + horizontal moulding. */
+.now-showing__wall::before {
+    background:
+        linear-gradient(
+            90deg,
+            transparent 0 8%,
+            color-mix(in srgb, var(--color-border) 16%, transparent) 8.2%,
+            transparent 8.6% 29%,
+            color-mix(in srgb, var(--color-border) 11%, transparent) 29.2%,
+            transparent 29.7% 50%,
+            color-mix(in srgb, var(--color-border) 15%, transparent) 50.2%,
+            transparent 50.7% 71%,
+            color-mix(in srgb, var(--color-border) 11%, transparent) 71.2%,
+            transparent 71.7% 92%,
+            color-mix(in srgb, var(--color-border) 16%, transparent) 92.2%,
+            transparent 92.7%
+        ),
+        linear-gradient(
+            180deg,
+            transparent 0 17%,
+            color-mix(in srgb, var(--color-text-primary) 7%, transparent) 17.2%,
+            transparent 17.7% 73%,
+            color-mix(in srgb, var(--color-border) 10%, transparent) 73.2%,
+            transparent 73.7%
+        );
+    opacity: 0.8;
+    transform: translateX(calc(var(--gallery-scene-progress, 0) * 12px));
+}
+
+/* Deep inset panels / wainscot framing. */
+.now-showing__wall::after {
+    left: 6%;
+    right: 6%;
+    top: 9%;
+    bottom: 3%;
+    border-color: color-mix(in srgb, var(--color-text-primary) 11%, transparent);
+    box-shadow:
+        inset 0 0 0 8px color-mix(in srgb, var(--color-black) 10%, transparent),
+        inset 0 0 0 9px color-mix(in srgb, var(--color-border) 7%, transparent),
+        inset 0 -84px 70px color-mix(in srgb, var(--color-black) 24%, transparent),
+        inset 0 0 55px color-mix(in srgb, var(--color-black) 22%, transparent);
+}
+
+/* Physical lower wall band / baseboard. */
+.now-showing__walls {
+    box-shadow:
+        inset 0 -74px 0 color-mix(in srgb, var(--color-black) 25%, transparent),
+        inset 0 -77px 0 1px color-mix(in srgb, var(--color-border) 13%, transparent);
+}
+
+/* Cornice line. */
+.now-showing__walls::after {
+    top: 15%;
+    right: 0;
+    width: 100%;
+    height: 3px;
+    border-radius: 0;
+    background: color-mix(in srgb, var(--color-text-primary) 13%, transparent);
+    box-shadow:
+        0 3px 0 color-mix(in srgb, var(--color-black) 36%, transparent),
+        0 0 24px color-mix(in srgb, var(--color-accent-gold) 6%, transparent);
+    opacity: 0.9;
+}
+
+/* Warm recessed wall lights with vertical wash. */
+.now-showing__walls::before {
+    top: 27%;
+    left: 14%;
+    width: 14px;
+    height: 56px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--color-accent-gold) 38%, var(--color-surface));
+    box-shadow:
+        0 0 12px color-mix(in srgb, var(--color-accent-gold) 34%, transparent),
+        0 24px 60px 18px color-mix(in srgb, var(--color-accent-gold) 8%, transparent);
+    opacity: 0.78;
+}
+
+/* ------------------------- CEILING ------------------------- */
+
+/* Recessed ceiling coffers. */
+.now-showing__ceiling {
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0 17.5%,
+            color-mix(in srgb, var(--color-black) 34%, transparent) 17.8% 18.6%,
+            transparent 18.9% 31%
+        ),
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-black) 78%, transparent),
+            color-mix(in srgb, var(--color-surface) 26%, transparent)
+        );
+}
+
+/* Receding coffer beams. */
+.now-showing__ceiling::before {
+    inset: 4% 5% 0;
+    opacity: 0.88;
+    background:
+        linear-gradient(
+            90deg,
+            transparent 0 12%,
+            color-mix(in srgb, var(--color-text-primary) 7%, transparent) 12.3%,
+            transparent 12.8% 31%,
+            color-mix(in srgb, var(--color-text-primary) 5%, transparent) 31.3%,
+            transparent 31.8% 50%,
+            color-mix(in srgb, var(--color-text-primary) 7%, transparent) 50.3%,
+            transparent 50.8% 69%,
+            color-mix(in srgb, var(--color-text-primary) 5%, transparent) 69.3%,
+            transparent 69.8% 88%,
+            color-mix(in srgb, var(--color-text-primary) 7%, transparent) 88.3%,
+            transparent 88.8%
+        );
+    clip-path: polygon(0 0, 100% 0, 57% 100%, 43% 100%);
+}
+
+/* Actual recessed fixtures + their spill. */
+.now-showing__ceiling span {
+    top: 7%;
+    width: clamp(58px, 7vw, 112px);
+    height: 9px;
+    border-radius: 2px;
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-text-primary) 68%, var(--color-surface)),
+            color-mix(in srgb, var(--color-accent-gold) 22%, var(--color-surface))
+        );
+    box-shadow:
+        0 0 8px color-mix(in srgb, var(--color-text-primary) 46%, transparent),
+        0 10px 24px color-mix(in srgb, var(--color-accent-gold) 14%, transparent),
+        0 28px 80px 20px color-mix(in srgb, var(--color-text-primary) 6%, transparent);
+}
+
+/* A softer central skylight/recess at the vanishing point. */
+.now-showing__ceiling::after {
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            color-mix(in srgb, var(--color-surface) 24%, transparent) 18%,
+            color-mix(in srgb, var(--color-text-primary) 7%, transparent) 50%,
+            color-mix(in srgb, var(--color-surface) 24%, transparent) 82%,
+            transparent
+        );
+    clip-path: polygon(0 0, 100% 0, 58% 100%, 42% 100%);
+    opacity: 0.82;
+}
+
+/* ------------------------- FLOOR ------------------------- */
+
+/*
+ * Polished tiled floor:
+ * broad tonal bands + long seams + cross seams.
+ */
+.now-showing__floor {
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0 8.5%,
+            color-mix(in srgb, var(--color-border) 8%, transparent) 8.65%,
+            transparent 8.9% 17%
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent 0 7%,
+            color-mix(in srgb, var(--color-border) 10%, transparent) 7.15%,
+            transparent 7.45%
+        ),
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-surface-raised) 10%, transparent),
+            color-mix(in srgb, var(--color-surface) 30%, transparent) 48%,
+            color-mix(in srgb, var(--color-black) 68%, transparent)
+        );
+}
+
+/* Perspective tile seams. */
+.now-showing__floor::before,
+.now-showing__floor::after {
+    width: 3px;
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-accent-gold) 13%, transparent),
+            color-mix(in srgb, var(--color-border) 8%, transparent) 42%,
+            transparent
+        );
+    box-shadow:
+        0 0 15px color-mix(in srgb, var(--color-accent-gold) 4%, transparent);
+}
+
+/* Central polished walkway. */
+.now-showing__walkway {
+    width: min(37%, 520px);
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            color-mix(in srgb, var(--color-surface) 13%, transparent) 14%,
+            color-mix(in srgb, var(--color-text-primary) 5%, transparent) 50%,
+            color-mix(in srgb, var(--color-surface) 13%, transparent) 86%,
+            transparent
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent 0 10.5%,
+            color-mix(in srgb, var(--color-border) 8%, transparent) 10.7%,
+            transparent 11.2%
+        );
+    border-inline-color: color-mix(in srgb, var(--color-border) 16%, transparent);
+    box-shadow:
+        0 -18px 58px color-mix(in srgb, var(--color-text-primary) 4%, transparent),
+        inset 0 0 90px color-mix(in srgb, var(--color-black) 24%, transparent);
+}
+
+/*
+ * Reflection plane:
+ * very faint, blurred mirror images of the current wall light/poster
+ * region. It is intentionally low contrast so it reads as polished stone.
+ */
+.now-showing__stage::after {
+    background:
+        linear-gradient(
+            180deg,
+            transparent 0 47%,
+            color-mix(in srgb, var(--color-text-primary) 2%, transparent) 47.5%,
+            transparent 64%
+        ),
+        radial-gradient(
+            ellipse 18% 16% at calc(31% + var(--gallery-scene-progress, 0) * 4%) 76%,
+            color-mix(in srgb, var(--color-accent-gold) 4%, transparent),
+            transparent 72%
+        ),
+        radial-gradient(
+            ellipse 18% 16% at calc(69% - var(--gallery-scene-progress, 0) * 4%) 76%,
+            color-mix(in srgb, var(--color-accent-gold) 4%, transparent),
+            transparent 72%
+        );
+    opacity: 0.82;
+    mix-blend-mode: screen;
+}
+
+/*
+ * Extra reflected light under the frames.
+ * The light trails move subtly as the visitor progresses.
+ */
+.now-showing__frame::after {
+    opacity: 0.18;
+    filter: blur(16px);
+}
+
+/* ------------------------- POSTER CONTACT ------------------------- */
+
+.now-showing__frame {
+    box-shadow:
+        0 0 0 4px color-mix(in srgb, var(--color-black) 70%, transparent),
+        0 16px 42px color-mix(in srgb, var(--color-black) 54%, transparent),
+        0 0 34px color-mix(in srgb, var(--color-accent-gold) 5%, transparent),
+        inset 0 -18px 20px color-mix(in srgb, var(--color-black) 12%, transparent);
+}
+
+.now-showing__pair.is-active .now-showing__frame {
+    filter: drop-shadow(
+        0 18px 26px
+        color-mix(in srgb, var(--color-black) 34%, transparent)
+    );
+}
+
+/* ------------------------- MOBILE ------------------------- */
+
+@media (max-width: 640px) {
+    .now-showing__wall::after {
+        inset: 8% 4% 3%;
+    }
+
+    .now-showing__floor {
+        opacity: 0.72;
+    }
+
+    .now-showing__walkway {
+        width: 52%;
+    }
+
+    .now-showing__ceiling span {
+        width: 48px;
+        height: 6px;
+    }
+}
+
+/* ================================================================
+   PASS 8 — ARCHITECTURAL GALLERY + POLISHED FLOOR REFLECTIONS
+   ================================================================ */
+
+/* Give the room stronger material separation. */
+.now-showing__stage {
+    background:
+        radial-gradient(
+            ellipse 24% 28% at 50% 31%,
+            color-mix(in srgb, var(--color-text-primary) 7%, transparent),
+            transparent 73%
+        ),
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-surface-raised) 36%, var(--color-background)) 0%,
+            color-mix(in srgb, var(--color-background) 96%, black) 43%,
+            color-mix(in srgb, var(--color-black) 36%, var(--color-background)) 100%
+        );
+}
+
+/* Stronger wall planes: upper gallery wall + lower architectural base. */
+.now-showing__wall {
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-surface-raised) 38%, transparent) 0 15%,
+            color-mix(in srgb, var(--color-border) 18%, transparent) 15.1% 15.45%,
+            color-mix(in srgb, var(--color-surface) 25%, transparent) 15.6% 73%,
+            color-mix(in srgb, var(--color-border) 11%, transparent) 73.15% 73.6%,
+            color-mix(in srgb, var(--color-black) 34%, transparent) 73.7% 100%
+        ),
+        linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--color-black) 44%, transparent),
+            transparent 16%,
+            color-mix(in srgb, var(--color-surface) 22%, transparent) 50%,
+            transparent 84%,
+            color-mix(in srgb, var(--color-black) 44%, transparent)
+        );
+}
+
+/* Wall bay ribs and a stronger picture rail. */
+.now-showing__wall::before {
+    background:
+        linear-gradient(
+            90deg,
+            transparent 0 8%,
+            color-mix(in srgb, var(--color-border) 20%, transparent) 8.2%,
+            color-mix(in srgb, var(--color-black) 18%, transparent) 8.45%,
+            transparent 8.7% 29%,
+            color-mix(in srgb, var(--color-border) 14%, transparent) 29.2%,
+            transparent 29.65% 50%,
+            color-mix(in srgb, var(--color-border) 18%, transparent) 50.2%,
+            color-mix(in srgb, var(--color-black) 13%, transparent) 50.45%,
+            transparent 50.7% 71%,
+            color-mix(in srgb, var(--color-border) 14%, transparent) 71.2%,
+            transparent 71.65% 92%,
+            color-mix(in srgb, var(--color-border) 20%, transparent) 92.2%,
+            transparent 92.7%
+        ),
+        linear-gradient(
+            180deg,
+            transparent 0 16.5%,
+            color-mix(in srgb, var(--color-text-primary) 10%, transparent) 16.8%,
+            color-mix(in srgb, var(--color-black) 12%, transparent) 17.1%,
+            transparent 17.5% 72.5%,
+            color-mix(in srgb, var(--color-border) 10%, transparent) 72.8%,
+            transparent 73.2%
+        );
+}
+
+.now-showing__wall::after {
+    left: 5.5%;
+    right: 5.5%;
+    top: 8.5%;
+    bottom: 2.5%;
+    border-color: color-mix(in srgb, var(--color-text-primary) 12%, transparent);
+    box-shadow:
+        inset 0 0 0 10px color-mix(in srgb, var(--color-black) 12%, transparent),
+        inset 0 0 0 11px color-mix(in srgb, var(--color-border) 7%, transparent),
+        inset 0 -96px 74px color-mix(in srgb, var(--color-black) 26%, transparent),
+        inset 0 0 66px color-mix(in srgb, var(--color-black) 24%, transparent),
+        0 0 28px color-mix(in srgb, var(--color-black) 26%, transparent);
+}
+
+/* Physical baseboard line. */
+.now-showing__walls {
+    box-shadow:
+        inset 0 -82px 0 color-mix(in srgb, var(--color-black) 28%, transparent),
+        inset 0 -85px 0 1px color-mix(in srgb, var(--color-border) 15%, transparent),
+        inset 0 -88px 18px color-mix(in srgb, var(--color-text-primary) 2%, transparent);
+}
+
+/* Several warm wall washes make the fixtures feel embedded in the walls. */
+.now-showing__walls::before {
+    top: 25%;
+    left: 13%;
+    width: 13px;
+    height: 58px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--color-accent-gold) 40%, var(--color-surface));
+    box-shadow:
+        0 0 12px color-mix(in srgb, var(--color-accent-gold) 34%, transparent),
+        0 28px 68px 14px color-mix(in srgb, var(--color-accent-gold) 9%, transparent),
+        0 0 90px 24px color-mix(in srgb, var(--color-accent-gold) 4%, transparent);
+    opacity: .8;
+}
+
+/* ------------------------- CEILING ------------------------- */
+
+.now-showing__ceiling {
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0 16%,
+            color-mix(in srgb, var(--color-black) 38%, transparent) 16.3% 17.2%,
+            transparent 17.5% 30.5%
+        ),
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-black) 82%, transparent),
+            color-mix(in srgb, var(--color-surface) 28%, transparent)
+        );
+}
+
+/* Recessed ceiling coffers. */
+.now-showing__ceiling::before {
+    inset: 3.5% 4% 0;
+    background:
+        linear-gradient(
+            90deg,
+            transparent 0 10%,
+            color-mix(in srgb, var(--color-text-primary) 8%, transparent) 10.3%,
+            color-mix(in srgb, var(--color-black) 22%, transparent) 10.8%,
+            transparent 11.2% 28.5%,
+            color-mix(in srgb, var(--color-text-primary) 6%, transparent) 28.8%,
+            transparent 29.4% 50%,
+            color-mix(in srgb, var(--color-text-primary) 8%, transparent) 50.3%,
+            transparent 50.9% 70.6%,
+            color-mix(in srgb, var(--color-text-primary) 6%, transparent) 70.9%,
+            transparent 71.5% 89.5%,
+            color-mix(in srgb, var(--color-text-primary) 8%, transparent) 89.8%,
+            transparent 90.4%
+        ),
+        linear-gradient(
+            180deg,
+            transparent 0 16%,
+            color-mix(in srgb, var(--color-border) 8%, transparent) 16.3%,
+            transparent 16.8% 58%,
+            color-mix(in srgb, var(--color-border) 7%, transparent) 58.3%,
+            transparent 58.8%
+        );
+    clip-path: polygon(0 0, 100% 0, 57.5% 100%, 42.5% 100%);
+}
+
+/* Large recessed light coffers. */
+.now-showing__ceiling::after {
+    left: 50%;
+    top: 3%;
+    width: 58%;
+    height: 42%;
+    transform: translateX(calc(-50% + var(--gallery-scene-progress, 0) * 8px));
+    background:
+        radial-gradient(
+            ellipse at 50% 18%,
+            color-mix(in srgb, var(--color-text-primary) 8%, transparent),
+            transparent 34%
+        ),
+        linear-gradient(
+            90deg,
+            transparent,
+            color-mix(in srgb, var(--color-surface) 28%, transparent) 18%,
+            color-mix(in srgb, var(--color-text-primary) 6%, transparent) 50%,
+            color-mix(in srgb, var(--color-surface) 28%, transparent) 82%,
+            transparent
+        );
+    clip-path: polygon(0 0, 100% 0, 58% 100%, 42% 100%);
+    opacity: .88;
+}
+
+.now-showing__ceiling span {
+    top: 7%;
+    width: clamp(60px, 7vw, 116px);
+    height: 10px;
+    border: 1px solid color-mix(in srgb, var(--color-text-primary) 18%, transparent);
+    border-radius: 3px;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-text-primary) 78%, var(--color-surface)),
+        color-mix(in srgb, var(--color-accent-gold) 24%, var(--color-surface))
+    );
+    box-shadow:
+        0 0 8px color-mix(in srgb, var(--color-text-primary) 48%, transparent),
+        0 12px 24px color-mix(in srgb, var(--color-accent-gold) 14%, transparent),
+        0 34px 86px 24px color-mix(in srgb, var(--color-text-primary) 7%, transparent);
+}
+
+/* ------------------------- FLOOR ------------------------- */
+
+.now-showing__floor {
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0 8%,
+            color-mix(in srgb, var(--color-border) 9%, transparent) 8.15%,
+            color-mix(in srgb, var(--color-black) 8%, transparent) 8.3%,
+            transparent 8.5% 16%
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent 0 7%,
+            color-mix(in srgb, var(--color-border) 11%, transparent) 7.15%,
+            color-mix(in srgb, var(--color-black) 8%, transparent) 7.35%,
+            transparent 7.55%
+        ),
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-surface-raised) 10%, transparent),
+            color-mix(in srgb, var(--color-surface) 34%, transparent) 45%,
+            color-mix(in srgb, var(--color-black) 72%, transparent)
+        );
+}
+
+/* Central floor runner. */
+.now-showing__walkway {
+    width: min(38%, 530px);
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            color-mix(in srgb, var(--color-surface) 16%, transparent) 14%,
+            color-mix(in srgb, var(--color-text-primary) 5%, transparent) 50%,
+            color-mix(in srgb, var(--color-surface) 16%, transparent) 86%,
+            transparent
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent 0 10%,
+            color-mix(in srgb, var(--color-border) 9%, transparent) 10.15%,
+            transparent 10.6%
+        );
+    border-inline-color: color-mix(in srgb, var(--color-border) 18%, transparent);
+    box-shadow:
+        0 -20px 65px color-mix(in srgb, var(--color-text-primary) 4%, transparent),
+        inset 0 0 100px color-mix(in srgb, var(--color-black) 28%, transparent);
+}
+
+/* ------------------------- FLOOR REFLECTIONS ------------------------- */
+
+/* The reflection layer is supplied by MovieCard.ts. */
+.movie-card__reflection {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: -19%;
+    height: 28%;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: .16;
+    transform:
+        perspective(700px)
+        rotateX(64deg)
+        scaleY(.8)
+        translateY(6px);
+    transform-origin: center top;
+    filter: blur(5px) saturate(.72);
+    mask-image: linear-gradient(180deg, black 0%, rgba(0,0,0,.65) 24%, transparent 100%);
+    -webkit-mask-image: linear-gradient(180deg, black 0%, rgba(0,0,0,.65) 24%, transparent 100%);
+}
+
+.movie-card__reflection img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: bottom center;
+    transform: scaleY(-1);
+    filter: brightness(.72) contrast(.88);
+    opacity: .8;
+}
+
+/* Reflection tint makes it read as part of the floor, not a duplicate poster. */
+.movie-card__reflection::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-surface) 22%, transparent),
+        color-mix(in srgb, var(--color-black) 34%, transparent)
+    );
+}
+
+.now-showing__frame {
+    position: relative;
+    overflow: visible;
+}
+
+.now-showing__frame > .movie-card {
+    position: relative;
+    z-index: 4;
+}
+
+/* A soft contact glow makes the poster appear illuminated on the floor. */
+.now-showing__frame::after {
+    opacity: .12;
+    filter: blur(18px);
+}
+
+/* Keep reflections subtle while the pair recedes. */
+.now-showing__pair:not(.is-active) .movie-card__reflection {
+    opacity: .08;
+}
+
+@media (max-width: 1024px) {
+    .movie-card__reflection {
+        bottom: -17%;
+        height: 24%;
+        opacity: .11;
+        filter: blur(6px);
+    }
+}
+
+@media (max-width: 640px) {
+    .movie-card__reflection {
+        display: none;
+    }
+}
+
+/* ------------------------- CLICK SAFETY ------------------------- */
+
+.now-showing__pairs {
+    pointer-events: auto;
+}
+
+.now-showing__pair {
+    pointer-events: none;
+}
+
+.now-showing__pair.is-active,
+.now-showing__pair.is-active .now-showing__frame,
+.now-showing__pair.is-active .movie-card,
+.now-showing__pair.is-active .movie-card__button {
+    pointer-events: auto;
+}
+
+.now-showing__pair.is-active .movie-card__button {
+    position: relative;
+    z-index: 40;
+    cursor: pointer;
+}
+
+
+/* ==========================================================================
+   FINAL MOBILE GALLERY POLISH
+   --------------------------------------------------------------------------
+   Preserve the cinematic corridor on small screens while respecting the
+   sticky global navbar. Desktop gallery geometry is intentionally untouched.
+   ========================================================================== */
+
+@media (max-width: 640px) {
+    /*
+     * The navbar is sticky, so the gallery needs an explicit safe zone below
+     * it. This prevents the title and animated stage from sliding underneath
+     * the header.
+     */
+    .now-showing {
+        scroll-margin-top: 4.25rem;
+        padding-top: clamp(1.5rem, 7vw, 2.25rem);
+    }
+
+    .now-showing__title {
+        position: relative;
+        z-index: 10;
+
+        margin-top: 0;
+        padding-top: 0.2rem;
+
+        background:
+            linear-gradient(
+                180deg,
+                color-mix(
+                    in srgb,
+                    var(--color-background) 96%,
+                    transparent
+                ),
+                transparent
+            );
+    }
+
+    /*
+     * Give the corridor a little breathing room around the active poster.
+     * The poster should read as a wall-mounted object, not as a full-width
+     * image filling the phone.
+     */
+    .now-showing__stage {
+        width: min(100%, 360px);
+
+        margin-inline: auto;
+
+        min-height: clamp(30rem, 112vw, 38rem);
+
+        border-radius: var(--radius-sm);
+
+        /*
+         * Keep the architectural lighting visible on phones.
+         */
+        background:
+            radial-gradient(
+                ellipse 55% 24% at 50% 18%,
+                color-mix(
+                    in srgb,
+                    var(--color-accent-gold) 4%,
+                    transparent
+                ),
+                transparent 72%
+            ),
+            linear-gradient(
+                180deg,
+                color-mix(
+                    in srgb,
+                    var(--color-black) 72%,
+                    transparent
+                ) 0%,
+                transparent 28%,
+                color-mix(
+                    in srgb,
+                    var(--color-black) 18%,
+                    transparent
+                ) 100%
+            );
+    }
+
+    /*
+     * Reduce the active pair width while keeping enough wall/corridor visible
+     * on both sides.
+     */
+    .now-showing__pair {
+        width: 100%;
+        padding-inline: clamp(0.7rem, 5vw, 1.1rem);
+        box-sizing: border-box;
+    }
+
+    .now-showing__frame {
+        width: min(100%, 260px);
+
+        margin-inline: auto;
+    }
+
+    /*
+     * On mobile, the visible pair is stacked vertically but stays narrow
+     * enough that the room itself remains visible.
+     */
+    .now-showing__pair .movie-card {
+        width: 100%;
+        max-width: 260px;
+    }
+
+    /*
+     * Preserve a little architectural context around the posters.
+     */
+    .now-showing__walls {
+        inset-inline: 0.35rem;
+    }
+
+    .now-showing__ceiling {
+        top: 0;
+        height: 23%;
+    }
+
+    .now-showing__floor {
+        bottom: 0;
+        height: 44%;
+    }
+
+    .now-showing__walkway {
+        bottom: 0;
+        height: 42%;
+    }
+
+    /*
+     * Keep enough room for the incoming second poster without making it
+     * collide with the navbar or disappear immediately.
+     */
+    .now-showing__pairs {
+        inset:
+            0.35rem
+            0
+            0.5rem;
+    }
+
+    /*
+     * Mobile reflections remain intentionally subtle but visible enough to
+     * preserve the glossy-gallery material.
+     */
+    .movie-card__reflection {
+        display: block;
+
+        bottom: -13%;
+
+        height: 18%;
+
+        opacity: 0.075;
+
+        filter: blur(6px) saturate(0.68);
+    }
+
+    /*
+     * Keep the first visible poster clear of the title and ceiling.
+     */
+    .now-showing__pair.is-active .now-showing__frame {
+        margin-top: clamp(0.8rem, 3vw, 1.2rem);
+    }
+}
+
+@media (max-width: 380px) {
+    .now-showing__stage {
+        min-height: 30rem;
+    }
+
+    .now-showing__pair {
+        padding-inline: 0.55rem;
+    }
+
+    .now-showing__frame,
+    .now-showing__pair .movie-card {
+        max-width: 238px;
+    }
+
+    .now-showing__title {
+        margin-bottom: var(--space-xl);
+    }
+}
+
+
+/* ==========================================================================
+   FINAL MOBILE NAVBAR SAFE ZONE
+   --------------------------------------------------------------------------
+   The gallery stage is itself sticky. On mobile it must begin below the
+   global sticky navbar, otherwise the animated poster can travel behind it.
+   ========================================================================== */
+
+@media (max-width: 640px) {
+    .now-showing__stage {
+        /*
+         * Match the compact mobile navbar with a small breathing margin.
+         * The stage remains sticky, but never occupies the navbar's visual
+         * band.
+         */
+        top: calc(2.75rem + var(--space-xs));
+
+        height: calc(78svh - 2.75rem - var(--space-xs));
+
+        min-height: 30rem;
+
+        scroll-margin-top: calc(
+            2.75rem + var(--space-sm)
+        );
+    }
+
+    /*
+     * The scroll spacer must match the stage's effective viewport position;
+     * otherwise the next pair can advance too aggressively into the navbar.
+     */
+    .now-showing__steps {
+        margin-top:
+            calc(
+                -78svh
+                + 2.75rem
+                + var(--space-xs)
+            );
+    }
+
+    .now-showing__step {
+        height:
+            calc(
+                78svh
+                - 2.75rem
+                - var(--space-xs)
+            );
+    }
+
+    /*
+     * Keep the architectural layers below the navbar-safe edge as well.
+     */
+    .now-showing__pairs {
+        top: 0;
+    }
+}
+
+@media (max-width: 380px) {
+    .now-showing__stage {
+        top: calc(2.5rem + var(--space-xs));
+
+        height: calc(78svh - 2.5rem - var(--space-xs));
+
+        min-height: 29rem;
+    }
+
+    .now-showing__steps {
+        margin-top:
+            calc(
+                -78svh
+                + 2.5rem
+                + var(--space-xs)
+            );
+    }
+
+    .now-showing__step {
+        height:
+            calc(
+                78svh
+                - 2.5rem
+                - var(--space-xs)
+            );
+    }
+}
+
+
+/* ==========================================================================
+   MOBILE GALLERY — FINAL STAGE / PAIR DEPTH FIX
+   ========================================================================== */
+
+@media (max-width: 640px) {
+    /*
+     * The stage should provide a full corridor viewport, not clip the
+     * incoming second poster at the bottom.
+     */
+    .now-showing__stage {
+        min-height: 42rem;
+
+        height: auto;
+
+        overflow: visible;
+    }
+
+    /*
+     * Keep the architectural scene visible while allowing the pair to travel
+     * through the full corridor.
+     */
+    .now-showing__pairs {
+        position: absolute;
+
+        top: 0;
+        left: 0;
+        right: 0;
+
+        height: 100%;
+
+        overflow: visible;
+    }
+
+    .now-showing__pair {
+        position: absolute;
+
+        top: 4.5rem;
+
+        left: 0;
+        right: 0;
+
+        width: 100%;
+        height: auto;
+
+        padding-inline: 0.6rem;
+
+        box-sizing: border-box;
+    }
+
+    /*
+     * The active poster sits in the middle of the corridor, leaving visible
+     * ceiling and wall around it.
+     */
+    .now-showing__pair.is-active {
+        min-height: 0;
+    }
+
+    .now-showing__pair .now-showing__frame {
+        width: min(100%, 252px);
+
+        margin-inline: auto;
+    }
+
+    .now-showing__pair .movie-card {
+        width: 100%;
+        max-width: 252px;
+    }
+
+    /*
+     * Let the incoming poster remain visibly deep in the corridor rather
+     * than being clipped by a short mobile stage.
+     */
+    .now-showing__pair:not(.is-active) {
+        pointer-events: none;
+    }
+
+    /*
+     * Give the room a longer floor so the second poster has somewhere
+     * visually meaningful to recede into.
+     */
+    .now-showing__floor {
+        height: 56%;
+        bottom: 0;
+    }
+
+    .now-showing__walkway {
+        height: 52%;
+        bottom: 0;
+    }
+
+    /*
+     * Slightly lower the active pair so the ceiling reads as a real
+     * architectural plane rather than a thin strip.
+     */
+    .now-showing__pair.is-active .now-showing__frame {
+        margin-top: 1.6rem;
+    }
+
+    /*
+     * Keep the next poster visible enough to communicate depth.
+     */
+    .now-showing__pair.is-active + .now-showing__pair {
+        opacity: 1;
+    }
+
+    /*
+     * The final pair should have enough scroll room to complete its
+     * entrance/exit animation before the gallery ends.
+     */
+    .now-showing__steps {
+        min-height: 42rem;
+    }
+
+    .now-showing__step {
+        min-height: 42rem;
+        height: 42rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .now-showing__stage,
+    .now-showing__steps,
+    .now-showing__step {
+        min-height: 40rem;
+    }
+
+    .now-showing__step {
+        height: 40rem;
+    }
+
+    .now-showing__pair .now-showing__frame,
+    .now-showing__pair .movie-card {
+        max-width: 235px;
+    }
+}
+
+
+/* ==========================================================================
+   MOBILE GALLERY — TWO POSTERS SIDE-BY-SIDE
+   --------------------------------------------------------------------------
+   The active pair remains a true left/right gallery installation on phones.
+   Each frame is slightly tilted inward so the room still reads as a corridor.
+   ========================================================================== */
+
+@media (max-width: 640px) {
+    .now-showing__pair {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr);
+
+        align-items: center;
+
+        justify-items: center;
+
+        column-gap: clamp(0.3rem, 2vw, 0.65rem);
+        row-gap: 0;
+
+        padding-inline: 0.45rem;
+
+        box-sizing: border-box;
+    }
+
+    .now-showing__pair .now-showing__frame {
+        width: min(100%, 170px);
+
+        max-width: 170px;
+
+        margin: 0;
+    }
+
+    .now-showing__pair .movie-card {
+        width: 100%;
+        max-width: 170px;
+    }
+
+    /*
+     * Re-establish the wall-mounted perspective on mobile.
+     * The two posters lean toward the central walkway.
+     */
+    .now-showing__pair .now-showing__frame--left {
+        justify-self: end;
+
+        transform:
+            perspective(900px)
+            rotateY(7deg)
+            rotateZ(-0.6deg);
+
+        transform-origin: right center;
+    }
+
+    .now-showing__pair .now-showing__frame--right {
+        justify-self: start;
+
+        transform:
+            perspective(900px)
+            rotateY(-7deg)
+            rotateZ(0.6deg);
+
+        transform-origin: left center;
+    }
+
+    /*
+     * Keep the pair centered inside the corridor.
+     */
+    .now-showing__pair.is-active {
+        align-items: center;
+    }
+
+    /*
+     * Keep the two posters visually separated from the centre walkway.
+     */
+    .now-showing__pair .now-showing__frame--left {
+        margin-right: 0.15rem;
+    }
+
+    .now-showing__pair .now-showing__frame--right {
+        margin-left: 0.15rem;
+    }
+
+    /*
+     * Compact typography so the full movie card remains practical at phone
+     * widths while preserving the same card hierarchy.
+     */
+    .now-showing__pair .movie-card__content {
+        padding:
+            0.55rem
+            0.58rem
+            0.65rem;
+    }
+
+    .now-showing__pair .movie-card__title {
+        min-height: calc(
+            0.73rem * 1.15 * 2
+        );
+
+        margin-bottom: 0.35rem;
+
+        font-size: 0.73rem;
+
+        line-height: 1.15;
+    }
+
+    .now-showing__pair .movie-card__date {
+        padding-left: 0.65rem;
+
+        margin-bottom: 0.55rem;
+
+        font-size: 0.57rem;
+    }
+
+    .now-showing__pair .movie-card__date::before {
+        width: 3px;
+        height: 3px;
+    }
+
+    .now-showing__pair .movie-card__button {
+        min-height: 30px;
+
+        padding:
+            0.35rem
+            0.45rem;
+
+        font-size: 0.58rem;
+
+        letter-spacing: 0.02em;
+    }
+
+    /*
+     * A pair should enter as a pair. Keep the two installations visible
+     * together and leave the architectural room between them.
+     */
+    .now-showing__pair:not(.is-active) {
+        pointer-events: none;
+    }
+
+    /*
+     * On very small phones, reduce the frames slightly rather than allowing
+     * horizontal overflow.
+     */
+    .now-showing__pair--single .now-showing__frame--left {
+        justify-self: center;
+
+        transform: none;
+    }
+}
+
+@media (max-width: 360px) {
+    .now-showing__pair {
+        column-gap: 0.15rem;
+
+        padding-inline: 0.28rem;
+    }
+
+    .now-showing__pair .now-showing__frame,
+    .now-showing__pair .movie-card {
+        max-width: 150px;
+    }
+
+    .now-showing__pair .movie-card__title {
+        font-size: 0.67rem;
+    }
+
+    .now-showing__pair .movie-card__date {
+        font-size: 0.53rem;
+    }
+
+    .now-showing__pair .movie-card__button {
+        min-height: 28px;
+
+        font-size: 0.54rem;
+    }
+
+    .now-showing__pair .now-showing__frame--left {
+        transform:
+            perspective(820px)
+            rotateY(6deg)
+            rotateZ(-0.5deg);
+    }
+
+    .now-showing__pair .now-showing__frame--right {
+        transform:
+            perspective(820px)
+            rotateY(-6deg)
+            rotateZ(0.5deg);
+    }
+}
+
+
+/* ==========================================================================
+   FINAL GALLERY SEQUENCE FIXES
+   ========================================================================== */
+
+/*
+ * The final step must be the same physical length as the gallery viewport.
+ * The old shorter last step prevented the last pair from ever reaching the
+ * same centered camera position as the earlier pairs at the bottom of the
+ * page.
+ */
+.now-showing__step:last-child {
+    height: min(88svh, 900px);
+}
+
+@media (min-width: 1200px) {
+    .now-showing__step:last-child {
+        height: min(90svh, 930px);
+    }
+}
+
+@media (max-width: 1024px) {
+    .now-showing__step:last-child {
+        height: 82svh;
+    }
+}
+
+/*
+ * Mobile owns its pair visibility through NowShowing.ts. This prevents an
+ * older pair from remaining faintly visible behind the active pair.
+ */
+@media (max-width: 640px) {
+    .now-showing__pair {
+        visibility: visible;
+        z-index: 1;
+    }
+
+    .now-showing__pair:not(.is-active) {
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .now-showing__pair.is-active {
+        visibility: visible;
+        z-index: 30;
+    }
+
+    /*
+     * Do not let the old "next pair" atmosphere rule reintroduce a ghost
+     * layer on phones.
+     */
+    .now-showing__pair.is-active + .now-showing__pair {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    /*
+     * The active pair remains a side-by-side wall installation.
+     */
+    .now-showing__pair.is-active .now-showing__frame--left,
+    .now-showing__pair.is-active .now-showing__frame--right {
+        opacity: 1;
+    }
+
+    /*
+     * Restore the architectural scene behind the pair on small screens.
+     * The latest mobile stage already has the room geometry; these layers
+     * should remain visible rather than being disabled by an older pass.
+     */
+    .now-showing__ceiling,
+    .now-showing__walls,
+    .now-showing__floor,
+    .now-showing__walkway,
+    .now-showing__vanishing-light {
+        display: block;
+    }
+
+    /*
+     * Keep the mobile active pair centered inside the physical corridor.
+     */
+    .now-showing__pair.is-active {
+        align-items: center;
+    }
+}
+
+
+/* ==========================================================================
+   FINAL SEQUENCE END-STOP
+   ========================================================================== */
+
+.now-showing__sequence {
+    padding-bottom: min(4svh, 36px);
+}
+
+.now-showing__steps {
+    padding-bottom: min(4svh, 36px);
+}
+
+@media (max-width: 640px) {
+    /*
+     * Keep enough scroll runway after the final pair so it can become the
+     * actual active pair before the sticky stage releases.
+     */
+    .now-showing__sequence {
+        padding-bottom: 5svh;
+    }
+
+    .now-showing__steps {
+        padding-bottom: 5svh;
+    }
+}
+
+
+@media (max-width: 640px) {
+    .now-showing__pair {
+        will-change: transform, opacity;
+    }
+}
+
+
+
+/* ==========================================================================
+   FINAL ANIMATION MATH CONTRACT
+   ========================================================================== */
+
+.now-showing__pair {
+    --gallery-x: 0px;
+}
+
+@media (max-width: 640px) {
+    .now-showing__pair {
+        /*
+         * The TS controls visibility during the handoff. Do not let older
+         * mobile selectors force all non-active pairs invisible before the
+         * short outgoing transition has completed.
+         */
+        transition: none;
+        will-change: transform, opacity;
+    }
+
+    .now-showing__pair.is-active .now-showing__frame--left,
+    .now-showing__pair.is-active .now-showing__frame--right {
+        opacity: 1;
+    }
+}
+
+
+/* ==========================================================================
+   FINAL CAMERA COMPOSITION TUNE
+   ========================================================================== */
+
+@media (min-width: 641px) {
+    /*
+     * Leave more architecture visible around the posters at the settled
+     * camera position.
+     */
+    .now-showing__pair.is-active {
+        padding-block: clamp(12px, 2vh, 24px);
+    }
+}
+
+@media (max-width: 640px) {
+    /*
+     * The mobile pair is deliberately a little larger and closer to the
+     * visitor. The room remains visible around it through the side walls and
+     * central walkway.
+     */
+    .now-showing__pair.is-active {
+        padding-block: 0.25rem;
+    }
+}
+
+
+/* ==========================================================================
+   FINAL MOBILE CTA INTERACTION
+   ========================================================================== */
+
+.now-showing__pairs {
+    pointer-events: auto;
+}
+
+.now-showing__pair {
+    pointer-events: none;
+}
+
+.now-showing__pair.is-active,
+.now-showing__pair.is-active .now-showing__frame,
+.now-showing__pair.is-active .movie-card,
+.now-showing__pair.is-active .movie-card__button {
+    pointer-events: auto;
+}
+
+.now-showing__pair.is-active .movie-card__button {
+    position: relative;
+    z-index: 100;
+    cursor: pointer;
+}
+
+@media (max-width: 640px) {
+    .now-showing__pair.is-active .now-showing__frame,
+    .now-showing__pair.is-active .movie-card,
+    .now-showing__pair.is-active .movie-card__button {
+        pointer-events: auto;
+    }
+
+    .now-showing__pair.is-active .movie-card__button {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+}
+
+
+
+/* ==========================================================================
+   MOBILE BOOK TICKETS — HARD HIT-TARGET CONTRACT
+   ========================================================================== */
+
+@media (max-width: 640px) {
+    .now-showing__pair.is-active .movie-card__button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        position: relative;
+        z-index: 200;
+
+        min-height: 36px;
+        min-width: 88px;
+
+        pointer-events: auto;
+        touch-action: manipulation;
+
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;
+        user-select: none;
+
+        cursor: pointer;
+    }
+
+    .now-showing__pair.is-active .movie-card,
+    .now-showing__pair.is-active .now-showing__frame {
+        pointer-events: auto;
+    }
+
+    .now-showing__pairs {
+        pointer-events: auto;
+    }
+}
+
+
+/* ==========================================================================
+   DEFINITIVE BOOK-TICKETS HIT TESTING
+   --------------------------------------------------------------------------
+   This block is intentionally last. The gallery is visually layered, but
+   the active poster button must be a real hit target on desktop and touch.
+   ========================================================================== */
+
+.now-showing__stage {
+    position: sticky;
+}
+
+.now-showing__pairs {
+    pointer-events: auto !important;
+}
+
+.now-showing__pair {
+    pointer-events: none !important;
+}
+
+.now-showing__pair.is-active {
+    pointer-events: auto !important;
+    z-index: 100 !important;
+}
+
+.now-showing__pair.is-active .now-showing__frame,
+.now-showing__pair.is-active .movie-card,
+.now-showing__pair.is-active .movie-card__button {
+    pointer-events: auto !important;
+}
+
+.now-showing__pair.is-active .now-showing__frame {
+    position: relative;
+    z-index: 101 !important;
+}
+
+.now-showing__pair.is-active .movie-card {
+    position: relative;
+    z-index: 102 !important;
+}
+
+.now-showing__pair.is-active .movie-card__button {
+    position: relative;
+    z-index: 103 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.now-showing__stage::before,
+.now-showing__stage::after,
+.now-showing__walls,
+.now-showing__wall,
+.now-showing__ceiling,
+.now-showing__floor,
+.now-showing__vanishing-light,
+.now-showing__walkway {
+    pointer-events: none !important;
+}
+
+@media (max-width: 640px) {
+    .now-showing__pairs {
+        pointer-events: auto !important;
+    }
+
+    .now-showing__pair.is-active .movie-card__button {
+        min-height: 36px;
+        min-width: 84px;
+        padding-inline: 0.55rem;
+    }
+}
+
+
+/* ==========================================================================
+   FINAL MOBILE / DESKTOP CTA CONTRACT
+   ========================================================================== */
+
+.now-showing__stage::before,
+.now-showing__stage::after,
+.now-showing__walls,
+.now-showing__wall,
+.now-showing__ceiling,
+.now-showing__floor,
+.now-showing__vanishing-light,
+.now-showing__walkway,
+.movie-card::before,
+.movie-card__reflection {
+    pointer-events: none !important;
+}
+
+.now-showing__pairs {
+    pointer-events: none !important;
+}
+
+.now-showing__pair {
+    pointer-events: none !important;
+}
+
+.now-showing__pair.is-active {
+    pointer-events: auto !important;
+    z-index: 1000 !important;
+}
+
+.now-showing__pair.is-active .now-showing__frame,
+.now-showing__pair.is-active .movie-card,
+.now-showing__pair.is-active .movie-card__content,
+.now-showing__pair.is-active .movie-card__button {
+    pointer-events: auto !important;
+}
+
+.now-showing__pair.is-active .now-showing__button,
+.now-showing__pair.is-active .movie-card__button {
+    position: relative;
+    z-index: 1002 !important;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 640px) {
+    .now-showing__pairs {
+        pointer-events: none !important;
+    }
+
+    .now-showing__pair.is-active,
+    .now-showing__pair.is-active .now-showing__frame,
+    .now-showing__pair.is-active .movie-card,
+    .now-showing__pair.is-active .movie-card__content,
+    .now-showing__pair.is-active .movie-card__button {
+        pointer-events: auto !important;
+    }
+
+    .now-showing__pair.is-active .movie-card__button {
+        min-height: 36px;
+        min-width: 84px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        touch-action: manipulation;
+    }
+}
+
+/* Native-link fallback: the CTA remains visually identical but has a real
+   browser navigation target even if JavaScript hit-testing is bypassed. */
+.movie-card__content > .movie-card__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+
+/* ==========================================================================
+   TRANSFORM-SAFE BOOK-TICKETS HIT TARGET
+   --------------------------------------------------------------------------
+   Transparent native anchors sit directly over the visible CTA. They are
+   outside the transformed/sticky poster hierarchy, so browser hit-testing is
+   stable at every gallery depth and on touch devices.
+   ========================================================================== */
+
+.now-showing__hit-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+    pointer-events: none;
+}
+
+.now-showing__hit-target {
+    position: fixed;
+    display: block;
+
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+    border: 0;
+
+    opacity: 0;
+    pointer-events: auto;
+
+    cursor: pointer;
+    touch-action: manipulation;
+
+    text-decoration: none;
+    outline: none;
+}
+
+.now-showing__hit-target:focus-visible {
+    opacity: 0;
+    outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .now-showing__hit-target {
+        transition: none;
+    }
+}
+
+
+/* ==========================================================================
+   FINAL CTA INTERACTION
+   ========================================================================== */
+
+.now-showing__stage::before,
+.now-showing__stage::after,
+.now-showing__walls,
+.now-showing__wall,
+.now-showing__ceiling,
+.now-showing__floor,
+.now-showing__vanishing-light,
+.now-showing__walkway,
+.movie-card::before,
+.movie-card__reflection {
+    pointer-events: none !important;
+}
+
+.now-showing__pair.is-active,
+.now-showing__pair.is-active .now-showing__frame,
+.now-showing__pair.is-active .movie-card,
+.now-showing__pair.is-active .movie-card__content,
+.now-showing__pair.is-active .movie-card__button {
+    pointer-events: auto !important;
+}
+
+.now-showing__pair.is-active .movie-card__button {
+    position: relative;
+    z-index: 1000 !important;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.now-showing__hit-layer,
+.now-showing__hit-target {
+    display: none !important;
+    pointer-events: none !important;
 }
