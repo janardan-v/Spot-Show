@@ -226,6 +226,10 @@ export async function NowShowing() {
         "--gallery-scene-progress",
         `${sceneProgress}`,
       );
+      section.style.setProperty(
+        "--gallery-horizontal-progress",
+        `${sequenceProgress}`,
+      );
 
       /*
        * Reduced motion:
@@ -249,6 +253,9 @@ export async function NowShowing() {
             isActive ? "1" : "0.55",
           );
           pair.style.setProperty("--gallery-rotate", "0deg");
+          pair.style.setProperty("--gallery-x", "0px");
+          pair.style.setProperty("--gallery-left-x", "0px");
+          pair.style.setProperty("--gallery-right-x", "0px");
 
           pair.classList.toggle("is-active", isActive);
           pair.setAttribute("aria-hidden", isActive ? "false" : "true");
@@ -327,9 +334,23 @@ export async function NowShowing() {
               "--gallery-progress",
               `${localProgress}`,
             );
+            const entryDirection = index % 2 === 0 ? -1 : 1;
+            const horizontalTravel = Math.min(
+              24,
+              Math.max(window.innerWidth * 0.045, 12),
+            );
+
             pair.style.setProperty(
               "--gallery-x",
-              "0px",
+              `${entryDirection * (1 - arrive) * horizontalTravel}px`,
+            );
+            pair.style.setProperty(
+              "--gallery-left-x",
+              `${-(1 - arrive) * 10}px`,
+            );
+            pair.style.setProperty(
+              "--gallery-right-x",
+              `${(1 - arrive) * 10}px`,
             );
           } else if (isPrevious) {
             /*
@@ -367,11 +388,33 @@ export async function NowShowing() {
               "--gallery-progress",
               "1",
             );
+            const exitDirection = index % 2 === 0 ? 1 : -1;
             pair.style.setProperty(
               "--gallery-x",
-              "0px",
+              `${exitDirection * exitProgress * 28}px`,
+            );
+            pair.style.setProperty(
+              "--gallery-left-x",
+              `${-exitProgress * 8}px`,
+            );
+            pair.style.setProperty(
+              "--gallery-right-x",
+              `${exitProgress * 8}px`,
             );
           } else {
+            const entryDirection = index % 2 === 0 ? -1 : 1;
+            pair.style.setProperty(
+              "--gallery-x",
+              `${entryDirection * 24}px`,
+            );
+            pair.style.setProperty(
+              "--gallery-left-x",
+              "-10px",
+            );
+            pair.style.setProperty(
+              "--gallery-right-x",
+              "10px",
+            );
             pair.style.setProperty(
               "--gallery-distance",
               "-900px",
@@ -391,10 +434,6 @@ export async function NowShowing() {
             pair.style.setProperty(
               "--gallery-progress",
               "0",
-            );
-            pair.style.setProperty(
-              "--gallery-x",
-              "0px",
             );
           }
 
@@ -481,10 +520,52 @@ export async function NowShowing() {
           "--gallery-progress",
           `${index === activeIndex ? activeProgress : 0}`,
         );
-        pair.style.setProperty(
-          "--gallery-x",
-          "0px",
+        const entryDirection = index % 2 === 0 ? -1 : 1;
+        const horizontalTravel = Math.min(
+          148,
+          Math.max(stage.clientWidth * 0.085, 72),
         );
+
+        if (index === activeIndex) {
+          pair.style.setProperty(
+            "--gallery-x",
+            `${entryDirection * (1 - activeProgress) * horizontalTravel}px`,
+          );
+          pair.style.setProperty(
+            "--gallery-left-x",
+            `${-(1 - activeProgress) * 32}px`,
+          );
+          pair.style.setProperty(
+            "--gallery-right-x",
+            `${(1 - activeProgress) * 32}px`,
+          );
+        } else if (index === activeIndex - 1) {
+          const exitProgress = clamp(
+            (activeProgress - 0.22) / 0.28,
+            0,
+            1,
+          );
+          const exitDirection = index % 2 === 0 ? 1 : -1;
+          pair.style.setProperty(
+            "--gallery-x",
+            `${exitDirection * exitProgress * 142}px`,
+          );
+          pair.style.setProperty(
+            "--gallery-left-x",
+            `${-exitProgress * 26}px`,
+          );
+          pair.style.setProperty(
+            "--gallery-right-x",
+            `${exitProgress * 26}px`,
+          );
+        } else {
+          pair.style.setProperty(
+            "--gallery-x",
+            `${entryDirection * horizontalTravel}px`,
+          );
+          pair.style.setProperty("--gallery-left-x", "-32px");
+          pair.style.setProperty("--gallery-right-x", "32px");
+        }
 
         const visible =
           index === activeIndex ||
@@ -553,6 +634,14 @@ export async function NowShowing() {
 
       <div class="now-showing__sequence">
         <div class="now-showing__stage" aria-live="polite">
+          <div class="now-showing__editorial-head" aria-hidden="true">
+            <span class="now-showing__editorial-kicker">SPOTSHOW / THE PROGRAMME</span>
+            <span class="now-showing__editorial-hint">SCROLL TO EXPLORE</span>
+            <span class="now-showing__editorial-progress">
+              <span></span>
+            </span>
+          </div>
+
           <div class="now-showing__ceiling" aria-hidden="true">
             <span></span><span></span><span></span><span></span>
           </div>
@@ -578,10 +667,24 @@ export async function NowShowing() {
                     aria-hidden="${pairIndex === 0 ? "false" : "true"}"
                   >
                     <div class="now-showing__frame now-showing__frame--left">
-                      ${pair[0] ? MovieCard(pair[0]) : ""}
+                      ${
+                        pair[0]
+                          ? `<div class="now-showing__frame-label" aria-hidden="true">
+                               <span>NOW SHOWING</span>
+                               <strong>${String(pairIndex * 2 + 1).padStart(2, "0")}</strong>
+                             </div>${MovieCard(pair[0])}`
+                          : ""
+                      }
                     </div>
                     <div class="now-showing__frame now-showing__frame--right">
-                      ${pair[1] ? MovieCard(pair[1]) : ""}
+                      ${
+                        pair[1]
+                          ? `<div class="now-showing__frame-label" aria-hidden="true">
+                               <span>NOW SHOWING</span>
+                               <strong>${String(pairIndex * 2 + 2).padStart(2, "0")}</strong>
+                             </div>${MovieCard(pair[1])}`
+                          : ""
+                      }
                     </div>
                   </div>
                 `,
