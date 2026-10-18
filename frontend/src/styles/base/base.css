@@ -1,11 +1,7 @@
 /*
 |--------------------------------------------------------------------------
-| Base Styles
+| Base Styles — The Black Film Journal
 |--------------------------------------------------------------------------
-|
-| Defines the default appearance of the application.
-| Every page inherits these styles.
-|
 */
 
 html {
@@ -28,16 +24,14 @@ body {
   min-height: 100vh;
 }
 
-/* Better text selection */
+/* Warm, quiet selection */
 
 ::selection {
-  background-color: var(--color-primary);
-  color: var(--color-text-primary);
+  background-color: var(--color-accent);
+  color: var(--color-accent-ink);
 }
 
-/* Default headings */
-/* Use the display face for cinematic/marquee character, while body copy
-   stays on the base sans for legibility. */
+/* Editorial headings */
 
 h1,
 h2,
@@ -47,27 +41,29 @@ h5,
 h6 {
   font-family: var(--font-family-display);
 
-  font-weight: var(--font-bold);
+  font-weight: var(--font-semibold);
 
   line-height: var(--leading-tight);
 
-  letter-spacing: var(--tracking-normal);
+  letter-spacing: -0.015em;
 
   color: var(--color-text-primary);
 }
-
-/* Default paragraphs */
 
 p {
   color: var(--color-text-secondary);
 }
 
-/* Links */
-
 a {
-  color: var(--color-accent-gold);
+  color: var(--color-accent);
 }
 
 a:hover {
-  color: var(--color-accent-gold-hover);
+  color: var(--color-accent-hover);
+}
+
+/* Underline everything with a quiet border so the layout never floats */
+hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
 }

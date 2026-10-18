@@ -5,56 +5,47 @@ import { calculateTotalPrice } from "../../utils/booking.utils";
 
 export function BookingSummary(seats: Seat[]) {
   const selectedSeatIds = getSelectedSeatIds();
-
   const selectedSeats = seats.filter((seat) => selectedSeatIds.has(seat.id));
   const totalPrice = calculateTotalPrice(selectedSeats.length);
 
   return `
-    <aside class="booking-summary">
-
-      <h2 class="booking-summary__title">
-        Booking Summary
-      </h2>
+    <aside class="booking-summary" aria-live="polite">
+      <p class="eyebrow">Your selection</p>
+      <h2 class="booking-summary__title">Summary</h2>
 
       <div class="booking-summary__seats">
         ${
           selectedSeats.length === 0
-            ? `
-              <p class="booking-summary__empty">
-                No seats selected
-              </p>
-            `
+            ? `<p class="booking-summary__empty">No seats selected yet. Tap an available seat.</p>`
             : selectedSeats
                 .map((seat) => {
                   const index = seats.indexOf(seat);
-
-                  return `
-                    <span class="booking-summary__seat">
-                      ${getSeatLabel(index)}
-                    </span>
-                  `;
+                  return `<span class="booking-summary__seat">${getSeatLabel(index)}</span>`;
                 })
                 .join("")
         }
       </div>
 
-      <p class="booking-summary__count">
-        ${selectedSeats.length}
-        seat${selectedSeats.length === 1 ? "" : "s"} selected
-      </p>
-
-      <p class="booking-summary__price">
-        Total: ₹${totalPrice}
-      </p>
+      <dl class="booking-summary__rows">
+        <div>
+          <dt>Seats</dt>
+          <dd>${selectedSeats.length} selected</dd>
+        </div>
+        <div>
+          <dt>Total</dt>
+          <dd class="booking-summary__total">₹${totalPrice}</dd>
+        </div>
+      </dl>
 
       <button
         class="booking-summary__button"
         type="button"
         data-action="proceed-booking"
         ${selectedSeats.length === 0 ? "disabled" : ""}
-        >
-           Proceed to Booking
+      >
+        Proceed to booking
       </button>
+      <p class="booking-summary__hint">You can review before paying.</p>
     </aside>
   `;
 }

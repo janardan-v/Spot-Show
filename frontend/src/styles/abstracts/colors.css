@@ -1,71 +1,70 @@
-/*
-|--------------------------------------------------------------------------
-| Color Tokens
-|--------------------------------------------------------------------------
-|
-| This file defines the visual identity of the application.
-| Components should NEVER use hardcoded colors.
-| Always reference these variables.
-|
-*/
+/* Design tokens — Premium Monochrome Cinema ("SpotShow") */
 
 :root {
+  /*
+   * Surface palette:
+   * Pure ink black foundation with subtle graphite surfaces.
+   */
+  --color-background: #000000;
+  --color-background-sunken: #050505;
+  --color-surface: #0c0c0c;
+  --color-surface-hover: #161616;
+  --color-surface-active: #202020;
+  --color-surface-elevated: #111111;
 
-  /* ===== Primary ===== */
-  /* Cinematic gold — restrained theatre marquee accent */
+  /* Monochrome surfaces for selected cards & stubs */
+  --color-surface-selected: #181818;
+  --color-surface-indigo: #121212;
 
-  --color-primary: #c9a24a;
-  --color-primary-hover: #d8b766;
-  --color-primary-active: #a98535;
+  /*
+   * Typography:
+   * Pure crisp white and refined neutral silver for timeless editorial craft.
+   */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a3a3a3;
+  --color-text-muted: #737373;
+  --color-text-subtle: #525252;
 
-  /* ===== Accent ===== */
-  /* Warm theatre gold — used for highlights, prices, active states and focus */
+  /*
+   * Borders:
+   * Clean neutral graphite hairlines.
+   */
+  --color-border: #262626;
+  --color-border-strong: #3a3a3a;
+  --color-border-subtle: #171717;
 
-  --color-accent-gold: #c9a24a;
-  --color-accent-gold-hover: #d8b766;
-  --color-accent-gold-muted: #8f7438;
+  /*
+   * Principal interactive accent:
+   * Pure white on black — tactile, high-contrast, premium cinema print.
+   */
+  --color-accent: #ffffff;
+  --color-accent-hover: #e5e5e5;
+  --color-accent-active: #cccccc;
+  --color-accent-soft: rgba(255, 255, 255, 0.08);
+  --color-accent-line: rgba(255, 255, 255, 0.22);
+  --color-accent-ink: #000000;
 
-  /* ===== Neutral ===== */
+  /* Semantic palette — quiet, disciplined */
+  --color-success: #e5e5e5;
+  --color-success-soft: rgba(255, 255, 255, 0.08);
+  --color-success-line: rgba(255, 255, 255, 0.22);
 
-  --color-white: #f5f2ea;
-  --color-black: #070707;
+  --color-warning: #d4d4d4;
+  --color-warning-soft: rgba(255, 255, 255, 0.08);
+  --color-warning-line: rgba(255, 255, 255, 0.22);
 
-  --color-gray-50: #faf9f5;
-  --color-gray-100: #eeeae1;
-  --color-gray-200: #ddd8ce;
-  --color-gray-300: #c5c0b6;
-  --color-gray-400: #a7a29a;
-  --color-gray-500: #8e8a82;
-  --color-gray-600: #6f6b64;
-  --color-gray-700: #4d4a45;
-  --color-gray-800: #2d2b28;
-  --color-gray-900: #181818;
+  --color-danger: #ef4444;
+  --color-danger-soft: rgba(239, 68, 68, 0.12);
+  --color-danger-line: rgba(239, 68, 68, 0.3);
 
-  /* ===== Semantic ===== */
+  /* Modal overlay — deep ink veil */
+  --color-overlay: rgba(0, 0, 0, 0.88);
 
-  --color-success: #5e9a70;
-  --color-warning: #c08a32;
-  --color-danger: #b84a4a;
-  --color-info: #7188a8;
-
-  /* ===== Background ===== */
-  /* Black theatre environment with layered charcoal surfaces */
-
-  --color-background: #070707;
-  --color-surface: #111111;
-  --color-surface-hover: #222222;
-  --color-surface-raised: #181818;
-
-  /* ===== Text ===== */
-  /* Warm ivory for a softer cinematic white */
-
-  --color-text-primary: #f5f2ea;
-  --color-text-secondary: #c9c5bc;
-  --color-text-muted: #8e8a82;
-
-  /* ===== Border ===== */
-  /* Quiet charcoal borders so gold remains the visual signature */
-
-  --color-border: #2c2c2c;
-  --color-border-strong: #44413b;
+  /* Backwards compatibility aliases */
+  --color-primary: var(--color-accent);
+  --color-primary-hover: var(--color-accent-hover);
+  --color-primary-active: var(--color-accent-active);
+  --color-primary-soft: var(--color-accent-soft);
+  --color-accent-gold: var(--color-accent);
+  --color-accent-gold-soft: var(--color-accent-soft);
 }

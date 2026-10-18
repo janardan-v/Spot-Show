@@ -1,338 +1,193 @@
 /*
----------------------------------------------------------------------------
-Seat Grid
----------------------------------------------------------------------------
-| Auditorium-style seat map. Clarity of state (available/booked/selected)
-| takes priority over decoration.
-|
-| The screen is the room's one true light source. A soft falloff extends
-| from it down into the seating area (visible mainly in the gaps between
-| seats), fading by the lower rows -- an atmosphere cue, not a spotlight.
-| A subtle centre aisle reinforces the "rows of seats" reading over a
-| flat button grid.
-*/
+ * Seat map — three separate layout areas:
+ *   .seat-map__screen   — static, reserves its own space, never scrolls
+ *   .seat-map__viewport — the ONLY vertical scroller, owns the height limit
+ *   .seat-grid          — plain grid, natural row geometry, never constrained
+ *
+ * Regression notes (do not reintroduce):
+ * - The screen must NOT be a sticky/grid item inside the scroller; sticky
+ *   content slides over rows instead of reserving space.
+ * - The centre aisle must NOT be a left-margin on 6th-column seats; inside
+ *   fixed 1fr tracks the margin overflows the track and overlaps neighbours.
+ *   The aisle is a real 16px grid track with explicit placement instead.
+ */
 
-.seat-grid {
-  position: relative;
-
-  display: grid;
-
-  grid-template-columns: repeat(10, 1fr);
-
-  row-gap: var(--space-md);
-
-  column-gap: var(--space-sm);
-
-  width: min(100%, 700px);
-
-  margin-inline: auto;
-
-  padding-top: var(--space-xl);
-
-  padding-bottom: var(--space-xl);
-
-  /* Screen-light falloff into the room. A single radial gradient
-     anchored at the screen, fading out well before the bottom of the
-     grid -- reads through the gaps between seats, never as a glow on
-     top of them. Scales naturally with however many rows are rendered,
-     since it's sized in viewport-independent units relative to the
-     container rather than pinned to a row count. */
-
-  background-image: radial-gradient(
-    ellipse 90% 55% at 50% 0%,
-    color-mix(in srgb, var(--color-accent-gold) 7%, transparent) 0%,
-    transparent 88%
-  );
-
-  background-repeat: no-repeat;
-
-  /* Soft edge vignette for a sense of containment/depth -- no border, no
-     background panel, just a very low-opacity darkening toward the outer
-     edges so the seating area reads as sitting "in" the room rather than
-     floating on a flat page. */
-
-  box-shadow: inset 0 0 90px 10px
-    color-mix(in srgb, var(--color-background) 45%, transparent);
+.seat-grid__meta {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-sm);
+  flex-shrink: 0;
 }
 
-/* The screen is the room's one true light source — everything else in
-   the auditorium (selected seats, the confirm button) only borrows
-   a fraction of this glow, never matches it. */
+.seat-map {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--color-background-sunken);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
 
-.seat-grid::before {
-  content: "SCREEN";
+/* Dedicated non-scrolling screen area */
 
-  display: block;
-
-  grid-column: 1 / -1;
-
-  margin-bottom: var(--space-xl);
-
-  padding-block: var(--space-md);
-
+.seat-map__screen {
+  flex-shrink: 0;
+  padding: var(--space-md) var(--space-md) var(--space-lg);
   text-align: center;
+  border-bottom: 1px solid var(--color-border);
+}
 
-  font-family: var(--font-family-base);
-
+.seat-map__screen-label {
+  display: block;
+  font-family: var(--font-family-mono);
   font-size: var(--text-xs);
-
-  font-weight: var(--font-semibold);
-
-  letter-spacing: var(--tracking-wider);
-
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
   color: var(--color-text-muted);
+  margin-bottom: var(--space-sm);
+}
 
+/*
+ * Stage edge: a thin lit rule that dissolves at the ends. Purposeful — it
+ * reads as the front-of-house light line, and it lives entirely inside the
+ * reserved screen area, so it can never sit over a seat.
+ */
+
+.seat-map__screen-bar {
+  display: block;
+  height: 2px;
+  max-width: 420px;
+  margin: 0 auto;
   background: linear-gradient(
-    to bottom,
-    color-mix(
-      in srgb,
-      var(--color-accent-gold) 14%,
-      var(--color-surface-hover)
-    ),
+    90deg,
+    transparent,
+    var(--color-accent) 28%,
+    var(--color-accent) 72%,
     transparent
   );
-
-  border-radius: var(--radius-full) var(--radius-full) 0 0;
-
-  /* A directional glow that spills downward, like light being cast into
-     the room, rather than a uniform glow that outlines a rectangle on
-     all sides. The hard border that previously closed off the bottom
-     edge is removed -- the gradient's own fade to transparent is what
-     now defines the edge, so it reads as light dispersing rather than a
-     panel ending. */
-
-  box-shadow:
-    var(--shadow-glow-gold),
-    0 36px 48px -20px color-mix(in srgb, var(--color-accent-gold) 20%, transparent);
+  opacity: 0.55;
 }
+
+/* The single scroll container for seat rows */
+
+.seat-map__viewport {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-md);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+.seat-map__viewport::-webkit-scrollbar {
+  width: 8px;
+}
+
+.seat-map__viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.seat-map__viewport::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+.seat-map__viewport::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+.seat-map__viewport:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+/*
+ * 10 seats per row with a genuine centre aisle: five seat tracks, one 16px
+ * aisle track, five seat tracks. Every seat is explicitly placed so the
+ * aisle column always stays empty (auto-placement alone would drift seats
+ * into it across rows).
+ */
+
+.seat-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr))
+    16px
+    repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.seat-grid > .seat:nth-child(10n + 1) { grid-column: 1; }
+.seat-grid > .seat:nth-child(10n + 2) { grid-column: 2; }
+.seat-grid > .seat:nth-child(10n + 3) { grid-column: 3; }
+.seat-grid > .seat:nth-child(10n + 4) { grid-column: 4; }
+.seat-grid > .seat:nth-child(10n + 5) { grid-column: 5; }
+.seat-grid > .seat:nth-child(10n + 6) { grid-column: 7; }
+.seat-grid > .seat:nth-child(10n + 7) { grid-column: 8; }
+.seat-grid > .seat:nth-child(10n + 8) { grid-column: 9; }
+.seat-grid > .seat:nth-child(10n + 9) { grid-column: 10; }
+.seat-grid > .seat:nth-child(10n) { grid-column: 11; }
 
 .seat {
-  position: relative;
-
-  aspect-ratio: 6 / 5;
-
-  display: grid;
-  place-items: center;
-
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 34px;
+  margin: 0;
   padding: 0;
-
-  border: 1px solid var(--color-border);
-
-  border-radius: var(--radius-sm);
-
-  background-color: var(--color-surface);
-
-  color: var(--color-text-primary);
-
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: var(--text-xs);
-
   font-weight: var(--font-medium);
-
-  cursor: pointer;
-
-  /* A slightly heavier bottom border reads as a seat base rather than a
-     flat rectangle, without introducing any new tokens or shapes. */
-
-  border-bottom-width: 2px;
-
-  transition:
-    transform 0.15s ease,
-    background-color 0.15s ease,
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
+  line-height: 1;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 
-/* Subtle centre aisle: a wider gap after the 5th seat in every row of
-   10, symmetrical on both sides of the room. The row length is fixed
-   by grid-template-columns (always 10), so this is stable regardless
-   of how many seats/rows are rendered -- not a fragile magic-number
-   position, just a per-row structural rule. */
-
-.seat:nth-child(10n + 5) {
-  margin-right: var(--space-md);
+.seat__label {
+  line-height: 1;
+  pointer-events: none;
 }
 
-.seat:nth-child(10n + 6) {
-  margin-left: var(--space-md);
+.seat--available:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
 }
 
-.seat:hover:not(:disabled) {
-  transform: translateY(-2px);
+.seat--selected {
+  background: var(--color-accent);
+  border-color: var(--color-accent-active);
+  color: var(--color-accent-ink);
+  font-weight: var(--font-semibold);
+}
 
-  border-color: var(--color-accent-gold-muted);
-
-  box-shadow: var(--shadow-xs);
+.seat--booked {
+  opacity: 0.45;
+  cursor: not-allowed;
+  text-decoration: line-through;
 }
 
 .seat:focus-visible {
-  outline: 2px solid var(--color-accent-gold);
-
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
-/* ===== Available ===== */
-
-.seat--available {
-  background-color: var(--color-surface);
-
-  border-color: var(--color-border);
-}
-
-/* ===== Booked ===== */
-
-.seat--booked {
-  background-color: var(--color-surface-hover);
-
-  border-color: var(--color-border);
-
-  color: var(--color-text-muted);
-
-  cursor: not-allowed;
-
-  opacity: 0.55;
-
-  position: relative;
-}
-
-.seat--booked::after {
-  content: "";
-
-  position: absolute;
-
-  width: 60%;
-
-  height: 1px;
-
-  background-color: var(--color-text-muted);
-
-  transform: rotate(-45deg);
-}
-
-.seat--booked:hover {
-  transform: none;
-
-  border-color: var(--color-border);
-
-  box-shadow: none;
-}
-
-/* ===== Selected ===== */
-/* Keeps the primary red identity (selected is still an action state,
-   consistent with buttons elsewhere in the app) but gains a restrained
-   theatre-light quality via the existing red glow token -- previously
-   defined but unused anywhere in the app. No new token introduced. */
-
-.seat--selected {
-  background-color: var(--color-primary);
-
-  border-color: var(--color-primary-hover);
-
-  color: var(--color-text-primary);
-
-  font-weight: var(--font-semibold);
-
-  box-shadow: var(--shadow-sm), var(--shadow-glow-primary);
-
-  transform: translateY(-2px);
-}
-
-.seat--selected:hover {
-  transform: translateY(-2px);
-
-  border-color: var(--color-primary-hover);
-}
-
-/* ===== Responsive ===== */
-
 @media (max-width: 640px) {
+  .seat-map__viewport {
+    padding: var(--space-sm);
+  }
+
   .seat-grid {
-    row-gap: var(--space-sm);
-
-    column-gap: var(--space-xs);
-
-    padding-top: var(--space-lg);
-
-    padding-bottom: var(--space-lg);
-  }
-
-  .seat-grid::before {
-    margin-bottom: var(--space-lg);
-
-    font-size: 0.65rem;
-  }
-
-  .seat:nth-child(10n + 5) {
-    margin-right: var(--space-sm);
-  }
-
-  .seat:nth-child(10n + 6) {
-    margin-left: var(--space-sm);
+    gap: 6px;
   }
 
   .seat {
-    font-size: 0.65rem;
-  }
-}
-
-/* ==========================================================================
-   SHOW PAGE AUDITORIUM REFINEMENT
-   Existing seat-state rules above remain intact.
-   ========================================================================== */
-
-.show-auditorium .seat-grid {
-  padding:
-    var(--space-xl)
-    clamp(var(--space-xs), 1.3vw, var(--space-lg))
-    var(--space-2xl);
-  background:
-    radial-gradient(
-      ellipse 90% 42% at 50% 0%,
-      color-mix(in srgb, var(--color-accent-gold) 6%, transparent),
-      transparent 72%
-    ),
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--color-surface-raised) 12%, transparent),
-      transparent 34%
-    );
-  border-top:
-    1px solid
-    color-mix(in srgb, var(--color-border-strong) 28%, transparent);
-  border-bottom:
-    1px solid
-    color-mix(in srgb, var(--color-border) 22%, transparent);
-  box-shadow:
-    inset 0 28px 58px color-mix(in srgb, var(--color-black) 16%, transparent),
-    inset 0 -60px 80px color-mix(in srgb, var(--color-black) 20%, transparent);
-}
-
-.show-auditorium .seat-grid::before {
-  margin-bottom: var(--space-xl);
-  border:
-    1px solid
-    color-mix(in srgb, var(--color-accent-gold) 10%, transparent);
-  box-shadow:
-    0 10px 34px color-mix(in srgb, var(--color-black) 22%, transparent);
-}
-
-.show-auditorium .seat:nth-child(10n + 5) {
-  margin-right: var(--space-md);
-}
-
-.show-auditorium .seat:nth-child(10n + 6) {
-  margin-left: var(--space-md);
-}
-
-@media (max-width: 640px) {
-  .show-auditorium .seat-grid {
-    padding-inline: 0;
-  }
-
-  .show-auditorium .seat:nth-child(10n + 5) {
-    margin-right: var(--space-sm);
-  }
-
-  .show-auditorium .seat:nth-child(10n + 6) {
-    margin-left: var(--space-sm);
+    min-height: 30px;
+    font-size: 11px;
   }
 }

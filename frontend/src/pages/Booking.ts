@@ -1,6 +1,7 @@
 import { removeSelectedSeat, getSelectedSeatIds } from "../store/booking.store";
 import { fetchSeats } from "../services/seat.service";
 import { getSeatLabel } from "../utils/seat.utils";
+import { calculateTotalPrice } from "../utils/booking.utils";
 import { bookSeat } from "../api/booking.api";
 import { getShows } from "../api/movie.api";
 import { navigate } from "../router";
@@ -8,40 +9,57 @@ import { ROUTES } from "../types/routes";
 
 export async function Booking() {
   const params = new URLSearchParams(window.location.search);
-
   const showId = params.get("showId");
 
   if (!showId) {
     return `
-      <main class="container">
-        <h1>Invalid booking</h1>
-        <p>Show ID is missing.</p>
+      <main class="container narrow">
+        <div class="empty-state" role="alert">
+          Invalid booking — show is missing.
+          <a href="${ROUTES.HOME}" data-route="${ROUTES.HOME}">Back to shows</a>
+        </div>
       </main>
     `;
   }
 
-  const [seats, { showResult }] = await Promise.all([
-    fetchSeats(showId),
-    getShows(),
-  ]);
+  let seats;
+  let show;
 
-  const show = showResult.find((show) => show.id === showId);
-
-  if (!show) {
+  try {
+    const [fetchedSeats, { showResult }] = await Promise.all([
+      fetchSeats(showId),
+      getShows(),
+    ]);
+    seats = fetchedSeats;
+    show = showResult.find((s) => s.id === showId);
+  } catch {
     return `
-    <main class="container">
-      <h1>Show not found</h1>
-      <p>The selected show could not be found.</p>
+      <main class="container narrow">
+        <div class="empty-state" role="alert">
+          Could not load booking. Please try again.
+          <a href="${ROUTES.HOME}" data-route="${ROUTES.HOME}">Back to shows</a>
+        </div>
+      </main>
+    `;
+  }
+
+  if (!show || !seats) {
+    return `
+    <main class="container narrow">
+      <div class="empty-state" role="alert">
+        Show not found.
+        <a href="${ROUTES.HOME}" data-route="${ROUTES.HOME}">Back to shows</a>
+      </div>
     </main>
   `;
   }
-  const selectedSeatIds = getSelectedSeatIds();
 
+  const selectedSeatIds = getSelectedSeatIds();
   const selectedSeats = seats.filter((seat) => selectedSeatIds.has(seat.id));
+  const totalPrice = calculateTotalPrice(selectedSeats.length);
 
   const updateSelectionUI = () => {
     const currentSelectedSeatIds = getSelectedSeatIds();
-
     const currentSelectedSeats = seats.filter((seat) =>
       currentSelectedSeatIds.has(seat.id),
     );
@@ -49,11 +67,10 @@ export async function Booking() {
     const selectedSeatsContainer = document.querySelector<HTMLDivElement>(
       "[data-selected-seats]",
     );
-
     const selectedCount = document.querySelector<HTMLParagraphElement>(
       "[data-selected-count]",
     );
-
+    const totalEl = document.querySelector<HTMLElement>("[data-booking-total]");
     const button = document.querySelector<HTMLButtonElement>(
       '[data-action="confirm-booking"]',
     );
@@ -61,24 +78,23 @@ export async function Booking() {
     if (selectedSeatsContainer) {
       selectedSeatsContainer.innerHTML =
         currentSelectedSeats.length === 0
-          ? "No seats selected"
+          ? `<p class="booking-summary__empty">No seats selected</p>`
           : currentSelectedSeats
               .map((seat) => {
                 const index = seats.indexOf(seat);
-
-                return `
-                <span class="selected-seat">
-                  ${getSeatLabel(index)}
-                </span>
-              `;
+                return `<span class="selected-seat">${getSeatLabel(index)}</span>`;
               })
-              .join(" ");
+              .join("");
     }
 
     if (selectedCount) {
       selectedCount.textContent = `${currentSelectedSeats.length} seat${
         currentSelectedSeats.length === 1 ? "" : "s"
       } selected`;
+    }
+
+    if (totalEl) {
+      totalEl.textContent = `₹${calculateTotalPrice(currentSelectedSeats.length)}`;
     }
 
     if (button) {
@@ -90,7 +106,6 @@ export async function Booking() {
     const button = document.querySelector<HTMLButtonElement>(
       '[data-action="confirm-booking"]',
     );
-
     if (!button) {
       return;
     }
@@ -105,7 +120,6 @@ export async function Booking() {
       }
 
       button.disabled = true;
-
       button.textContent = "Booking...";
 
       const bookedSeats = [];
@@ -116,23 +130,12 @@ export async function Booking() {
 
         try {
           await bookSeat(seat.id);
-
-          bookedSeats.push({
-            seat,
-            label,
-          });
-
+          bookedSeats.push({ seat, label });
           removeSelectedSeat(seat.id);
           updateSelectionUI();
         } catch (error) {
-          console.error(
-            `Failed to book seat: ${getSeatLabel(seats.indexOf(seat))}`,
-            error,
-          );
-          failedSeats.push({
-            seat,
-            label,
-          });
+          console.error(`Failed to book seat: ${label}`, error);
+          failedSeats.push({ seat, label });
           removeSelectedSeat(seat.id);
           updateSelectionUI();
         }
@@ -141,125 +144,94 @@ export async function Booking() {
       if (message) {
         if (failedSeats.length === 0) {
           message.className = "booking-message booking-message--success";
-
           message.innerHTML = `
-      <strong>✓ Booking confirmed</strong>
-
+      <strong>Booking confirmed</strong>
       <p>All selected seats were booked successfully.</p>
-
       <ul>
-        ${bookedSeats
-          .map(({ label }) => `<li>✓ ${label} — Booked successfully</li>`)
-          .join("")}
+        ${bookedSeats.map(({ label }) => `<li>${label} — booked</li>`).join("")}
       </ul>
     `;
         } else {
           message.className = "booking-message booking-message--warning";
-
           message.innerHTML = `
-      <strong>⚠ Partial booking</strong>
-
+      <strong>Partial booking</strong>
       ${
         bookedSeats.length > 0
-          ? `
-            <p><strong>Booked:</strong></p>
-            <ul>
-              ${bookedSeats
-                .map(({ label }) => `<li>✓ ${label} — Booked successfully</li>`)
-                .join("")}
-            </ul>
-          `
+          ? `<p><strong>Booked:</strong></p>
+            <ul>${bookedSeats.map(({ label }) => `<li>${label} — booked</li>`).join("")}</ul>`
           : ""
       }
-
       <p><strong>Not booked:</strong></p>
-
-      <ul>
-        ${failedSeats
-          .map(({ label }) => `<li>✕ ${label} — Already booked</li>`)
-          .join("")}
-      </ul>
+      <ul>${failedSeats.map(({ label }) => `<li>${label} — already booked</li>`).join("")}</ul>
     `;
         }
       }
+
       if (failedSeats.length === 0) {
         setTimeout(() => {
           navigate(`${ROUTES.SHOW}/${showId}`);
-      }, 2000);
+        }, 2000);
       }
 
-      if (bookedSeats.length === selectedSeats.length) {
-        button.textContent = "Booking Complete";
-      } else {
-        button.textContent = "Booking Attempted";
-      }
+      button.textContent =
+        bookedSeats.length === selectedSeats.length
+          ? "Booking complete"
+          : "Booking attempted";
     });
   });
 
+  const showDate = new Date(show.showDate);
+  const dateLabel = isNaN(showDate.getTime())
+    ? String(show.showDate)
+    : showDate.toLocaleDateString(undefined, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+  const timeLabel = isNaN(showDate.getTime())
+    ? ""
+    : showDate.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
   return `
-  <main class="booking-page">
-  <section class="booking-summary">
+  <main class="container narrow booking-page">
+    <a class="back-link" href="${ROUTES.SHOW}/${showId}" data-route="${ROUTES.SHOW}/${showId}">← Back to seats</a>
 
-    <h1>Booking Summary</h1>
+    <section class="booking-card card" aria-labelledby="booking-title">
+      <p class="eyebrow">Review & confirm</p>
+      <h1 id="booking-title">Booking summary</h1>
+      <p class="section-sub">${show.movieName} · ${dateLabel}${timeLabel ? ` · ${timeLabel}` : ""}</p>
 
-    <div class="booking-show-info">
+      <h2 class="booking-card__label">Selected seats</h2>
+      <div class="selected-seats" data-selected-seats>
+        ${
+          selectedSeats.length === 0
+            ? `<p class="booking-summary__empty">No seats selected</p>`
+            : selectedSeats
+                .map((seat) => {
+                  const index = seats.indexOf(seat);
+                  return `<span class="selected-seat">${getSeatLabel(index)}</span>`;
+                })
+                .join("")
+        }
+      </div>
 
-      <h2>${show.movieName}</h2>
+      <dl class="booking-summary__rows">
+        <div><dt>Seats</dt><dd data-selected-count>${selectedSeats.length} seat${selectedSeats.length === 1 ? "" : "s"} selected</dd></div>
+        <div><dt>Total</dt><dd class="booking-summary__total" data-booking-total>₹${totalPrice}</dd></div>
+      </dl>
 
-      <p>
-        ${new Date(show.showDate).toLocaleDateString()}
-      </p>
+      <div class="booking-message" data-booking-message aria-live="polite"></div>
 
-      <p>
-        ${new Date(show.showDate).toLocaleTimeString([], {
-          hour: "numeric",
-          minute: "2-digit",
-        })}
-      </p>
-
-    </div>
-
-    <h2>Selected Seats</h2>
-
-    <div class="selected-seats" data-selected-seats>
-      ${
-        selectedSeats.length === 0
-          ? "No seats selected"
-          : selectedSeats
-              .map((seat) => {
-                const index = seats.indexOf(seat);
-
-                return `
-                  <span class="selected-seat">
-                    ${getSeatLabel(index)}
-                  </span>
-                `;
-              })
-              .join(" ")
-      }
-    </div>
-
-    <p data-selected-count>
-      ${selectedSeats.length} seat${
-        selectedSeats.length === 1 ? "" : "s"
-      } selected
-    </p>
-
-    <div
-      class="booking-message"
-      data-booking-message
-      aria-live="polite"
-    ></div>
-
-    <button
-      type="button"
-      data-action="confirm-booking"
-      ${selectedSeats.length === 0 ? "disabled" : ""}
-    >
-      Confirm Booking
-    </button>
-
-  </section>
+      <button
+        type="button"
+        class="booking-confirm"
+        data-action="confirm-booking"
+        ${selectedSeats.length === 0 ? "disabled" : ""}
+      >
+        Confirm booking
+      </button>
+    </section>
   </main>
 `;
 }

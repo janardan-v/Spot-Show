@@ -10,8 +10,13 @@ import { Account } from "./pages/Account";
 import { runCleanup } from "./utils/lifecycle";
 
 export function navigate(path: string) {
-  window.history.pushState({}, "", path);
+  if (path === ROUTES.HOME && window.location.pathname === ROUTES.HOME) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
 
+  window.history.pushState({}, "", path);
+  window.scrollTo(0, 0);
   renderCurrentRoute();
 }
 

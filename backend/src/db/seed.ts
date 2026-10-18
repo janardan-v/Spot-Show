@@ -7,22 +7,22 @@ async function seed() {
     {
       movieName: "Spider-Man: Brand New Day",
       totalSeats: 100,
-      showDate: new Date("2026-08-15T18:00:00"),
+      showDate: new Date("2030-08-15T18:00:00"),
     },
     {
       movieName: "Avengers: Doomsday",
       totalSeats: 100,
-      showDate: new Date("2026-08-16T18:00:00"),
+      showDate: new Date("2030-08-16T18:00:00"),
     },
     {
       movieName: "Mahavatar Narasimha",
       totalSeats: 100,
-      showDate: new Date("2026-08-17T18:00:00"),
+      showDate: new Date("2030-08-17T18:00:00"),
     },
     {
       movieName: "Mahavatar Parshuram",
       totalSeats: 100,
-      showDate: new Date("2026-08-18T18:00:00"),
+      showDate: new Date("2030-08-18T18:00:00"),
     },
   ];
 

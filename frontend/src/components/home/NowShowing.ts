@@ -1,709 +1,466 @@
 import { fetchShows } from "../../services/movie.service";
-import { MovieCard } from "./MovieCard";
-import { navigate } from "../../router";
+import { moviePosters } from "../../utils/moviePosters";
 import { registerCleanup } from "../../utils/lifecycle";
+import { SEAT_PRICE } from "../../utils/booking.utils";
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(Math.max(value, min), max);
+function getWavePaths(cycleProgress: number) {
+  // Wave phase based on cycle progress (continuous travelling wave with period 1.0)
+  const p = cycleProgress * Math.PI * 4;
+
+  // Top wave control points (normalized 0 to 1 for clip-path)
+  const y0_t = 0.14 + Math.sin(p) * 0.025;
+  const y1_t = 0.26 + Math.sin(p + 1.2) * 0.035;
+  const y2_t = 0.13 + Math.sin(p + 2.5) * 0.03;
+  const y3_t = 0.20 + Math.sin(p + 3.8) * 0.025;
+
+  // Bottom wave control points (normalized 0 to 1 for clip-path)
+  const y0_b = 0.86 + Math.cos(p) * 0.025;
+  const y1_b = 0.90 + Math.cos(p + 1.2) * 0.03;
+  const y2_b = 0.74 + Math.cos(p + 2.5) * 0.035;
+  const y3_b = 0.84 + Math.cos(p + 3.8) * 0.025;
+
+  const clipD =
+    `M 0 ${y0_t.toFixed(4)} ` +
+    `C 0.25 ${y0_t.toFixed(4)}, 0.35 ${y1_t.toFixed(4)}, 0.50 ${((y1_t + y2_t) / 2).toFixed(4)} ` +
+    `C 0.65 ${y2_t.toFixed(4)}, 0.80 ${y2_t.toFixed(4)}, 1.0 ${y3_t.toFixed(4)} ` +
+    `L 1.0 ${y3_b.toFixed(4)} ` +
+    `C 0.80 ${y2_b.toFixed(4)}, 0.65 ${y2_b.toFixed(4)}, 0.50 ${((y1_b + y2_b) / 2).toFixed(4)} ` +
+    `C 0.35 ${y1_b.toFixed(4)}, 0.25 ${y0_b.toFixed(4)}, 0 ${y0_b.toFixed(4)} Z`;
+
+  // Hairline strokes (1000 x 600 coordinate space)
+  const topHairlineD =
+    `M 0 ${(y0_t * 600).toFixed(1)} ` +
+    `C 250 ${(y0_t * 600).toFixed(1)}, 350 ${(y1_t * 600).toFixed(1)}, 500 ${(((y1_t + y2_t) / 2) * 600).toFixed(1)} ` +
+    `C 650 ${(y2_t * 600).toFixed(1)}, 800 ${(y2_t * 600).toFixed(1)}, 1000 ${(y3_t * 600).toFixed(1)}`;
+
+  const botHairlineD =
+    `M 0 ${(y0_b * 600).toFixed(1)} ` +
+    `C 250 ${(y0_b * 600).toFixed(1)}, 350 ${(y1_b * 600).toFixed(1)}, 500 ${(((y1_b + y2_b) / 2) * 600).toFixed(1)} ` +
+    `C 650 ${(y2_b * 600).toFixed(1)}, 800 ${(y2_b * 600).toFixed(1)}, 1000 ${(y3_b * 600).toFixed(1)}`;
+
+  return { clipD, topHairlineD, botHairlineD };
+}
 
 export async function NowShowing() {
-  const shows = await fetchShows();
-  const pairs = [];
+  let shows = [];
 
-  for (let index = 0; index < shows.length; index += 2) {
-    pairs.push(shows.slice(index, index + 2));
+  try {
+    shows = await fetchShows();
+  } catch {
+    return `
+      <section id="now-showing" class="now-showing container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">The Programme</p>
+            <h2>Now screening</h2>
+          </div>
+        </div>
+        <div class="empty-state" role="alert">
+          Could not load shows. Please try again.
+        </div>
+      </section>
+    `;
   }
 
+  if (!shows.length) {
+    return `
+      <section id="now-showing" class="now-showing container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">The Programme</p>
+            <h2>Now screening</h2>
+          </div>
+        </div>
+        <div class="empty-state">No screenings scheduled yet.</div>
+      </section>
+    `;
+  }
+
+  /*
+   * Genuinely Infinite Cinema Reel ("SpotShow").
+   *
+   * Continuous multi-buffer horizontal reel with curved ribbon boundary,
+   * subtle 3D perspective warp, and seamless bidirectional scroll wrapping.
+   *
+   * Forward: 1 -> 2 -> 3 -> 4 -> 1 -> 2 -> 3 -> 4 (indefinite loops)
+   * Backward: 4 -> 3 -> 2 -> 1 -> 4 -> 3 -> 2 -> 1 (indefinite loops)
+   */
   setTimeout(() => {
     const section = document.querySelector<HTMLElement>("#now-showing");
-    const sequence = section?.querySelector<HTMLElement>(".now-showing__sequence");
-    const stage = section?.querySelector<HTMLElement>(".now-showing__stage");
-    const steps = Array.from(
-      section?.querySelectorAll<HTMLElement>(".now-showing__step") ?? [],
+    const sequence = section?.querySelector<HTMLElement>(".gallery__sequence");
+    const sticky = section?.querySelector<HTMLElement>(".gallery__sticky");
+    const viewport = section?.querySelector<HTMLElement>(".gallery__viewport");
+    const track = section?.querySelector<HTMLElement>(".gallery__track");
+    const panels = Array.from(
+      section?.querySelectorAll<HTMLElement>(".gallery__panel") ?? [],
     );
-    const pairElements = Array.from(
-      section?.querySelectorAll<HTMLElement>(".now-showing__pair") ?? [],
+    const arts = panels.map((panel) =>
+      panel.querySelector<HTMLElement>(".gallery__art"),
     );
+    const fill = section?.querySelector<HTMLElement>(".gallery__progress-fill");
+    const counter = section?.querySelector<HTMLElement>(".gallery__counter");
+    const chromeNo = section?.querySelector<HTMLElement>(".gallery__chrome-no");
 
-    if (!section || !sequence || !stage || !steps.length || !pairElements.length) {
+    const clipPathEl = section?.querySelector<SVGPathElement>("#gallery-wave-clip-path");
+    const topHairlineEl = section?.querySelector<SVGPathElement>("#gallery-wave-hairline-top");
+    const botHairlineEl = section?.querySelector<SVGPathElement>("#gallery-wave-hairline-bottom");
+
+    if (!section || !sequence || !sticky || !viewport || !track || !panels.length) {
       return;
     }
 
-    /*
-     * TRANSFORM-SAFE BOOKING INTERACTION
-     *
-     * The posters live inside a sticky 3D transformed scene. We compare the
-     * actual pointer coordinates with the CURRENT viewport rectangle of the
-     * active Book Tickets button, so interaction follows the visual poster at
-     * every depth position.
-     */
-    let lastTouchNavigation = 0;
-    let lastTouchRoute = "";
-
-    const getActiveBookingButtonAtPoint = (
-      clientX: number,
-      clientY: number,
-    ): HTMLButtonElement | HTMLAnchorElement | null => {
-      const buttons = Array.from(
-        section.querySelectorAll<
-          HTMLButtonElement | HTMLAnchorElement
-        >(
-          '.now-showing__pair[aria-hidden="false"] .movie-card__button[data-route]',
-        ),
-      );
-
-      const candidates = buttons
-        .map((button) => {
-          const rect = button.getBoundingClientRect();
-
-          if (
-            clientX < rect.left ||
-            clientX > rect.right ||
-            clientY < rect.top ||
-            clientY > rect.bottom ||
-            rect.width <= 0 ||
-            rect.height <= 0
-          ) {
-            return null;
-          }
-
-          const pair = button.closest<HTMLElement>(".now-showing__pair");
-          const pairIndex = Number(pair?.dataset.pair ?? -1);
-
-          return {
-            button,
-            pairIndex,
-            area: rect.width * rect.height,
-          };
-        })
-        .filter(
-          (
-            candidate,
-          ): candidate is {
-            button: HTMLButtonElement | HTMLAnchorElement;
-            pairIndex: number;
-            area: number;
-          } => candidate !== null,
-        )
-        .sort((a, b) => {
-          /*
-           * When two pairs briefly overlap, prefer the later/deeper pair
-           * that visually sits on top. If the pair index is identical, use
-           * the smaller hit area as a tie-breaker.
-           */
-          if (a.pairIndex !== b.pairIndex) {
-            return b.pairIndex - a.pairIndex;
-          }
-
-          return a.area - b.area;
-        });
-
-      return candidates[0]?.button ?? null;
-    };
-
-    const navigateFromPoint = (
-      event: MouseEvent | PointerEvent,
-      button: HTMLButtonElement | HTMLAnchorElement,
-    ) => {
-      const route = button.dataset.route;
-
-      if (!route) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      navigate(route);
-    };
-
-    const handleGalleryPointerUp = (event: PointerEvent) => {
-      if (
-        event.pointerType !== "touch" &&
-        event.pointerType !== "pen"
-      ) {
-        return;
-      }
-
-      const button = getActiveBookingButtonAtPoint(
-        event.clientX,
-        event.clientY,
-      );
-
-      if (!button) {
-        return;
-      }
-
-      lastTouchNavigation = Date.now();
-      lastTouchRoute = button.dataset.route ?? "";
-
-      navigateFromPoint(event, button);
-    };
-
-    const handleGalleryDocumentClick = (event: MouseEvent) => {
-      const button = getActiveBookingButtonAtPoint(
-        event.clientX,
-        event.clientY,
-      );
-
-      if (!button) {
-        return;
-      }
-
-      const route = button.dataset.route ?? "";
-
-      if (
-        lastTouchRoute === route &&
-        Date.now() - lastTouchNavigation < 700
-      ) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        return;
-      }
-
-      navigateFromPoint(event, button);
-    };
-
-    document.addEventListener(
-      "pointerup",
-      handleGalleryPointerUp,
-      true,
-    );
-
-    document.addEventListener(
-      "click",
-      handleGalleryDocumentClick,
-      true,
-    );
-
+    const numShows = shows.length;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const mobileQuery = window.matchMedia("(max-width: 640px)");
-
     let rafId = 0;
+    let lastIndex = -1;
+    let pinnedTop = 0;
+    let isWrapping = false;
+    let hasEnteredLoop = false;
 
-    const renderGallery = () => {
+    // Cycle geometry measurements
+    let cycleWidth = 0;
+    let cycleScroll = 0;
+    let centerShift = 0;
+    let pinStart = 0;
+
+    const syncReduced = () => {
+      sequence.classList.toggle("is-reduced", reducedMotion.matches);
+    };
+
+    const measure = () => {
+      const topVal = parseFloat(window.getComputedStyle(sticky).top);
+      pinnedTop = Number.isFinite(topVal) ? topVal : 0;
+
+      const viewportWidth = sticky.clientWidth;
+
+      // Measure width of 1 complete set of 4 panels
+      cycleWidth = 0;
+      for (let i = 0; i < numShows; i++) {
+        cycleWidth += panels[i]?.offsetWidth ?? 0;
+      }
+      if (cycleWidth <= 0) {
+        cycleWidth = viewportWidth * 3;
+      }
+
+      // Height of 1 cycle in vertical scroll
+      cycleScroll = Math.max(window.innerHeight * 1.5, 1400);
+
+      // Total sequence runway height: 6 full cycles
+      sequence.style.height = `${cycleScroll * 6}px`;
+
+      // Start of pinned range
+      const seqRect = sequence.getBoundingClientRect();
+      pinStart = seqRect.top + window.scrollY - pinnedTop;
+
+      // The canonical primary set is Set 2 (film index 2 * numShows = 8)
+      const centerPanel = panels[2 * numShows] ?? panels[0];
+      centerShift =
+        centerPanel.offsetLeft + centerPanel.offsetWidth / 2 - viewportWidth / 2;
+    };
+
+    syncReduced();
+    measure();
+
+    const render = () => {
       rafId = 0;
 
-      const viewportCenter = window.scrollY + window.innerHeight * 0.48;
-
-      /*
-       * Choose the pair from the actual gallery sequence progress rather than
-       * whichever invisible marker happens to be closest to the viewport.
-       * This removes the "blank corridor" that can appear when the viewport is
-       * between two markers and guarantees that the final pair owns the end of
-       * the sequence.
-       */
-      const sequenceRect = sequence.getBoundingClientRect();
-      const sequenceStart = sequenceRect.top + window.scrollY;
-      const sequenceEnd =
-        sequenceStart + Math.max(sequenceRect.height - stage.offsetHeight, 1);
-
-      const sequenceProgress = clamp(
-        (viewportCenter - sequenceStart) /
-          Math.max(sequenceEnd - sequenceStart, 1),
-        0,
-        0.999999,
-      );
-
-      const activeIndex = Math.min(
-        pairElements.length - 1,
-        Math.floor(sequenceProgress * pairElements.length),
-      );
-
-      const activeStep = steps[activeIndex];
-      const activeRect = activeStep?.getBoundingClientRect();
-      const activeStart = activeRect
-        ? activeRect.top + window.scrollY
-        : window.scrollY;
-      const activeLength = Math.max(activeRect?.height ?? 1, 1);
-
-      const sceneProgress = clamp(
-        (viewportCenter - activeStart) / activeLength,
-        0,
-        1,
-      );
-
-      section.style.setProperty(
-        "--gallery-scene-progress",
-        `${sceneProgress}`,
-      );
-      section.style.setProperty(
-        "--gallery-horizontal-progress",
-        `${sequenceProgress}`,
-      );
-
-      /*
-       * Reduced motion:
-       * show exactly one pair and keep it fully settled.
-       */
       if (reducedMotion.matches) {
-        pairElements.forEach((pair, index) => {
-          const isActive = index === activeIndex;
-
-          pair.style.setProperty("--gallery-progress", isActive ? "1" : "0");
-          pair.style.setProperty(
-            "--gallery-distance",
-            isActive ? "0px" : "-900px",
-          );
-          pair.style.setProperty(
-            "--gallery-opacity",
-            isActive ? "1" : "0",
-          );
-          pair.style.setProperty(
-            "--gallery-scale",
-            isActive ? "1" : "0.55",
-          );
-          pair.style.setProperty("--gallery-rotate", "0deg");
-          pair.style.setProperty("--gallery-x", "0px");
-          pair.style.setProperty("--gallery-left-x", "0px");
-          pair.style.setProperty("--gallery-right-x", "0px");
-
-          pair.classList.toggle("is-active", isActive);
-          pair.setAttribute("aria-hidden", isActive ? "false" : "true");
-          pair.style.pointerEvents = isActive ? "auto" : "none";
+        track.style.transform = "";
+        panels.forEach((panel, index) => {
+          panel.style.transform = "";
+          panel.classList.remove("is-active");
+          const art = arts[index];
+          if (art) art.style.transform = "";
         });
-
-        section.style.setProperty(
-          "--gallery-active-index",
-          `${activeIndex}`,
-        );
-
         return;
       }
 
-      /*
-       * Mobile:
-       * Use one continuous pair-space coordinate. The current pair approaches
-       * the visitor through a short physical depth range, while the pair just
-       * passed exits quickly. The overlap is deliberately brief and subtle:
-       * it reads as walking past a wall installation rather than a cross-fade.
-       */
-      if (mobileQuery.matches) {
-        const pairCount = Math.max(pairElements.length, 1);
-        const galleryPosition = sequenceProgress * pairCount;
-        const localProgress = clamp(
-          galleryPosition - activeIndex,
-          0,
-          1,
-        );
+      const currentY = window.scrollY;
+      const dY = hasEnteredLoop ? currentY - pinStart : Math.max(0, currentY - pinStart);
 
-        const smoothstep = (value: number) =>
-          value * value * (3 - 2 * value);
-
-        const arrive = smoothstep(localProgress);
-
-        pairElements.forEach((pair, index) => {
-          const isActive = index === activeIndex;
-          const isPrevious = index === activeIndex - 1;
-
-          if (isActive) {
-            /*
-             * Keep the visitor close to the poster. The full arrival is only
-             * about 180px of depth, so posters never disappear deep into the
-             * corridor on a phone.
-             */
-            const distance = -120 + arrive * 120;
-            const scale = 0.94 + arrive * 0.06;
-
-            /*
-             * Start the new pair gently, then become fully present quickly.
-             * This also makes the last pair fully visible at the scroll limit.
-             */
-            const opacity = clamp(
-              (localProgress - 0.08) / 0.42,
-              0,
-              1,
-            );
-
-            pair.style.setProperty(
-              "--gallery-distance",
-              `${distance}px`,
-            );
-            pair.style.setProperty(
-              "--gallery-opacity",
-              `${opacity}`,
-            );
-            pair.style.setProperty(
-              "--gallery-scale",
-              `${scale}`,
-            );
-            pair.style.setProperty(
-              "--gallery-rotate",
-              "0deg",
-            );
-            pair.style.setProperty(
-              "--gallery-progress",
-              `${localProgress}`,
-            );
-            const entryDirection = index % 2 === 0 ? -1 : 1;
-            const horizontalTravel = Math.min(
-              24,
-              Math.max(window.innerWidth * 0.045, 12),
-            );
-
-            pair.style.setProperty(
-              "--gallery-x",
-              `${entryDirection * (1 - arrive) * horizontalTravel}px`,
-            );
-            pair.style.setProperty(
-              "--gallery-left-x",
-              `${-(1 - arrive) * 10}px`,
-            );
-            pair.style.setProperty(
-              "--gallery-right-x",
-              `${(1 - arrive) * 10}px`,
-            );
-          } else if (isPrevious) {
-            /*
-             * The passed pair moves a little closer and outward before
-             * disappearing. Keep the handoff short so it feels physical,
-             * not like two full pairs are layered together.
-             */
-            const exitProgress = clamp(
-              (localProgress - 0.28) / 0.24,
-              0,
-              1,
-            );
-
-            const distance = exitProgress * 150;
-            const scale = 1 + exitProgress * 0.08;
-            const opacity = 1 - exitProgress;
-
-            pair.style.setProperty(
-              "--gallery-distance",
-              `${distance}px`,
-            );
-            pair.style.setProperty(
-              "--gallery-opacity",
-              `${opacity}`,
-            );
-            pair.style.setProperty(
-              "--gallery-scale",
-              `${scale}`,
-            );
-            pair.style.setProperty(
-              "--gallery-rotate",
-              "0deg",
-            );
-            pair.style.setProperty(
-              "--gallery-progress",
-              "1",
-            );
-            const exitDirection = index % 2 === 0 ? 1 : -1;
-            pair.style.setProperty(
-              "--gallery-x",
-              `${exitDirection * exitProgress * 28}px`,
-            );
-            pair.style.setProperty(
-              "--gallery-left-x",
-              `${-exitProgress * 8}px`,
-            );
-            pair.style.setProperty(
-              "--gallery-right-x",
-              `${exitProgress * 8}px`,
-            );
-          } else {
-            const entryDirection = index % 2 === 0 ? -1 : 1;
-            pair.style.setProperty(
-              "--gallery-x",
-              `${entryDirection * 24}px`,
-            );
-            pair.style.setProperty(
-              "--gallery-left-x",
-              "-10px",
-            );
-            pair.style.setProperty(
-              "--gallery-right-x",
-              "10px",
-            );
-            pair.style.setProperty(
-              "--gallery-distance",
-              "-900px",
-            );
-            pair.style.setProperty(
-              "--gallery-opacity",
-              "0",
-            );
-            pair.style.setProperty(
-              "--gallery-scale",
-              "0.7",
-            );
-            pair.style.setProperty(
-              "--gallery-rotate",
-              "0deg",
-            );
-            pair.style.setProperty(
-              "--gallery-progress",
-              "0",
-            );
-          }
-
-          const visible = isActive || isPrevious;
-
-          pair.classList.toggle("is-active", isActive);
-          pair.setAttribute(
-            "aria-hidden",
-            visible ? "false" : "true",
-          );
-          pair.style.pointerEvents = isActive ? "auto" : "none";
-          pair.style.visibility = visible ? "visible" : "hidden";
-        });
-
-        section.style.setProperty(
-          "--gallery-active-index",
-          `${activeIndex}`,
-        );
-
-        return;
+      // Seamless bidirectional wraparound:
+      // When scrolling forward past 2 cycles: wrap back by 1 cycle
+      // When scrolling backward below 0 (and after having entered the loop): wrap forward by 1 cycle
+      if (!isWrapping) {
+        if (dY >= 2 * cycleScroll) {
+          isWrapping = true;
+          window.scrollTo({ top: currentY - cycleScroll, behavior: "instant" });
+          window.requestAnimationFrame(() => {
+            isWrapping = false;
+          });
+          return;
+        } else if (hasEnteredLoop && dY < 0 && currentY > 50) {
+          isWrapping = true;
+          window.scrollTo({ top: currentY + cycleScroll, behavior: "instant" });
+          window.requestAnimationFrame(() => {
+            isWrapping = false;
+          });
+          return;
+        }
       }
 
-      /*
-       * Desktop/tablet:
-       * Keep the established depth-gallery language, but derive the pair
-       * progress from the same global sequence coordinate. This guarantees
-       * that the final pair reaches the same settled camera position as every
-       * earlier pair instead of stopping prematurely.
-       */
-      const pairCount = Math.max(pairElements.length, 1);
-      const galleryPosition = sequenceProgress * pairCount;
-      const activeProgress = clamp(
-        galleryPosition - activeIndex,
-        0,
-        1,
-      );
+      if (dY >= 0) {
+        hasEnteredLoop = true;
+      }
 
-      pairElements.forEach((pair, index) => {
-        let distance = -900;
-        let opacity = 0;
-        let scale = 0.52;
-        let rotate = 0;
+      const viewportWidth = sticky.clientWidth;
+      const stickyRect = sticky.getBoundingClientRect();
+      const vpCenter = stickyRect.left + viewportWidth / 2;
 
-        if (index === activeIndex) {
-          distance = -520 + activeProgress * 520;
-          opacity = clamp(activeProgress * 1.8, 0, 1);
-          scale = 0.58 + activeProgress * 0.22;
-          rotate = (1 - activeProgress) * 1.2;
-        } else if (index === activeIndex - 1) {
-          const exitProgress = clamp(
-            (activeProgress - 0.22) / 0.28,
-            0,
-            1,
-          );
+      // Normalized progress within the current cycle [0..1)
+      const cycleProgress = (((dY % cycleScroll) + cycleScroll) % cycleScroll) / cycleScroll;
 
-          distance = exitProgress * 240;
-          opacity = 1 - exitProgress;
-          scale = 0.82 + exitProgress * 0.08;
-          rotate = -exitProgress * 1.7;
-        } else if (index === activeIndex + 1) {
-          distance = -950;
-          opacity = activeProgress > 0.72 ? 0.08 : 0;
-          scale = 0.4;
-          rotate = 0;
+      // 1. Horizontal track travel with exact modular translation
+      const shift = centerShift + (dY / cycleScroll) * cycleWidth;
+      track.style.transform = `translate3d(${-shift.toFixed(2)}px, 0, 0)`;
+
+      // 2. Periodic wave boundary and hairline stroke update
+      const { clipD, topHairlineD, botHairlineD } = getWavePaths(cycleProgress);
+      if (clipPathEl) clipPathEl.setAttribute("d", clipD);
+      if (topHairlineEl) topHairlineEl.setAttribute("d", topHairlineD);
+      if (botHairlineEl) botHairlineEl.setAttribute("d", botHairlineD);
+
+      // 3. Subtle 3D perspective warp and wave ripple across panels
+      let closestDist = Infinity;
+      let activePanelIdx = -1;
+      let activeFilmIndex = 0;
+
+      panels.forEach((panel, index) => {
+        const art = arts[index];
+        const rect = panel.getBoundingClientRect();
+        const panelCenter = rect.left + rect.width / 2;
+        const dist = Math.abs(panelCenter - vpCenter);
+
+        if (dist < closestDist) {
+          closestDist = dist;
+          activePanelIdx = index;
+          activeFilmIndex = index % numShows;
         }
 
-        pair.style.setProperty(
-          "--gallery-distance",
-          `${distance}px`,
-        );
-        pair.style.setProperty(
-          "--gallery-opacity",
-          `${opacity}`,
-        );
-        pair.style.setProperty(
-          "--gallery-scale",
-          `${scale}`,
-        );
-        pair.style.setProperty(
-          "--gallery-rotate",
-          `${rotate}deg`,
-        );
-        pair.style.setProperty(
-          "--gallery-progress",
-          `${index === activeIndex ? activeProgress : 0}`,
-        );
-        const entryDirection = index % 2 === 0 ? -1 : 1;
-        const horizontalTravel = Math.min(
-          148,
-          Math.max(stage.clientWidth * 0.085, 72),
-        );
+        // Distance normalized by half-viewport (-1 left, 0 center, +1 right)
+        const distance = (panelCenter - vpCenter) / (viewportWidth * 0.5);
+        const abs = Math.abs(distance);
 
-        if (index === activeIndex) {
-          pair.style.setProperty(
-            "--gallery-x",
-            `${entryDirection * (1 - activeProgress) * horizontalTravel}px`,
-          );
-          pair.style.setProperty(
-            "--gallery-left-x",
-            `${-(1 - activeProgress) * 32}px`,
-          );
-          pair.style.setProperty(
-            "--gallery-right-x",
-            `${(1 - activeProgress) * 32}px`,
-          );
-        } else if (index === activeIndex - 1) {
-          const exitProgress = clamp(
-            (activeProgress - 0.22) / 0.28,
-            0,
-            1,
-          );
-          const exitDirection = index % 2 === 0 ? 1 : -1;
-          pair.style.setProperty(
-            "--gallery-x",
-            `${exitDirection * exitProgress * 142}px`,
-          );
-          pair.style.setProperty(
-            "--gallery-left-x",
-            `${-exitProgress * 26}px`,
-          );
-          pair.style.setProperty(
-            "--gallery-right-x",
-            `${exitProgress * 26}px`,
-          );
-        } else {
-          pair.style.setProperty(
-            "--gallery-x",
-            `${entryDirection * horizontalTravel}px`,
-          );
-          pair.style.setProperty("--gallery-left-x", "-32px");
-          pair.style.setProperty("--gallery-right-x", "32px");
+        // Periodic wave phase
+        const phase = distance * 1.5 + cycleProgress * Math.PI * 2;
+        const waveY = Math.sin(phase) * 8;
+        const shearY = Math.cos(phase) * 1.4;
+        const scaleY = 1 - Math.min(abs * 0.03, 0.06);
+
+        panel.style.transform =
+          `translate3d(0, ${waveY.toFixed(2)}px, 0) ` +
+          `skewY(${shearY.toFixed(2)}deg) ` +
+          `scaleY(${scaleY.toFixed(3)})`;
+
+        if (art) {
+          const rotateY = distance * -7;
+          art.style.transform = `perspective(1100px) rotateY(${rotateY.toFixed(2)}deg)`;
         }
-
-        const visible =
-          index === activeIndex ||
-          (index === activeIndex - 1 && opacity > 0) ||
-          (index === activeIndex + 1 && opacity > 0);
-
-        const isActive = index === activeIndex;
-
-        pair.classList.toggle("is-active", isActive);
-        pair.setAttribute(
-          "aria-hidden",
-          visible ? "false" : "true",
-        );
-        pair.style.pointerEvents = isActive ? "auto" : "none";
-        pair.style.visibility = visible ? "visible" : "hidden";
       });
 
-      section.style.setProperty(
-        "--gallery-active-index",
-        `${activeIndex}`,
-      );
+      // 4. Update active panel state & ensure inactive panels do not intercept clicks
+      panels.forEach((panel, idx) => {
+        const isActive = idx === activePanelIdx;
+        panel.classList.toggle("is-active", isActive);
+      });
+
+      // 5. Update index counter and progress fill
+      if (activeFilmIndex !== lastIndex) {
+        lastIndex = activeFilmIndex;
+        const label = `${String(activeFilmIndex + 1).padStart(2, "0")} / ${String(numShows).padStart(2, "0")}`;
+
+        if (counter) counter.textContent = label;
+        if (chromeNo) chromeNo.textContent = `N° ${label}`;
+      }
+
+      if (fill) {
+        fill.style.transform = `scaleX(${cycleProgress.toFixed(3)})`;
+      }
     };
 
     const requestRender = () => {
       if (!rafId) {
-        rafId = window.requestAnimationFrame(renderGallery);
+        rafId = window.requestAnimationFrame(render);
       }
     };
 
+    const handleResize = () => {
+      measure();
+      lastIndex = -1;
+      requestRender();
+    };
+
+    const handleReducedChange = () => {
+      syncReduced();
+      measure();
+      lastIndex = -1;
+      requestRender();
+    };
+
     window.addEventListener("scroll", requestRender, { passive: true });
-    window.addEventListener("resize", requestRender);
-    reducedMotion.addEventListener("change", requestRender);
-    mobileQuery.addEventListener("change", requestRender);
+    window.addEventListener("resize", handleResize);
+    reducedMotion.addEventListener("change", handleReducedChange);
 
     requestRender();
 
     registerCleanup(() => {
       window.removeEventListener("scroll", requestRender);
-      window.removeEventListener("resize", requestRender);
-      reducedMotion.removeEventListener("change", requestRender);
-      mobileQuery.removeEventListener("change", requestRender);
+      window.removeEventListener("resize", handleResize);
+      reducedMotion.removeEventListener("change", handleReducedChange);
 
       if (rafId) {
         window.cancelAnimationFrame(rafId);
       }
-
-      document.removeEventListener(
-        "pointerup",
-        handleGalleryPointerUp,
-        true,
-      );
-
-      document.removeEventListener(
-        "click",
-        handleGalleryDocumentClick,
-        true,
-      );
     });
   });
 
+  const initialWave = getWavePaths(0);
+
+  // Build multi-buffer reel panels: 5 sets of shows for continuous bidirectional loop
+  // Sets 0..1: Preceding buffer
+  // Sets 2..3: Canonical active sets
+  // Set 4: Trailing buffer
+  const totalSets = 5;
+  const allPanelsData: Array<{
+    movie: (typeof shows)[number];
+    filmIndex: number;
+    isClone: boolean;
+    setNumber: number;
+  }> = [];
+
+  for (let s = 0; s < totalSets; s++) {
+    shows.forEach((movie, mIdx) => {
+      allPanelsData.push({
+        movie,
+        filmIndex: mIdx,
+        isClone: s !== 2, // Set 2 is the canonical primary set
+        setNumber: s,
+      });
+    });
+  }
+
+  const formats = [
+    "70MM FILM · DOLBY ATMOS",
+    "IMAX DUAL LASER · 12CH SOUND",
+    "35MM CELLULOID · OPTICAL SOUND",
+    "70MM ULTRA PANAVISION · ATMOS",
+  ];
+
   return `
-    <section id="now-showing" class="now-showing container">
-      <h2 class="now-showing__title">
-        Now Showing
-      </h2>
-
-      <div class="now-showing__sequence">
-        <div class="now-showing__stage" aria-live="polite">
-          <div class="now-showing__editorial-head" aria-hidden="true">
-            <span class="now-showing__editorial-kicker">SPOTSHOW / THE PROGRAMME</span>
-            <span class="now-showing__editorial-hint">SCROLL TO EXPLORE</span>
-            <span class="now-showing__editorial-progress">
-              <span></span>
-            </span>
-          </div>
-
-          <div class="now-showing__ceiling" aria-hidden="true">
-            <span></span><span></span><span></span><span></span>
-          </div>
-
-          <div class="now-showing__walls" aria-hidden="true">
-            <div class="now-showing__wall now-showing__wall--left"></div>
-            <div class="now-showing__wall now-showing__wall--right"></div>
-          </div>
-
-          <div class="now-showing__floor" aria-hidden="true">
-            <div class="now-showing__floor-line now-showing__floor-line--1"></div>
-            <div class="now-showing__floor-line now-showing__floor-line--2"></div>
-            <div class="now-showing__floor-line now-showing__floor-line--3"></div>
-          </div>
-
-          <div class="now-showing__pairs">
-            ${pairs
-              .map(
-                (pair, pairIndex) => `
-                  <div
-                    class="now-showing__pair${pair.length === 1 ? " now-showing__pair--single" : ""}"
-                    data-pair="${pairIndex}"
-                    aria-hidden="${pairIndex === 0 ? "false" : "true"}"
-                  >
-                    <div class="now-showing__frame now-showing__frame--left">
-                      ${
-                        pair[0]
-                          ? `<div class="now-showing__frame-label" aria-hidden="true">
-                               <span>NOW SHOWING</span>
-                               <strong>${String(pairIndex * 2 + 1).padStart(2, "0")}</strong>
-                             </div>${MovieCard(pair[0])}`
-                          : ""
-                      }
-                    </div>
-                    <div class="now-showing__frame now-showing__frame--right">
-                      ${
-                        pair[1]
-                          ? `<div class="now-showing__frame-label" aria-hidden="true">
-                               <span>NOW SHOWING</span>
-                               <strong>${String(pairIndex * 2 + 2).padStart(2, "0")}</strong>
-                             </div>${MovieCard(pair[1])}`
-                          : ""
-                      }
-                    </div>
-                  </div>
-                `,
-              )
-              .join("")}
-          </div>
-
-          <div class="now-showing__vanishing-light" aria-hidden="true"></div>
-          <div class="now-showing__walkway" aria-hidden="true"></div>
+    <section id="now-showing" class="now-showing container" aria-label="Infinite Cinema Reel">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">The Gallery</p>
+          <h2>Continuous cinema</h2>
+          <p class="section-sub">${shows.length} feature films ·</p>
         </div>
+        <p class="gallery__counter" aria-live="polite">01 / ${String(shows.length).padStart(2, "0")}</p>
+      </div>
 
-        <div class="now-showing__steps" aria-hidden="true">
-          ${pairs
-            .map(
-              (_, pairIndex) => `
-                <div class="now-showing__step" data-pair-index="${pairIndex}"></div>
-              `,
-            )
-            .join("")}
+      <div
+        class="gallery__sequence"
+        style="--panel-count: ${shows.length}"
+      >
+        <div class="gallery__sticky">
+          <div class="gallery__chrome">
+            <span>Now screening</span>
+            <span class="gallery__chrome-no" aria-hidden="true">N° 01 / ${String(shows.length).padStart(2, "0")}</span>
+          </div>
+
+          <div class="gallery__viewport">
+            <svg class="gallery__wave-defs" width="0" height="0" aria-hidden="true">
+              <defs>
+                <clipPath id="gallery-wave-clip" clipPathUnits="objectBoundingBox">
+                  <path id="gallery-wave-clip-path" d="${initialWave.clipD}" />
+                </clipPath>
+              </defs>
+            </svg>
+
+            <div class="gallery__ribbon">
+              <div class="gallery__track">
+                ${allPanelsData
+                  .map(({ movie, filmIndex, isClone }) => {
+                    const poster =
+                      moviePosters[movie.movieName] ?? moviePosters.default;
+                    const d = new Date(movie.showDate);
+                    const dateLabel = isNaN(d.getTime())
+                      ? String(movie.showDate)
+                      : d.toLocaleString(undefined, {
+                          weekday: "short",
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        });
+
+                    const formatText = formats[filmIndex % formats.length];
+
+                    return `
+                      <article
+                        class="gallery__panel gallery__panel--film-${filmIndex + 1} ${isClone ? "gallery__panel--clone" : ""}"
+                        aria-label="${movie.movieName}"
+                      >
+                        <div class="gallery__art">
+                          <img
+                            class="gallery__art-fill"
+                            src="${poster}"
+                            alt=""
+                            aria-hidden="true"
+                          />
+                          <img
+                            class="gallery__poster"
+                            src="${poster}"
+                            alt="${movie.movieName}"
+                            loading="lazy"
+                          />
+                        </div>
+
+                        <div class="gallery__meta">
+                          <div class="gallery__meta-head">
+                            <p class="gallery__no" aria-hidden="true">
+                              <span>N°</span>${String(filmIndex + 1).padStart(2, "0")}
+                            </p>
+                            <span class="gallery__format">${formatText}</span>
+                          </div>
+
+                          <h3 class="gallery__title">${movie.movieName}</h3>
+                          <p class="gallery__details">${dateLabel} · ${movie.totalSeats} seats</p>
+
+                          <div class="gallery__action">
+                            <a
+                              class="gallery__cta"
+                              href="/shows/${movie.id}"
+                              data-route="/shows/${movie.id}"
+                              aria-label="Book tickets for ${movie.movieName}"
+                            >
+                              Book tickets
+                            </a>
+                            <span class="gallery__price">₹${SEAT_PRICE} a seat</span>
+                          </div>
+                        </div>
+                      </article>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            </div>
+
+            <svg class="gallery__wave-hairlines" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+              <path id="gallery-wave-hairline-top" class="gallery__hairline gallery__hairline--top" vector-effect="non-scaling-stroke" d="${initialWave.topHairlineD}" />
+              <path id="gallery-wave-hairline-bottom" class="gallery__hairline gallery__hairline--bottom" vector-effect="non-scaling-stroke" d="${initialWave.botHairlineD}" />
+            </svg>
+          </div>
+
+          <div class="gallery__chrome gallery__chrome--bottom">
+            <span>SpotShow Cinema</span>
+            <span class="gallery__chrome-center">${shows.length} Feature Films · ₹${SEAT_PRICE} a seat</span>
+            <span>Scroll to navigate</span>
+          </div>
+
+          <div class="gallery__progress" aria-hidden="true">
+            <span class="gallery__progress-fill"></span>
+          </div>
         </div>
       </div>
     </section>
