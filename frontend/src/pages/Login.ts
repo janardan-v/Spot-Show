@@ -36,7 +36,7 @@ export function Login() {
       } catch (error) {
         if (errorContainer) {
           errorContainer.textContent =
-            error instanceof Error ? error.message : "Login failed";
+            error instanceof Error ? error.message : "Authentication failed";
         }
         submit?.removeAttribute("disabled");
       }
@@ -45,30 +45,36 @@ export function Login() {
 
   return `
     <main class="container narrow auth-page">
+      <div class="show-breadcrumb">
+        <a class="back-link" href="${ROUTES.HOME}" data-route="${ROUTES.HOME}">
+          ← RETURN TO PROGRAMME
+        </a>
+      </div>
+
       <section class="auth-card card" aria-labelledby="login-title">
-        <p class="eyebrow">Member access</p>
-        <h1 id="login-title">Log in</h1>
-        <p class="section-sub">
-          ${returnTo ? "Please log in to continue with your booking." : "Welcome back to SpotShow."}
-          No account?
-          <a href="${ROUTES.REGISTER}" data-route="${ROUTES.REGISTER}">Create one</a>
+        <div class="auth-badge">MEMBER PORTAL</div>
+        <h1 id="login-title" class="auth-title">AUTHENTICATE PASS</h1>
+        <p class="auth-sub">
+          ${returnTo ? "Authenticate to finalize your locked auditorium seats." : "Sign in to access your SpotShow credentials & reservations."}
+          No pass?
+          <a href="${ROUTES.REGISTER}" data-route="${ROUTES.REGISTER}">Acquire membership</a>
         </p>
 
         <form class="auth-form" data-form="login" novalidate>
           <div class="field">
-            <label for="login-email">Email</label>
+            <label for="login-email">MEMBER EMAIL</label>
             <input
               id="login-email"
               name="email"
               type="email"
               autocomplete="email"
               required
-              placeholder="you@example.com"
+              placeholder="cinephile@archive.com"
             />
           </div>
 
           <div class="field">
-            <label for="login-password">Password</label>
+            <label for="login-password">PASSWORD</label>
             <input
               id="login-password"
               name="password"
@@ -79,7 +85,7 @@ export function Login() {
             />
           </div>
 
-          <button type="submit" class="booking-confirm">Log in</button>
+          <button type="submit" class="booking-confirm">SIGN IN TO SPOTSHOW →</button>
           <p class="auth-error" data-login-error role="alert"></p>
         </form>
       </section>

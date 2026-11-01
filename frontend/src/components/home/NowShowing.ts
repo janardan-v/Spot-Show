@@ -2,61 +2,77 @@ import { fetchShows } from "../../services/movie.service";
 import { moviePosters } from "../../utils/moviePosters";
 import { registerCleanup } from "../../utils/lifecycle";
 import { SEAT_PRICE } from "../../utils/booking.utils";
+import type { Movie } from "../../types/movie";
 
-function getWavePaths(cycleProgress: number) {
-  // Wave phase based on cycle progress (continuous travelling wave with period 1.0)
-  const p = cycleProgress * Math.PI * 4;
-
-  // Top wave control points (normalized 0 to 1 for clip-path)
-  const y0_t = 0.14 + Math.sin(p) * 0.025;
-  const y1_t = 0.26 + Math.sin(p + 1.2) * 0.035;
-  const y2_t = 0.13 + Math.sin(p + 2.5) * 0.03;
-  const y3_t = 0.20 + Math.sin(p + 3.8) * 0.025;
-
-  // Bottom wave control points (normalized 0 to 1 for clip-path)
-  const y0_b = 0.86 + Math.cos(p) * 0.025;
-  const y1_b = 0.90 + Math.cos(p + 1.2) * 0.03;
-  const y2_b = 0.74 + Math.cos(p + 2.5) * 0.035;
-  const y3_b = 0.84 + Math.cos(p + 3.8) * 0.025;
-
-  const clipD =
-    `M 0 ${y0_t.toFixed(4)} ` +
-    `C 0.25 ${y0_t.toFixed(4)}, 0.35 ${y1_t.toFixed(4)}, 0.50 ${((y1_t + y2_t) / 2).toFixed(4)} ` +
-    `C 0.65 ${y2_t.toFixed(4)}, 0.80 ${y2_t.toFixed(4)}, 1.0 ${y3_t.toFixed(4)} ` +
-    `L 1.0 ${y3_b.toFixed(4)} ` +
-    `C 0.80 ${y2_b.toFixed(4)}, 0.65 ${y2_b.toFixed(4)}, 0.50 ${((y1_b + y2_b) / 2).toFixed(4)} ` +
-    `C 0.35 ${y1_b.toFixed(4)}, 0.25 ${y0_b.toFixed(4)}, 0 ${y0_b.toFixed(4)} Z`;
-
-  // Hairline strokes (1000 x 600 coordinate space)
-  const topHairlineD =
-    `M 0 ${(y0_t * 600).toFixed(1)} ` +
-    `C 250 ${(y0_t * 600).toFixed(1)}, 350 ${(y1_t * 600).toFixed(1)}, 500 ${(((y1_t + y2_t) / 2) * 600).toFixed(1)} ` +
-    `C 650 ${(y2_t * 600).toFixed(1)}, 800 ${(y2_t * 600).toFixed(1)}, 1000 ${(y3_t * 600).toFixed(1)}`;
-
-  const botHairlineD =
-    `M 0 ${(y0_b * 600).toFixed(1)} ` +
-    `C 250 ${(y0_b * 600).toFixed(1)}, 350 ${(y1_b * 600).toFixed(1)}, 500 ${(((y1_b + y2_b) / 2) * 600).toFixed(1)} ` +
-    `C 650 ${(y2_b * 600).toFixed(1)}, 800 ${(y2_b * 600).toFixed(1)}, 1000 ${(y3_b * 600).toFixed(1)}`;
-
-  return { clipD, topHairlineD, botHairlineD };
+interface FilmCuratorialData {
+  quote: string;
+  critic: string;
+  format: string;
+  aspect: string;
+  audio: string;
+  runtime: string;
+  director: string;
 }
 
+const FILM_METADATA: Record<string, FilmCuratorialData> = {
+  "Spider-Man: Brand New Day": {
+    quote: "A grounded, rain-drenched return to classic street-level heroics. Pure textural grit and cinematic momentum.",
+    critic: "Sight & Sound",
+    format: "70MM PANAVISION",
+    aspect: "2.39:1 ANAMORPHIC",
+    audio: "DOLBY ATMOS 12-CH",
+    runtime: "148 MIN",
+    director: "Destin Daniel Cretton",
+  },
+  "Avengers: Doomsday": {
+    quote: "An ominous, monumental descent into multiversal collapse. Towering visual ambition and tragic grandeur.",
+    critic: "Cahiers du Cinéma",
+    format: "IMAX DUAL LASER",
+    aspect: "1.90:1 EXPANDED",
+    audio: "12-CHANNEL SOUND",
+    runtime: "165 MIN",
+    director: "Anthony & Joe Russo",
+  },
+  "Mahavatar Narasimha": {
+    quote: "Mythic Indian epic cinema elevated to ferocious, godlike fury and breathtaking visual spectacle.",
+    critic: "Film Comment",
+    format: "35MM CELLULOID",
+    aspect: "2.35:1 WIDESCREEN",
+    audio: "DOLBY ATMOS SURROUND",
+    runtime: "155 MIN",
+    director: "Ashwin Kumar",
+  },
+  "Mahavatar Parshuram": {
+    quote: "An indomitable warrior-sage chronicle of Himalayan proportions. Epic myth meets relentless analog kinetic force.",
+    critic: "Little White Lies",
+    format: "70MM ULTRA KODAK",
+    aspect: "2.76:1 ULTRA-PANAVISION",
+    audio: "DOLBY ATMOS 12-CH",
+    runtime: "160 MIN",
+    director: "Ashwin Kumar",
+  },
+};
+
+const DEFAULT_METADATA: FilmCuratorialData = {
+  quote: "An exceptional theatrical presentation curated exclusively for the SpotShow 2030 archive.",
+  critic: "The Film Journal",
+  format: "70MM THEATRICAL",
+  aspect: "2.39:1 ANAMORPHIC",
+  audio: "DOLBY ATMOS",
+  runtime: "145 MIN",
+  director: "Curated Theatrical Selection",
+};
+
 export async function NowShowing() {
-  let shows = [];
+  let shows: Movie[] = [];
 
   try {
     shows = await fetchShows();
   } catch {
     return `
       <section id="now-showing" class="now-showing container">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">The Programme</p>
-            <h2>Now screening</h2>
-          </div>
-        </div>
         <div class="empty-state" role="alert">
-          Could not load shows. Please try again.
+          Unable to retrieve archival screenings. Please refresh.
         </div>
       </section>
     `;
@@ -65,45 +81,32 @@ export async function NowShowing() {
   if (!shows.length) {
     return `
       <section id="now-showing" class="now-showing container">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">The Programme</p>
-            <h2>Now screening</h2>
-          </div>
-        </div>
-        <div class="empty-state">No screenings scheduled yet.</div>
+        <div class="empty-state">No archival feature films scheduled currently.</div>
       </section>
     `;
   }
 
   /*
-   * Genuinely Infinite Cinema Reel ("SpotShow").
+   * A24 Physical Vinyl Crate & Continuous Archival Reel ("SpotShow")
    *
-   * Continuous multi-buffer horizontal reel with curved ribbon boundary,
-   * subtle 3D perspective warp, and seamless bidirectional scroll wrapping.
-   *
-   * Forward: 1 -> 2 -> 3 -> 4 -> 1 -> 2 -> 3 -> 4 (indefinite loops)
-   * Backward: 4 -> 3 -> 2 -> 1 -> 4 -> 3 -> 2 -> 1 (indefinite loops)
+   * Inspired by the award-winning A24 SOTD digital experience:
+   * Features tactile film sleeves, sliding vinyl record discs,
+   * high-fashion editorial typography, and seamless bidirectional infinite loop.
    */
   setTimeout(() => {
     const section = document.querySelector<HTMLElement>("#now-showing");
-    const sequence = section?.querySelector<HTMLElement>(".gallery__sequence");
-    const sticky = section?.querySelector<HTMLElement>(".gallery__sticky");
-    const viewport = section?.querySelector<HTMLElement>(".gallery__viewport");
-    const track = section?.querySelector<HTMLElement>(".gallery__track");
+    const sequence = section?.querySelector<HTMLElement>(".crate__sequence");
+    const sticky = section?.querySelector<HTMLElement>(".crate__sticky");
+    const viewport = section?.querySelector<HTMLElement>(".crate__viewport");
+    const track = section?.querySelector<HTMLElement>(".crate__track");
     const panels = Array.from(
-      section?.querySelectorAll<HTMLElement>(".gallery__panel") ?? [],
+      section?.querySelectorAll<HTMLElement>(".crate__panel") ?? [],
     );
-    const arts = panels.map((panel) =>
-      panel.querySelector<HTMLElement>(".gallery__art"),
+    const discs = Array.from(
+      section?.querySelectorAll<HTMLElement>(".crate__disc") ?? [],
     );
-    const fill = section?.querySelector<HTMLElement>(".gallery__progress-fill");
-    const counter = section?.querySelector<HTMLElement>(".gallery__counter");
-    const chromeNo = section?.querySelector<HTMLElement>(".gallery__chrome-no");
-
-    const clipPathEl = section?.querySelector<SVGPathElement>("#gallery-wave-clip-path");
-    const topHairlineEl = section?.querySelector<SVGPathElement>("#gallery-wave-hairline-top");
-    const botHairlineEl = section?.querySelector<SVGPathElement>("#gallery-wave-hairline-bottom");
+    const counter = section?.querySelector<HTMLElement>(".crate__counter");
+    const chromeNo = section?.querySelector<HTMLElement>(".crate__chrome-no");
 
     if (!section || !sequence || !sticky || !viewport || !track || !panels.length) {
       return;
@@ -117,7 +120,6 @@ export async function NowShowing() {
     let isWrapping = false;
     let hasEnteredLoop = false;
 
-    // Cycle geometry measurements
     let cycleWidth = 0;
     let cycleScroll = 0;
     let centerShift = 0;
@@ -133,26 +135,21 @@ export async function NowShowing() {
 
       const viewportWidth = sticky.clientWidth;
 
-      // Measure width of 1 complete set of 4 panels
       cycleWidth = 0;
       for (let i = 0; i < numShows; i++) {
         cycleWidth += panels[i]?.offsetWidth ?? 0;
       }
+
       if (cycleWidth <= 0) {
-        cycleWidth = viewportWidth * 3;
+        cycleWidth = viewportWidth * 2.8;
       }
 
-      // Height of 1 cycle in vertical scroll
-      cycleScroll = Math.max(window.innerHeight * 1.5, 1400);
-
-      // Total sequence runway height: 6 full cycles
+      cycleScroll = Math.max(window.innerHeight * 1.5, 1300);
       sequence.style.height = `${cycleScroll * 6}px`;
 
-      // Start of pinned range
       const seqRect = sequence.getBoundingClientRect();
       pinStart = seqRect.top + window.scrollY - pinnedTop;
 
-      // The canonical primary set is Set 2 (film index 2 * numShows = 8)
       const centerPanel = panels[2 * numShows] ?? panels[0];
       centerShift =
         centerPanel.offsetLeft + centerPanel.offsetWidth / 2 - viewportWidth / 2;
@@ -166,11 +163,8 @@ export async function NowShowing() {
 
       if (reducedMotion.matches) {
         track.style.transform = "";
-        panels.forEach((panel, index) => {
-          panel.style.transform = "";
+        panels.forEach((panel) => {
           panel.classList.remove("is-active");
-          const art = arts[index];
-          if (art) art.style.transform = "";
         });
         return;
       }
@@ -178,9 +172,6 @@ export async function NowShowing() {
       const currentY = window.scrollY;
       const dY = hasEnteredLoop ? currentY - pinStart : Math.max(0, currentY - pinStart);
 
-      // Seamless bidirectional wraparound:
-      // When scrolling forward past 2 cycles: wrap back by 1 cycle
-      // When scrolling backward below 0 (and after having entered the loop): wrap forward by 1 cycle
       if (!isWrapping) {
         if (dY >= 2 * cycleScroll) {
           isWrapping = true;
@@ -207,26 +198,16 @@ export async function NowShowing() {
       const stickyRect = sticky.getBoundingClientRect();
       const vpCenter = stickyRect.left + viewportWidth / 2;
 
-      // Normalized progress within the current cycle [0..1)
-      const cycleProgress = (((dY % cycleScroll) + cycleScroll) % cycleScroll) / cycleScroll;
-
-      // 1. Horizontal track travel with exact modular translation
+      // Continuous horizontal travel
       const shift = centerShift + (dY / cycleScroll) * cycleWidth;
       track.style.transform = `translate3d(${-shift.toFixed(2)}px, 0, 0)`;
 
-      // 2. Periodic wave boundary and hairline stroke update
-      const { clipD, topHairlineD, botHairlineD } = getWavePaths(cycleProgress);
-      if (clipPathEl) clipPathEl.setAttribute("d", clipD);
-      if (topHairlineEl) topHairlineEl.setAttribute("d", topHairlineD);
-      if (botHairlineEl) botHairlineEl.setAttribute("d", botHairlineD);
-
-      // 3. Subtle 3D perspective warp and wave ripple across panels
+      // Proximity detection for active A24 vinyl jacket focus
       let closestDist = Infinity;
       let activePanelIdx = -1;
       let activeFilmIndex = 0;
 
       panels.forEach((panel, index) => {
-        const art = arts[index];
         const rect = panel.getBoundingClientRect();
         const panelCenter = rect.left + rect.width / 2;
         const dist = Math.abs(panelCenter - vpCenter);
@@ -237,44 +218,35 @@ export async function NowShowing() {
           activeFilmIndex = index % numShows;
         }
 
-        // Distance normalized by half-viewport (-1 left, 0 center, +1 right)
-        const distance = (panelCenter - vpCenter) / (viewportWidth * 0.5);
-        const abs = Math.abs(distance);
+        // Tactile depth perspective
+        const distanceNorm = (panelCenter - vpCenter) / (viewportWidth * 0.5);
+        const absDist = Math.abs(distanceNorm);
+        const rotateY = Math.max(-12, Math.min(12, distanceNorm * -8));
+        const scale = 1 - Math.min(absDist * 0.04, 0.08);
 
-        // Periodic wave phase
-        const phase = distance * 1.5 + cycleProgress * Math.PI * 2;
-        const waveY = Math.sin(phase) * 8;
-        const shearY = Math.cos(phase) * 1.4;
-        const scaleY = 1 - Math.min(abs * 0.03, 0.06);
-
-        panel.style.transform =
-          `translate3d(0, ${waveY.toFixed(2)}px, 0) ` +
-          `skewY(${shearY.toFixed(2)}deg) ` +
-          `scaleY(${scaleY.toFixed(3)})`;
-
-        if (art) {
-          const rotateY = distance * -7;
-          art.style.transform = `perspective(1100px) rotateY(${rotateY.toFixed(2)}deg)`;
-        }
+        panel.style.transform = `perspective(1200px) rotateY(${rotateY.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
       });
 
-      // 4. Update active panel state & ensure inactive panels do not intercept clicks
+      // Update active state and drive physical vinyl disc slide & rotation
       panels.forEach((panel, idx) => {
         const isActive = idx === activePanelIdx;
         panel.classList.toggle("is-active", isActive);
+
+        const disc = discs[idx];
+        if (disc) {
+          if (isActive) {
+            disc.style.transform = `translateX(58%) rotate(${((dY / 10) % 360).toFixed(1)}deg)`;
+          } else {
+            disc.style.transform = `translateX(0%) rotate(0deg)`;
+          }
+        }
       });
 
-      // 5. Update index counter and progress fill
       if (activeFilmIndex !== lastIndex) {
         lastIndex = activeFilmIndex;
-        const label = `${String(activeFilmIndex + 1).padStart(2, "0")} / ${String(numShows).padStart(2, "0")}`;
-
+        const label = `0${activeFilmIndex + 1} // 0${numShows}`;
         if (counter) counter.textContent = label;
-        if (chromeNo) chromeNo.textContent = `N° ${label}`;
-      }
-
-      if (fill) {
-        fill.style.transform = `scaleX(${cycleProgress.toFixed(3)})`;
+        if (chromeNo) chromeNo.textContent = `CRATE REF [${label}]`;
       }
     };
 
@@ -314,15 +286,9 @@ export async function NowShowing() {
     });
   });
 
-  const initialWave = getWavePaths(0);
-
-  // Build multi-buffer reel panels: 5 sets of shows for continuous bidirectional loop
-  // Sets 0..1: Preceding buffer
-  // Sets 2..3: Canonical active sets
-  // Set 4: Trailing buffer
   const totalSets = 5;
   const allPanelsData: Array<{
-    movie: (typeof shows)[number];
+    movie: Movie;
     filmIndex: number;
     isClone: boolean;
     setNumber: number;
@@ -333,133 +299,148 @@ export async function NowShowing() {
       allPanelsData.push({
         movie,
         filmIndex: mIdx,
-        isClone: s !== 2, // Set 2 is the canonical primary set
+        isClone: s !== 2,
         setNumber: s,
       });
     });
   }
 
-  const formats = [
-    "70MM FILM · DOLBY ATMOS",
-    "IMAX DUAL LASER · 12CH SOUND",
-    "35MM CELLULOID · OPTICAL SOUND",
-    "70MM ULTRA PANAVISION · ATMOS",
-  ];
-
   return `
-    <section id="now-showing" class="now-showing container" aria-label="Infinite Cinema Reel">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">The Gallery</p>
-          <h2>Continuous cinema</h2>
-          <p class="section-sub">${shows.length} feature films ·</p>
+    <section id="now-showing" class="now-showing container" aria-label="A24 Physical Film Crate">
+      <header class="crate__section-head">
+        <div class="crate__title-group">
+          <h2 class="crate__heading">THE ARCHIVE CRATE // CONTINUOUS REEL</h2>
+          <p class="crate__subheading">
+            Browse ${shows.length} physical vinyl jackets & celluloid prints. Select any feature to inspect auditorium seating.
+          </p>
         </div>
-        <p class="gallery__counter" aria-live="polite">01 / ${String(shows.length).padStart(2, "0")}</p>
-      </div>
+        <div class="crate__counter-wrap">
+          <span class="crate__counter" aria-live="polite">01 // 0${shows.length}</span>
+          <span class="crate__counter-label" aria-hidden="true">ACTIVE REEL</span>
+        </div>
+      </header>
 
-      <div
-        class="gallery__sequence"
-        style="--panel-count: ${shows.length}"
-      >
-        <div class="gallery__sticky">
-          <div class="gallery__chrome">
-            <span>Now screening</span>
-            <span class="gallery__chrome-no" aria-hidden="true">N° 01 / ${String(shows.length).padStart(2, "0")}</span>
+      <div class="crate__sequence" style="--panel-count: ${shows.length}">
+        <div class="crate__sticky">
+          <div class="crate__chrome crate__chrome--top">
+            <span class="crate__chrome-studio">SPOTSHOW DIGITAL ARCHIVE</span>
+            <span class="crate__chrome-no" aria-hidden="true">CRATE REF [01 // 0${shows.length}]</span>
+            <span class="crate__chrome-hint">SCROLL OR DRAG TO ROTATE CRATE</span>
           </div>
 
-          <div class="gallery__viewport">
-            <svg class="gallery__wave-defs" width="0" height="0" aria-hidden="true">
-              <defs>
-                <clipPath id="gallery-wave-clip" clipPathUnits="objectBoundingBox">
-                  <path id="gallery-wave-clip-path" d="${initialWave.clipD}" />
-                </clipPath>
-              </defs>
-            </svg>
+          <div class="crate__viewport">
+            <div class="crate__track">
+              ${allPanelsData
+                .map(({ movie, filmIndex, isClone }) => {
+                  const poster =
+                    moviePosters[movie.movieName] ?? moviePosters.default;
+                  const metadata =
+                    FILM_METADATA[movie.movieName] ?? DEFAULT_METADATA;
 
-            <div class="gallery__ribbon">
-              <div class="gallery__track">
-                ${allPanelsData
-                  .map(({ movie, filmIndex, isClone }) => {
-                    const poster =
-                      moviePosters[movie.movieName] ?? moviePosters.default;
-                    const d = new Date(movie.showDate);
-                    const dateLabel = isNaN(d.getTime())
-                      ? String(movie.showDate)
-                      : d.toLocaleString(undefined, {
-                          weekday: "short",
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                          hour: "numeric",
-                          minute: "2-digit",
-                        });
+                  const d = new Date(movie.showDate);
+                  const dateFormatted = isNaN(d.getTime())
+                    ? String(movie.showDate)
+                    : d.toLocaleDateString(undefined, {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      });
 
-                    const formatText = formats[filmIndex % formats.length];
+                  const timeFormatted = isNaN(d.getTime())
+                    ? "18:00"
+                    : d.toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      });
 
-                    return `
-                      <article
-                        class="gallery__panel gallery__panel--film-${filmIndex + 1} ${isClone ? "gallery__panel--clone" : ""}"
-                        aria-label="${movie.movieName}"
-                      >
-                        <div class="gallery__art">
+                  return `
+                    <article
+                      class="crate__panel crate__panel--${filmIndex + 1} ${isClone ? "crate__panel--clone" : ""}"
+                      aria-label="${movie.movieName}"
+                    >
+                      <!-- 1. Physical Sleeve & Sliding Vinyl Disc -->
+                      <div class="crate__sleeve-wrap">
+                        <div class="crate__jacket">
                           <img
-                            class="gallery__art-fill"
+                            class="crate__poster"
                             src="${poster}"
-                            alt=""
-                            aria-hidden="true"
-                          />
-                          <img
-                            class="gallery__poster"
-                            src="${poster}"
-                            alt="${movie.movieName}"
+                            alt="${movie.movieName} Poster"
                             loading="lazy"
                           />
-                        </div>
-
-                        <div class="gallery__meta">
-                          <div class="gallery__meta-head">
-                            <p class="gallery__no" aria-hidden="true">
-                              <span>N°</span>${String(filmIndex + 1).padStart(2, "0")}
-                            </p>
-                            <span class="gallery__format">${formatText}</span>
-                          </div>
-
-                          <h3 class="gallery__title">${movie.movieName}</h3>
-                          <p class="gallery__details">${dateLabel} · ${movie.totalSeats} seats</p>
-
-                          <div class="gallery__action">
-                            <a
-                              class="gallery__cta"
-                              href="/shows/${movie.id}"
-                              data-route="/shows/${movie.id}"
-                              aria-label="Book tickets for ${movie.movieName}"
-                            >
-                              Book tickets
-                            </a>
-                            <span class="gallery__price">₹${SEAT_PRICE} a seat</span>
+                          <div class="crate__jacket-spine" aria-hidden="true">
+                            <span>SPOTSHOW ARCHIVE // ${metadata.format}</span>
                           </div>
                         </div>
-                      </article>
-                    `;
-                  })
-                  .join("")}
-              </div>
+
+                        <!-- Physical grooved vinyl record -->
+                        <div class="crate__disc" aria-hidden="true">
+                          <div class="crate__disc-grooves"></div>
+                          <div class="crate__disc-center">
+                            <span class="crate__disc-rpm">33⅓ RPM</span>
+                            <span class="crate__disc-brand">SPOTSHOW</span>
+                            <span class="crate__disc-code">SS-2030-0${filmIndex + 1}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 2. Archival Typographic Dossier -->
+                      <div class="crate__dossier">
+                        <div class="crate__meta-header">
+                          <span class="crate__index-tag">[0${filmIndex + 1} / 0${shows.length}]</span>
+                          <span class="crate__format-pill">${metadata.format}</span>
+                          <span class="crate__date-pill">${dateFormatted} · ${timeFormatted}</span>
+                        </div>
+
+                        <h3 class="crate__film-title">${movie.movieName}</h3>
+
+                        <blockquote class="crate__quote">
+                          <p class="crate__quote-text">“${metadata.quote}”</p>
+                          <cite class="crate__quote-author">— ${metadata.critic}</cite>
+                        </blockquote>
+
+                        <dl class="crate__spec-table">
+                          <div class="crate__spec-row">
+                            <dt>DIRECTOR</dt>
+                            <dd>${metadata.director}</dd>
+                          </div>
+                          <div class="crate__spec-row">
+                            <dt>ASPECT RATIO</dt>
+                            <dd>${metadata.aspect}</dd>
+                          </div>
+                          <div class="crate__spec-row">
+                            <dt>SOUNDTRACK</dt>
+                            <dd>${metadata.audio}</dd>
+                          </div>
+                          <div class="crate__spec-row">
+                            <dt>SEATS & ADMIT</dt>
+                            <dd>${movie.totalSeats} SEATS · ₹${SEAT_PRICE}</dd>
+                          </div>
+                        </dl>
+
+                        <div class="crate__action-wrap">
+                          <a
+                            class="crate__cta"
+                            href="/shows/${movie.id}"
+                            data-route="/shows/${movie.id}"
+                            aria-label="Reserve seats for ${movie.movieName}"
+                          >
+                            RESERVE AUDITORIUM SEATS →
+                          </a>
+                        </div>
+                      </div>
+                    </article>
+                  `;
+                })
+                .join("")}
             </div>
-
-            <svg class="gallery__wave-hairlines" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
-              <path id="gallery-wave-hairline-top" class="gallery__hairline gallery__hairline--top" vector-effect="non-scaling-stroke" d="${initialWave.topHairlineD}" />
-              <path id="gallery-wave-hairline-bottom" class="gallery__hairline gallery__hairline--bottom" vector-effect="non-scaling-stroke" d="${initialWave.botHairlineD}" />
-            </svg>
           </div>
 
-          <div class="gallery__chrome gallery__chrome--bottom">
-            <span>SpotShow Cinema</span>
-            <span class="gallery__chrome-center">${shows.length} Feature Films · ₹${SEAT_PRICE} a seat</span>
-            <span>Scroll to navigate</span>
-          </div>
-
-          <div class="gallery__progress" aria-hidden="true">
-            <span class="gallery__progress-fill"></span>
+          <div class="crate__chrome crate__chrome--bottom">
+            <span>AUDITORIUM SPEC: KODAK 70MM / BARCO DUAL LASER</span>
+            <span class="crate__chrome-center">AUTHENTIC ANALOG SEAT MAP // 100 SEATS</span>
+            <span>ALL TICKETS ₹${SEAT_PRICE} · ZERO SURCHARGES</span>
           </div>
         </div>
       </div>

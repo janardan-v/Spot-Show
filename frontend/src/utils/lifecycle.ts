@@ -1,13 +1,16 @@
-let cleanup: (() => void) | null = null;
+const cleanups: Array<() => void> = [];
 
 export function registerCleanup(fn: () => void) {
-  cleanup?.();
-
-  cleanup = fn;
+  cleanups.push(fn);
 }
 
 export function runCleanup() {
-  cleanup?.();
-
-  cleanup = null;
+  while (cleanups.length > 0) {
+    const fn = cleanups.pop();
+    try {
+      fn?.();
+    } catch (e) {
+      console.error("Cleanup error:", e);
+    }
+  }
 }

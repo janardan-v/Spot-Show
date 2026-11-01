@@ -36,7 +36,7 @@ export function Register() {
       } catch (error) {
         if (errorContainer) {
           errorContainer.textContent =
-            error instanceof Error ? error.message : "Registration failed";
+            error instanceof Error ? error.message : "Membership registration failed";
         }
         submit?.removeAttribute("disabled");
       }
@@ -45,36 +45,42 @@ export function Register() {
 
   return `
     <main class="container narrow auth-page">
+      <div class="show-breadcrumb">
+        <a class="back-link" href="${ROUTES.HOME}" data-route="${ROUTES.HOME}">
+          ← RETURN TO PROGRAMME
+        </a>
+      </div>
+
       <section class="auth-card card" aria-labelledby="register-title">
-        <p class="eyebrow">Join SpotShow</p>
-        <h1 id="register-title">Create account</h1>
-        <p class="section-sub">
-          Already have one?
-          <a href="${ROUTES.LOGIN}" data-route="${ROUTES.LOGIN}">Log in</a>
+        <div class="auth-badge">NEW ARCHIVE MEMBERSHIP</div>
+        <h1 id="register-title" class="auth-title">CREATE ACCOUNT</h1>
+        <p class="auth-sub">
+          Already registered?
+          <a href="${ROUTES.LOGIN}" data-route="${ROUTES.LOGIN}">Member log in</a>
         </p>
 
         <form class="auth-form" data-form="register" novalidate>
           <div class="field">
-            <label for="register-name">Name</label>
+            <label for="register-name">PATRON NAME</label>
             <input id="register-name" name="name" type="text" autocomplete="name" required placeholder="Ada Lovelace" />
           </div>
 
           <div class="field">
-            <label for="register-email">Email</label>
-            <input id="register-email" name="email" type="email" autocomplete="email" required placeholder="you@example.com" />
+            <label for="register-email">EMAIL ADDRESS</label>
+            <input id="register-email" name="email" type="email" autocomplete="email" required placeholder="you@archive.com" />
           </div>
 
           <div class="field">
-            <label for="register-age">Age</label>
-            <input id="register-age" name="age" type="number" min="1" required placeholder="18" />
+            <label for="register-age">AGE</label>
+            <input id="register-age" name="age" type="number" min="1" required placeholder="21" />
           </div>
 
           <div class="field">
-            <label for="register-password">Password</label>
+            <label for="register-password">PASSWORD</label>
             <input id="register-password" name="password" type="password" autocomplete="new-password" required placeholder="••••••••" />
           </div>
 
-          <button type="submit" class="booking-confirm">Create account</button>
+          <button type="submit" class="booking-confirm">ACQUIRE MEMBERSHIP PASS →</button>
           <p class="auth-error" data-register-error role="alert"></p>
         </form>
       </section>

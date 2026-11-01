@@ -6,6 +6,7 @@ import { Register } from "./pages/Register";
 import { Booking } from "./pages/Booking";
 import { Show } from "./pages/Show";
 import { Account } from "./pages/Account";
+import { initPreloader } from "./components/home/Preloader";
 
 import { runCleanup } from "./utils/lifecycle";
 
@@ -108,6 +109,11 @@ document.addEventListener("click", (event) => {
       behavior: "smooth",
     });
 
+    return;
+  }
+
+  if (actionElement?.dataset.action === "replay-preloader") {
+    initPreloader(true);
     return;
   }
 

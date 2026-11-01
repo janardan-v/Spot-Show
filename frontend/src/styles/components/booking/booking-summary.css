@@ -1,104 +1,232 @@
-/* Booking summary — editorial ticket stub */
+/*
+ * Booking Summary — A24 Perforated Cinema Ticket Voucher
+ */
 
 .booking-summary {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--space-lg);
+  padding: var(--space-xl);
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
+  position: relative;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.booking-summary__ticket-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-xs);
+}
+
+.booking-summary__stub-badge {
+  font-family: var(--font-family-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--color-accent-ink);
+  background: var(--color-accent);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-bold);
+}
+
+.booking-summary__stub-no {
+  font-family: var(--font-family-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-text-muted);
 }
 
 .booking-summary__title {
+  font-family: var(--font-family-display);
   font-size: var(--text-lg);
-  letter-spacing: -0.01em;
+  font-weight: var(--font-heavy);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  margin: 0;
 }
 
 .booking-summary__seats {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-xs);
-  min-height: 30px;
+  min-height: 34px;
 }
 
 .booking-summary__seat {
   font-family: var(--font-family-mono);
-  font-size: var(--text-xs);
-  letter-spacing: 0.04em;
+  font-size: 11px;
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.05em;
   background: transparent;
   color: var(--color-text-primary);
-  border: 1px solid var(--color-accent-line);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
-  padding: 2px 8px;
+  padding: 3px 8px;
 }
 
 .booking-summary__empty {
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   color: var(--color-text-muted);
+  font-style: italic;
+  margin: 0;
 }
+
+/* Ticket Perforation Tear Line */
+
+.booking-summary__perforation {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: var(--space-xs) -24px;
+  height: 16px;
+}
+
+.booking-summary__notch {
+  width: 14px;
+  height: 14px;
+  background: var(--color-background);
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.booking-summary__notch--left {
+  margin-left: -7px;
+  clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%);
+}
+
+.booking-summary__notch--right {
+  margin-right: -7px;
+  clip-path: polygon(0% 0%, 50% 0%, 50% 100%, 0% 100%);
+}
+
+.booking-summary__perf-line {
+  flex: 1;
+  border-bottom: 1px dashed var(--color-border-strong);
+  height: 1px;
+}
+
+/* Financials DL */
 
 .booking-summary__rows {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
-  border-top: 1px solid var(--color-border);
-  padding-top: var(--space-md);
   margin: 0;
 }
 
 .booking-summary__rows > div {
   display: flex;
   justify-content: space-between;
-  font-size: var(--text-sm);
+  font-family: var(--font-family-mono);
+  font-size: var(--text-xs);
   color: var(--color-text-secondary);
 }
 
 .booking-summary__rows dt {
-  font-family: var(--font-family-mono);
-  font-size: var(--text-xs);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   color: var(--color-text-muted);
 }
 
 .booking-summary__rows dd {
+  font-weight: var(--font-medium);
   margin: 0;
 }
 
-.booking-summary__total {
-  color: var(--color-text-primary);
-  font-weight: var(--font-semibold);
+.booking-summary__total-row {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-xs);
+  margin-top: var(--space-xs);
 }
+
+.booking-summary__total {
+  font-size: var(--text-md) !important;
+  font-weight: var(--font-heavy) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Barcode decoration */
+
+.booking-summary__barcode {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  padding: var(--space-xs) 0;
+  opacity: 0.65;
+}
+
+.booking-summary__barcode-lines {
+  display: block;
+  width: 100%;
+  height: 22px;
+  background: repeating-linear-gradient(
+    90deg,
+    #ffffff 0,
+    #ffffff 2px,
+    transparent 2px,
+    transparent 4px,
+    #ffffff 4px,
+    #ffffff 5px,
+    transparent 5px,
+    transparent 8px,
+    #ffffff 8px,
+    #ffffff 11px,
+    transparent 11px,
+    transparent 13px
+  );
+}
+
+.booking-summary__barcode-code {
+  font-family: var(--font-family-mono);
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: var(--color-text-muted);
+}
+
+/* Main proceed action */
 
 .booking-summary__button {
   background: var(--color-accent);
   color: var(--color-accent-ink);
-  border: 1px solid var(--color-accent-active);
+  border: 1px solid var(--color-accent);
   border-radius: var(--radius-sm);
-  padding: var(--space-sm) var(--space-md);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  letter-spacing: 0.01em;
-  transition: background-color 0.15s ease;
+  padding: 12px var(--space-md);
+  font-family: var(--font-family-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
 }
 
 .booking-summary__button:hover:not(:disabled) {
   background: var(--color-accent-hover);
+  transform: translateY(-1px);
 }
 
 .booking-summary__button:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
 .booking-summary__button:focus-visible {
-  outline: 1px solid var(--color-accent);
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
 .booking-summary__hint {
-  font-size: var(--text-xs);
+  font-family: var(--font-family-mono);
+  font-size: 10px;
   color: var(--color-text-muted);
   text-align: center;
+  margin: 0;
 }

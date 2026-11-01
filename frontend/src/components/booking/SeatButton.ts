@@ -20,7 +20,7 @@ export function SeatButton(seat: Seat, label: string) {
     <button
       class="seat ${statusClass}"
       data-seat-id="${seat.id}"
-      ${seat.isBooked ? "disabled aria-disabled=\"true\"" : ""}
+      ${seat.isBooked ? 'disabled aria-disabled="true"' : ""}
       ${selected && !seat.isBooked ? 'aria-pressed="true"' : 'aria-pressed="false"'}
       aria-label="Seat ${label_text}"
       type="button"

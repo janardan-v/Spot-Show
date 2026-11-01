@@ -15,8 +15,8 @@ export async function Booking() {
     return `
       <main class="container narrow">
         <div class="empty-state" role="alert">
-          Invalid booking — show is missing.
-          <a href="${ROUTES.HOME}" data-route="${ROUTES.HOME}">Back to shows</a>
+          Invalid reservation reference — show identifier missing.
+          <a href="${ROUTES.HOME}" data-route="${ROUTES.HOME}">Return to programme</a>
         </div>
       </main>
     `;
@@ -36,8 +36,8 @@ export async function Booking() {
     return `
       <main class="container narrow">
         <div class="empty-state" role="alert">
-          Could not load booking. Please try again.
-          <a href="${ROUTES.HOME}" data-route="${ROUTES.HOME}">Back to shows</a>
+          Unable to prepare admission voucher. Please try again.
+          <a href="${ROUTES.HOME}" data-route="${ROUTES.HOME}">Return to programme</a>
         </div>
       </main>
     `;
@@ -47,8 +47,8 @@ export async function Booking() {
     return `
     <main class="container narrow">
       <div class="empty-state" role="alert">
-        Show not found.
-        <a href="${ROUTES.HOME}" data-route="${ROUTES.HOME}">Back to shows</a>
+        Feature screening not located in archive.
+        <a href="${ROUTES.HOME}" data-route="${ROUTES.HOME}">Return to programme</a>
       </div>
     </main>
   `;
@@ -88,9 +88,9 @@ export async function Booking() {
     }
 
     if (selectedCount) {
-      selectedCount.textContent = `${currentSelectedSeats.length} seat${
-        currentSelectedSeats.length === 1 ? "" : "s"
-      } selected`;
+      selectedCount.textContent = `${currentSelectedSeats.length} PASS${
+        currentSelectedSeats.length === 1 ? "" : "ES"
+      }`;
     }
 
     if (totalEl) {
@@ -120,7 +120,7 @@ export async function Booking() {
       }
 
       button.disabled = true;
-      button.textContent = "Booking...";
+      button.textContent = "EXECUTING ROW LOCK TRANSACTION...";
 
       const bookedSeats = [];
       const failedSeats = [];
@@ -134,7 +134,7 @@ export async function Booking() {
           removeSelectedSeat(seat.id);
           updateSelectionUI();
         } catch (error) {
-          console.error(`Failed to book seat: ${label}`, error);
+          console.error(`Failed to lock seat: ${label}`, error);
           failedSeats.push({ seat, label });
           removeSelectedSeat(seat.id);
           updateSelectionUI();
@@ -145,38 +145,38 @@ export async function Booking() {
         if (failedSeats.length === 0) {
           message.className = "booking-message booking-message--success";
           message.innerHTML = `
-      <strong>Booking confirmed</strong>
-      <p>All selected seats were booked successfully.</p>
-      <ul>
-        ${bookedSeats.map(({ label }) => `<li>${label} — booked</li>`).join("")}
-      </ul>
-    `;
+            <strong>ADMISSION PASS CONFIRMED</strong>
+            <p>Transactional row lock committed. All selected auditorium seats reserved successfully.</p>
+            <ul>
+              ${bookedSeats.map(({ label }) => `<li>SEAT ${label} — RESERVED</li>`).join("")}
+            </ul>
+          `;
         } else {
           message.className = "booking-message booking-message--warning";
           message.innerHTML = `
-      <strong>Partial booking</strong>
-      ${
-        bookedSeats.length > 0
-          ? `<p><strong>Booked:</strong></p>
-            <ul>${bookedSeats.map(({ label }) => `<li>${label} — booked</li>`).join("")}</ul>`
-          : ""
-      }
-      <p><strong>Not booked:</strong></p>
-      <ul>${failedSeats.map(({ label }) => `<li>${label} — already booked</li>`).join("")}</ul>
-    `;
+            <strong>CONCURRENCY CONFLICT DETECTED</strong>
+            ${
+              bookedSeats.length > 0
+                ? `<p><strong>RESERVED:</strong></p>
+                  <ul>${bookedSeats.map(({ label }) => `<li>SEAT ${label} — RESERVED</li>`).join("")}</ul>`
+                : ""
+            }
+            <p><strong>OCCUPIED SIMULTANEOUSLY BY ANOTHER GUEST:</strong></p>
+            <ul>${failedSeats.map(({ label }) => `<li>SEAT ${label} — UNAVAILABLE (HTTP 409)</li>`).join("")}</ul>
+          `;
         }
       }
 
       if (failedSeats.length === 0) {
         setTimeout(() => {
           navigate(`${ROUTES.SHOW}/${showId}`);
-        }, 2000);
+        }, 2200);
       }
 
       button.textContent =
         bookedSeats.length === selectedSeats.length
-          ? "Booking complete"
-          : "Booking attempted";
+          ? "RESERVATION COMPLETE"
+          : "TRANSACTION ATTEMPTED";
     });
   });
 
@@ -195,14 +195,18 @@ export async function Booking() {
 
   return `
   <main class="container narrow booking-page">
-    <a class="back-link" href="${ROUTES.SHOW}/${showId}" data-route="${ROUTES.SHOW}/${showId}">← Back to seats</a>
+    <div class="show-breadcrumb">
+      <a class="back-link" href="${ROUTES.SHOW}/${showId}" data-route="${ROUTES.SHOW}/${showId}">
+        ← RETURN TO SEAT SELECTION
+      </a>
+    </div>
 
     <section class="booking-card card" aria-labelledby="booking-title">
-      <p class="eyebrow">Review & confirm</p>
-      <h1 id="booking-title">Booking summary</h1>
-      <p class="section-sub">${show.movieName} · ${dateLabel}${timeLabel ? ` · ${timeLabel}` : ""}</p>
+      <div class="booking-card__tag">TRANSACTION CHECKOUT</div>
+      <h1 id="booking-title" class="booking-card__title">RESERVATION VOUCHER</h1>
+      <p class="booking-card__sub">${show.movieName} · ${dateLabel}${timeLabel ? ` · ${timeLabel}` : ""}</p>
 
-      <h2 class="booking-card__label">Selected seats</h2>
+      <h2 class="booking-card__label">RESERVED SEATS</h2>
       <div class="selected-seats" data-selected-seats>
         ${
           selectedSeats.length === 0
@@ -210,15 +214,25 @@ export async function Booking() {
             : selectedSeats
                 .map((seat) => {
                   const index = seats.indexOf(seat);
-                  return `<span class="selected-seat">${getSeatLabel(index)}</span>`;
+                  return `<span class="selected-seat">SEAT ${getSeatLabel(index)}</span>`;
                 })
                 .join("")
         }
       </div>
 
       <dl class="booking-summary__rows">
-        <div><dt>Seats</dt><dd data-selected-count>${selectedSeats.length} seat${selectedSeats.length === 1 ? "" : "s"} selected</dd></div>
-        <div><dt>Total</dt><dd class="booking-summary__total" data-booking-total>₹${totalPrice}</dd></div>
+        <div>
+          <dt>ADMISSION PASSES</dt>
+          <dd data-selected-count>${selectedSeats.length} PASS${selectedSeats.length === 1 ? "" : "ES"}</dd>
+        </div>
+        <div>
+          <dt>TARIFF</dt>
+          <dd>₹200 / PASS</dd>
+        </div>
+        <div class="booking-summary__total-row">
+          <dt>TOTAL CHARGE</dt>
+          <dd class="booking-summary__total" data-booking-total>₹${totalPrice}</dd>
+        </div>
       </dl>
 
       <div class="booking-message" data-booking-message aria-live="polite"></div>
@@ -229,7 +243,7 @@ export async function Booking() {
         data-action="confirm-booking"
         ${selectedSeats.length === 0 ? "disabled" : ""}
       >
-        Confirm booking
+        AUTHORIZE ADMISSION & BOOK SEATS →
       </button>
     </section>
   </main>

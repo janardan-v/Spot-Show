@@ -10,32 +10,51 @@ export function BookingSummary(seats: Seat[]) {
 
   return `
     <aside class="booking-summary" aria-live="polite">
-      <p class="eyebrow">Your selection</p>
-      <h2 class="booking-summary__title">Summary</h2>
+      <div class="booking-summary__ticket-head">
+        <span class="booking-summary__stub-badge">ADMIT VOUCHER</span>
+        <span class="booking-summary__stub-no">N° 2030-AUD-1</span>
+      </div>
+
+      <h2 class="booking-summary__title">RESERVATION SUMMARY</h2>
 
       <div class="booking-summary__seats">
         ${
           selectedSeats.length === 0
-            ? `<p class="booking-summary__empty">No seats selected yet. Tap an available seat.</p>`
+            ? `<p class="booking-summary__empty">No seats selected yet. Choose seats from the auditorium map.</p>`
             : selectedSeats
                 .map((seat) => {
                   const index = seats.indexOf(seat);
-                  return `<span class="booking-summary__seat">${getSeatLabel(index)}</span>`;
+                  return `<span class="booking-summary__seat">SEAT ${getSeatLabel(index)}</span>`;
                 })
                 .join("")
         }
       </div>
 
+      <div class="booking-summary__perforation" aria-hidden="true">
+        <span class="booking-summary__notch booking-summary__notch--left"></span>
+        <span class="booking-summary__perf-line"></span>
+        <span class="booking-summary__notch booking-summary__notch--right"></span>
+      </div>
+
       <dl class="booking-summary__rows">
         <div>
-          <dt>Seats</dt>
-          <dd>${selectedSeats.length} selected</dd>
+          <dt>SELECTED SEATS</dt>
+          <dd>${selectedSeats.length} PASS${selectedSeats.length === 1 ? "" : "ES"}</dd>
         </div>
         <div>
-          <dt>Total</dt>
+          <dt>ADMIT TARIFF</dt>
+          <dd>₹200 / SEAT</dd>
+        </div>
+        <div class="booking-summary__total-row">
+          <dt>TOTAL AMOUNT</dt>
           <dd class="booking-summary__total">₹${totalPrice}</dd>
         </div>
       </dl>
+
+      <div class="booking-summary__barcode" aria-hidden="true">
+        <span class="booking-summary__barcode-lines"></span>
+        <span class="booking-summary__barcode-code">SPOTSHOW-2030-LOCK-TX</span>
+      </div>
 
       <button
         class="booking-summary__button"
@@ -43,9 +62,9 @@ export function BookingSummary(seats: Seat[]) {
         data-action="proceed-booking"
         ${selectedSeats.length === 0 ? "disabled" : ""}
       >
-        Proceed to booking
+        CONFIRM SEAT SELECTION →
       </button>
-      <p class="booking-summary__hint">You can review before paying.</p>
+      <p class="booking-summary__hint">Row-locked concurrency reservation backed by PostgreSQL.</p>
     </aside>
   `;
 }
