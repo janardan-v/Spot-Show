@@ -129,6 +129,7 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  console.log("ROUTE CLICK INTERCEPTED:", route);
   event.preventDefault();
   navigate(route);
 });
