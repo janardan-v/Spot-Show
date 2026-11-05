@@ -1,5 +1,5 @@
 import { Preloader, initPreloader } from "../components/home/Preloader";
-import { Hero, initHeroAutonomousEngine } from "../components/home/Hero";
+import { Hero } from "../components/home/Hero";
 
 export async function Home() {
   const preloader = Preloader();
@@ -7,7 +7,6 @@ export async function Home() {
 
   setTimeout(() => {
     initPreloader();
-    initHeroAutonomousEngine();
   }, 30);
 
   return `

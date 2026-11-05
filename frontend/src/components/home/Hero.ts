@@ -21,41 +21,6 @@ export interface HeroMovieData {
   indexStr: string;
 }
 
-export const DEFAULT_MOVIES_DATA: HeroMovieData[] = [
-  {
-    id: "a655588c-6b9c-421a-a8bc-f24649301764",
-    name: "Spider-Man: Brand New Day",
-    dateStr: "Thu, 15 Aug 2030 · 18:00",
-    seatsStr: `₹${SEAT_PRICE} · 100 Seats Total`,
-    poster: "/images/spiderman-brand-new-day.jpg",
-    indexStr: "[01 // 04]",
-  },
-  {
-    id: "989cfd20-ae3f-4ac1-81e6-b78d7da9480e",
-    name: "Avengers: Doomsday",
-    dateStr: "Fri, 16 Aug 2030 · 18:00",
-    seatsStr: `₹${SEAT_PRICE} · 100 Seats Total`,
-    poster: "/images/avengers-doomsday.jpg",
-    indexStr: "[02 // 04]",
-  },
-  {
-    id: "6be8a59b-193a-4f92-9458-af0f07ab7a64",
-    name: "Mahavatar Narasimha",
-    dateStr: "Sat, 17 Aug 2030 · 18:00",
-    seatsStr: `₹${SEAT_PRICE} · 100 Seats Total`,
-    poster: "/images/mahavatar-narasimha.png",
-    indexStr: "[03 // 04]",
-  },
-  {
-    id: "9f6be93b-1909-4364-8207-05816c2fa7ad",
-    name: "Mahavatar Parshuram",
-    dateStr: "Sun, 18 Aug 2030 · 18:00",
-    seatsStr: `₹${SEAT_PRICE} · 100 Seats Total`,
-    poster: "/images/mahavatar-parshuram.png",
-    indexStr: "[04 // 04]",
-  },
-];
-
 const DESKTOP_SLOTS = [
   // Slot 0: Active Foreground Focus (Center-Left prominent, sharpest focus)
   { x: 90,  y: 40,  z: 50,  rotY: -3,  rotZ: -1, scale: 1.05,  shadowAlpha: 0.32, opacity: 1.0 },
@@ -75,12 +40,22 @@ const HARMONICS = [
 ];
 
 export async function Hero() {
-  let moviesData = DEFAULT_MOVIES_DATA;
+  let fetchedMovies: HeroMovieData[] | null = null;
 
   try {
     const shows = await fetchShows();
-    if (shows && shows.length >= 4) {
-      moviesData = shows.slice(0, 4).map((m: Movie, idx: number) => {
+
+    if (shows && shows.length > 0) {
+      const distinct = shows.slice(0, 4);
+      // The hero composition is built around four disc slots. When the
+      // archive holds fewer films, repeat the real entries so every slot
+      // still links to an existing show instead of a placeholder ID.
+      const slots = Array.from(
+        { length: 4 },
+        (_, i) => distinct[i % distinct.length],
+      );
+
+      fetchedMovies = slots.map((m: Movie, idx: number) => {
         const d = new Date(m.showDate);
         const dateFormatted = !isNaN(d.getTime())
           ? d.toLocaleDateString(undefined, {
@@ -99,13 +74,44 @@ export async function Hero() {
           dateStr: dateFormatted,
           seatsStr: `₹${SEAT_PRICE} · ${m.totalSeats} Seats Total`,
           poster,
-          indexStr: `[0${idx + 1} // 0${shows.length}]`,
+          indexStr: `[0${(idx % distinct.length) + 1} // 0${distinct.length}]`,
         };
       });
     }
   } catch (err) {
-    console.warn("Using default curated archive movies:", err);
+    console.warn("Unable to load archival showtimes:", err);
   }
+
+  if (!fetchedMovies) {
+    // Without real show IDs the Reserve CTA would navigate to a feature
+    // that does not exist in the archive, so surface an explicit error
+    // state instead of silently falling back to placeholder data.
+    setTimeout(() => {
+      document
+        .querySelector<HTMLButtonElement>('[data-action="reload-archive"]')
+        ?.addEventListener("click", () => window.location.reload());
+    });
+
+    return `
+      <section class="hero-archival" id="hero-archival" aria-label="SpotShow Object-Led Cinema Archive">
+        <div class="hero-archival__inner">
+          <header class="hero-archival__masthead">
+            <div class="hero-archival__brand">
+              <span class="hero-archival__brand-tag">CURATED 2030 ARCHIVAL SELECTION</span>
+            </div>
+          </header>
+          <div class="empty-state" role="alert">
+            <p>ARCHIVE UNAVAILABLE — Unable to load the screening schedule.</p>
+            <button type="button" class="btn-primary" data-action="reload-archive">
+              TRY AGAIN
+            </button>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  const moviesData = fetchedMovies;
 
   // Trigger autonomous engine mount with retry guarantee
   setTimeout(() => {
@@ -271,8 +277,8 @@ export async function Hero() {
   `;
 }
 
-export function initHeroAutonomousEngine(movies?: HeroMovieData[]) {
-  const dataset = movies ?? DEFAULT_MOVIES_DATA;
+export function initHeroAutonomousEngine(movies: HeroMovieData[]) {
+  const dataset = movies;
   const container = document.getElementById("hero-archival");
   const disc0 = document.getElementById("hero-disc-0");
 
